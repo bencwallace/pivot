@@ -102,6 +102,10 @@ rot rot::operator*(const rot &r) const {
     return rot(cos_ * r.cos_ - sin_ * r.sin_, sin_ * r.cos_ + cos_ * r.sin_);
 }
 
+rot rot::inverse() const {
+    return rot(cos_, -sin_);
+}
+
 std::string rot::to_string() const {
     return "(" + std::to_string(cos_) + ", " + std::to_string(sin_) + ")";
 }

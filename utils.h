@@ -56,6 +56,8 @@ public:
 
     rot operator*(const rot &r) const;
 
+    rot inverse() const;
+
     std::string to_string() const;
 
 private:
