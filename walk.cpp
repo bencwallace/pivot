@@ -39,13 +39,9 @@ std::pair<int, point *> walk::try_rand_pivot() {
     return {step, try_pivot(step, r)};
 }
 
-void walk::set(int i, point p) {
-    steps_[i] = p;
-}
-
 void walk::do_pivot(int step, point *new_points) {
     for (int i = step + 1; i < num_steps_; ++i) {
-        set(i, new_points[i - step - 1]);
+        steps_[i] = new_points[i - step - 1];
     }
 }
 
@@ -135,12 +131,6 @@ point *occupied_walk::try_pivot(int step, rot r) {
         new_points[i - step - 1] = q;
     }
     return new_points;
-}
-
-void occupied_walk::set(int i, point p) {
-    occupied_.erase(steps_[i]);
-    steps_[i] = p;
-    occupied_[p] = i;
 }
 
 void occupied_walk::do_pivot(int step, point *new_points) {
