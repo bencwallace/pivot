@@ -33,6 +33,8 @@ protected:
 
     virtual void set(int i, point p);
 
+    virtual void do_pivot(int step, point *new_points);
+
     point pivot_point(int step, int i, rot r);
 
 };
