@@ -80,10 +80,7 @@ bool walk::rand_pivot(int num_workers) {
         auto step = steps[i];
         auto new_points = proposals[i];
         if (!success && new_points != nullptr) {
-            // TODO: this seems to be a bigger bottleneck than expected
-            for (int j = step + 1; j < num_steps_; ++j) {
-                set(j, new_points[j - step - 1]);
-            }
+            do_pivot(step, new_points);
             success = true;
         }
     }
