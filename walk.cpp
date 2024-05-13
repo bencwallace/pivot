@@ -32,13 +32,17 @@ point *walk::try_pivot(int step, rot r) {
     return new_points;
 }
 
+void walk::set(int i, point p) {
+    steps_[i] = p;
+}
+
 bool walk::pivot(int step, rot r) {
     auto new_points = try_pivot(step, r);
     if (new_points == nullptr) {
         return false;
     }
     for (int i = step + 1; i < num_steps_; ++i) {
-        steps_[i] = new_points[i - step - 1];
+        set(i, new_points[i - step - 1]);
     }
     delete[] new_points;
     return true;
@@ -71,4 +75,45 @@ void walk::export_csv(std::string path) {
 point walk::pivot_point(int step, int i, rot r) {
     auto p = steps_[step];
     return p + r * (steps_[i] - p);
+}
+
+/* occupied_walk */
+
+occupied_walk::occupied_walk(int num_steps) : walk(num_steps) {
+    for (int i = 0; i < num_steps; ++i) {
+        occupied_[steps_[i]] = {i};
+    }
+}
+
+point *occupied_walk::try_pivot(int step, rot r) {
+    point *new_points = new point[num_steps_ - step - 1];
+    for (int i = step + 1; i < num_steps_; ++i) {
+        auto q = pivot_point(step, i, r);
+        auto it = occupied_.find(q);
+        if (it != occupied_.end() && *it->second.cbegin() <= step) {
+            delete[] new_points;
+            return nullptr;
+        }
+        new_points[i - step - 1] = q;
+    }
+    return new_points;
+}
+
+void occupied_walk::set(int i, point p) {
+    auto it = occupied_.find(steps_[i]);
+    if (it != occupied_.end()) {
+        it->second.erase(i);
+        if (it->second.empty()) {
+            occupied_.erase(it);
+        }
+    }
+
+    steps_[i] = p;
+
+    auto jt = occupied_.find(p);
+    if (jt != occupied_.end()) {
+        jt->second.insert(i);
+    } else {
+        occupied_[p] = {i};
+    }
 }

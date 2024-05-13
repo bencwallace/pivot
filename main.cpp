@@ -9,6 +9,7 @@ namespace po = boost::program_options;
 int main(int argc, char **argv) {
     int num_steps;
     int iters;
+    bool occupied;
     bool require_success;
     bool verify;
     bool save;
@@ -19,6 +20,7 @@ int main(int argc, char **argv) {
         ("help", "produce help message")
         ("steps", po::value<int>(&num_steps), "number of steps")
         ("iters", po::value<int>(&iters), "number of iterations")
+        ("occupied", po::value<bool>(&occupied), "use occupied walk")
         ("success", po::value<bool>(&require_success)->default_value(false), "require success")
         ("verify", po::value<bool>(&verify)->default_value(false), "verify")
         ("save", po::value<bool>(&save)->default_value(true), "save")
@@ -33,7 +35,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    walk w(num_steps);
+    walk *w = occupied ? new occupied_walk(num_steps) : new walk(num_steps);
 
     int num_success = 0;
     int num_iter = 0;
@@ -44,7 +46,7 @@ int main(int argc, char **argv) {
             std::cout << "Iterations: " << num_iter << " / Successes: " << num_success << " / Success rate: " << num_success / static_cast<float>(num_iter) << std::endl;
         }
 
-        num_success += w.rand_pivot();
+        num_success += w->rand_pivot();
         ++num_iter;
 
         if (require_success) {
@@ -57,10 +59,10 @@ int main(int argc, char **argv) {
     }
     if (verify) {
         std::cout << "Verifying self-avoiding\n";
-        assert(w.self_avoiding());
+        assert(w->self_avoiding());
     }
     if (save) {
         std::cout << "Saving to walk.csv\n";
-        w.export_csv("walk.csv");
+        w->export_csv("walk.csv");
     }
 }
