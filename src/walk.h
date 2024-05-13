@@ -21,17 +21,17 @@ public:
 
   ~walk();
 
-  point *try_pivot(int step, rot r);
+  point *try_pivot(int step, const rot &r) const;
 
-  std::pair<int, point *> try_rand_pivot();
+  std::pair<int, point *> try_rand_pivot() const;
 
   bool rand_pivot();
 
   bool rand_pivot(int num_workers);
 
-  bool self_avoiding();
+  bool self_avoiding() const;
 
-  void export_csv(std::string path);
+  void export_csv(const std::string &path) const;
 
 protected:
   int num_steps_;
@@ -40,7 +40,7 @@ protected:
 
   void do_pivot(int step, point *new_points);
 
-  point pivot_point(int step, int i, rot r);
+  point pivot_point(int step, int i, rot r) const;
 };
 
 } // namespace pivot

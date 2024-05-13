@@ -17,7 +17,7 @@ walk::walk(int num_steps) : num_steps_(num_steps), occupied_(num_steps, point_ha
 
 walk::~walk() { delete[] steps_; }
 
-std::pair<int, point *> walk::try_rand_pivot() {
+std::pair<int, point *> walk::try_rand_pivot() const {
   auto step = std::rand() % num_steps_;
   auto r = rot::rand();
   return {step, try_pivot(step, r)};
@@ -66,7 +66,7 @@ bool walk::rand_pivot(int num_workers) {
   return success;
 }
 
-bool walk::self_avoiding() {
+bool walk::self_avoiding() const {
   for (int i = 0; i < num_steps_; ++i) {
     for (int j = i + 1; j < num_steps_; ++j) {
       if (steps_[i] == steps_[j]) {
@@ -77,19 +77,19 @@ bool walk::self_avoiding() {
   return true;
 }
 
-void walk::export_csv(std::string path) {
+void walk::export_csv(const std::string &path) const {
   std::ofstream file(path);
   for (int i = 0; i < num_steps_; ++i) {
     file << steps_[i].x() << "," << steps_[i].y() << std::endl;
   }
 }
 
-point walk::pivot_point(int step, int i, rot r) {
+point walk::pivot_point(int step, int i, rot r) const {
   auto p = steps_[step];
   return p + r * (steps_[i] - p);
 }
 
-point *walk::try_pivot(int step, rot r) {
+point *walk::try_pivot(int step, const rot &r) const {
   point *new_points = new point[num_steps_ - step - 1];
   for (int i = step + 1; i < num_steps_; ++i) {
     auto q = pivot_point(step, i, r);

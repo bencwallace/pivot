@@ -35,7 +35,7 @@ public:
 
   bool intersect() const;
 
-  bool try_pivot(int n, rot r);
+  bool try_pivot(int n, const rot &r);
 
   bool rand_pivot();
 
@@ -43,9 +43,9 @@ public:
 
   std::vector<point> steps() const;
 
-  void export_csv(std::string path);
+  void export_csv(const std::string &path) const;
 
-  void todot(const std::string &path);
+  void todot(const std::string &path) const;
 
   static walk_tree *leaf();
 
@@ -72,7 +72,7 @@ private:
   void set_right(walk_tree *right);
   void merge();
 
-  Agnode_t *todot(Agraph_t *g);
+  Agnode_t *todot(Agraph_t *g) const;
 };
 
 bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_anchor, const point &r_anchor,

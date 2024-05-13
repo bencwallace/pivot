@@ -182,7 +182,7 @@ std::vector<point> walk_tree::steps() const {
   return result;
 }
 
-void walk_tree::export_csv(std::string path) {
+void walk_tree::export_csv(const std::string &path) const {
   std::ofstream file(path);
   auto steps = this->steps();
   for (auto &step : steps) {
@@ -190,7 +190,7 @@ void walk_tree::export_csv(std::string path) {
   }
 }
 
-Agnode_t *walk_tree::todot(Agraph_t *g) {
+Agnode_t *walk_tree::todot(Agraph_t *g) const {
   auto name = std::to_string(id_);
   Agnode_t *node = agnode(g, (char *)name.c_str(), 1);
   agset(node, (char *)"shape", (char *)"box");
@@ -225,7 +225,7 @@ Agnode_t *walk_tree::todot(Agraph_t *g) {
   return node;
 }
 
-void walk_tree::todot(const std::string &path) {
+void walk_tree::todot(const std::string &path) const {
   GVC_t *gvc = gvContext();
   Agraph_t *g = agopen((char *)"G", Agdirected, nullptr);
   agattr(g, AGNODE, (char *)"shape", (char *)"circle");
@@ -274,7 +274,7 @@ bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_
   }
 }
 
-bool walk_tree::try_pivot(int n, rot r) {
+bool walk_tree::try_pivot(int n, const rot &r) {
   shuffle_up(n);
   symm_ = symm_ * r;
   auto success = !intersect();
