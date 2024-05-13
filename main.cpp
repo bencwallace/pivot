@@ -4,6 +4,7 @@
 #include <cstring>
 #include <fstream>
 #include <iostream>
+#include <set>
 #include <string>
 #include <tuple>
 #include <unordered_map>
@@ -104,7 +105,7 @@ public:
         steps_ = new point[num_steps];
         for (int i = 0; i < num_steps; ++i) {
             steps_[i] = point(i, 0);
-            occupied_[steps_[i]] = i;
+            occupied_[steps_[i]] = {i};
         }
     }
 
@@ -116,7 +117,8 @@ public:
         point *new_points = new point[num_steps_ - step - 1];
         for (int i = step + 1; i < num_steps_; ++i) {
             auto q = pivot_point(step, i, r);
-            if (occupied_.find(q) != occupied_.end()) {
+            auto it = occupied_.find(q);
+            if (it != occupied_.end() && *it->second.cbegin() <= step) {
                 delete[] new_points;
                 return nullptr;
             }
@@ -164,7 +166,7 @@ public:
 private:
     int num_steps_;
     point *steps_;
-    std::unordered_map<point, int, point_hash> occupied_;
+    std::unordered_map<point, std::set<int>, point_hash> occupied_;
 
     point pivot_point(int step, int i, rot r) {
         auto p = steps_[step];
@@ -172,9 +174,22 @@ private:
     }
 
     void set(int i, point p) {
-        occupied_.erase(steps_[i]);
+        auto it = occupied_.find(steps_[i]);
+        if (it != occupied_.end()) {
+            it->second.erase(i);
+            if (it->second.empty()) {
+                occupied_.erase(it);
+            }
+        }
+
         steps_[i] = p;
-        occupied_[p] = i;
+
+        auto jt = occupied_.find(p);
+        if (jt != occupied_.end()) {
+            jt->second.insert(i);
+        } else {
+            occupied_[p] = {i};
+        }
     }
 
 };
