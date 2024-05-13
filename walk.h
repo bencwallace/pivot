@@ -51,4 +51,6 @@ private:
 
     void set(int i, point p) override;
 
+    void do_pivot(int step, point *new_points) override;
+
 };

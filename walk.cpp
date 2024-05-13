@@ -170,3 +170,13 @@ void occupied_walk::set(int i, point p) {
         occupied_[p] = {i};
     }
 }
+
+void occupied_walk::do_pivot(int step, point *new_points) {
+    for (int i = step + 1; i < num_steps_; ++i) {
+        occupied_.erase(steps_[i]);
+    }
+    for (int i = step + 1; i < num_steps_; ++i) {
+        steps_[i] = new_points[i - step - 1];
+        occupied_[steps_[i]].insert(i);
+    }
+}
