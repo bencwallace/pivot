@@ -1,6 +1,7 @@
 #include <fstream>
 #include <future>
 #include <unordered_set>
+#include <vector>
 
 #include "walk.h"
 
@@ -39,9 +40,9 @@ bool walk::rand_pivot(int num_workers) {
         return rand_pivot();
     }
 
-    int steps[num_workers];
-    point *proposals[num_workers];
-    std::future<std::pair<int, point *>> futures[num_workers];
+    std::vector<int> steps(num_workers);
+    std::vector<point *> proposals(num_workers);
+    std::vector<std::future<std::pair<int, point *>> > futures(num_workers);
     for (int i = 0; i < num_workers; ++i) {
         futures[i] = std::async(&walk::try_rand_pivot, this);
     }

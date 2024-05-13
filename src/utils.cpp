@@ -130,7 +130,7 @@ rot::rot(angle a) {
 rot::rot(point p, point q) {
     auto dx = q.x() - p.x();
     auto dy = q.y() - p.y();
-    if (!(std::abs(dx) == 1 ^ std::abs(dy) == 1)) {
+    if (!((std::abs(dx) == 1) ^ (std::abs(dy) == 1))) {
         throw std::invalid_argument("Points are not adjacent");
     }
     if (dx == 0) {

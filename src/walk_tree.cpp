@@ -10,11 +10,11 @@ walk_tree *walk_tree::line(int num_sites, bool balanced) {
     if (num_sites < 2) {
         throw std::invalid_argument("num_sites must be at least 2");
     }
-    point steps[num_sites];
+    std::vector<point> steps(num_sites);
     for (int i = 0; i < num_sites; ++i) {
         steps[i] = point(i + 1, 0);
     }
-    walk_tree *root = balanced ? balanced_rep(num_sites, steps) : pivot_rep(num_sites, steps);
+    walk_tree *root = balanced ? balanced_rep(num_sites, &steps[0]) : pivot_rep(num_sites, &steps[0]);
     return root;
 }
 
@@ -333,8 +333,8 @@ bool walk_tree::rand_pivot() {
 
 bool walk_tree::self_avoiding() const {
     auto steps = this->steps();
-    for (int i = 0; i < steps.size(); ++i) {
-        for (int j = i + 1; j < steps.size(); ++j) {
+    for (size_t i = 0; i < steps.size(); ++i) {
+        for (size_t j = i + 1; j < steps.size(); ++j) {
             if (steps[i] == steps[j]) {
                 return false;
             }
