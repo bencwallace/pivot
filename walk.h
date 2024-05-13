@@ -13,7 +13,7 @@ public:
 
     ~walk();
 
-    virtual point *try_pivot(int step, rot r);
+    point *try_pivot(int step, rot r);
 
     std::pair<int, point *> try_rand_pivot();
 
@@ -28,23 +28,10 @@ public:
 protected:
     int num_steps_;
     point *steps_;
-
-    virtual void do_pivot(int step, point *new_points);
-
-    point pivot_point(int step, int i, rot r);
-
-};
-
-class occupied_walk : public walk {
-
-public:
-    occupied_walk(int num_steps);
-
-    point *try_pivot(int step, rot r) override;
-
-private:
     std::unordered_map<point, int, point_hash> occupied_;
 
-    void do_pivot(int step, point *new_points) override;
+    void do_pivot(int step, point *new_points);
+
+    point pivot_point(int step, int i, rot r);
 
 };

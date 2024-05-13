@@ -8,6 +8,7 @@ walk::walk(int num_steps) : num_steps_(num_steps) {
     steps_ = new point[num_steps];
     for (int i = 0; i < num_steps; ++i) {
         steps_[i] = point(i, 0);
+        occupied_[steps_[i]] = i;
     }
 }
 
@@ -15,34 +16,10 @@ walk::~walk() {
     delete[] steps_;
 }
 
-point *walk::try_pivot(int step, rot r) {
-    std::unordered_set<point, point_hash> init_segment;
-    for (int i = 0; i <= step; ++i) {
-        init_segment.insert(steps_[i]);
-    }
-
-    point *new_points = new point[num_steps_ - step - 1];
-    for (int i = step + 1; i < num_steps_; ++i) {
-        auto q = pivot_point(step, i, r);
-        if (init_segment.find(q) != init_segment.end()) {
-            delete[] new_points;
-            return nullptr;
-        }
-        new_points[i - step - 1] = q;
-    }
-    return new_points;
-}
-
 std::pair<int, point *> walk::try_rand_pivot() {
     auto step = std::rand() % num_steps_;
     auto r = rot::rand();
     return {step, try_pivot(step, r)};
-}
-
-void walk::do_pivot(int step, point *new_points) {
-    for (int i = step + 1; i < num_steps_; ++i) {
-        steps_[i] = new_points[i - step - 1];
-    }
 }
 
 bool walk::rand_pivot() {
@@ -111,15 +88,7 @@ point walk::pivot_point(int step, int i, rot r) {
     return p + r * (steps_[i] - p);
 }
 
-/* occupied_walk */
-
-occupied_walk::occupied_walk(int num_steps) : walk(num_steps) {
-    for (int i = 0; i < num_steps; ++i) {
-        occupied_[steps_[i]] = {i};
-    }
-}
-
-point *occupied_walk::try_pivot(int step, rot r) {
+point *walk::try_pivot(int step, rot r) {
     point *new_points = new point[num_steps_ - step - 1];
     for (int i = step + 1; i < num_steps_; ++i) {
         auto q = pivot_point(step, i, r);
@@ -133,7 +102,7 @@ point *occupied_walk::try_pivot(int step, rot r) {
     return new_points;
 }
 
-void occupied_walk::do_pivot(int step, point *new_points) {
+void walk::do_pivot(int step, point *new_points) {
     for (int i = step + 1; i < num_steps_; ++i) {
         occupied_.erase(steps_[i]);
     }
