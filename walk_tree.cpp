@@ -33,4 +33,46 @@ walk_tree walk_tree::pivot_rep(int num_sites, point *steps) {
 
 walk_tree::walk_tree(int id, int num_sites, rot symm) : id_(id), num_sites_(num_sites), symm_(symm) {}
 
+Agnode_t *walk_tree::todot(Agraph_t *g) {
+    auto name = std::to_string(id_);
+    Agnode_t *node = agnode(g, (char *) name.c_str(), 1);
+    agset(node, (char *) "shape", (char *) "box");
+
+    auto label = "id: " + std::to_string(id_) + "\\l";
+    label += "num_sites: " + std::to_string(num_sites_) + "\\l";
+    label += "symm: " + symm_.to_string();
+    agset(node, (char *) "label", (char *) label.c_str());
+
+    if (left_ != nullptr) {
+        agedge(g, node, left_->todot(g), nullptr, 1);
+    } else {
+        auto left_node = agnode(g, (char *) (name + "L").c_str(), 1);
+        agset(left_node, (char *) "label", (char *) std::to_string(id_ - 1).c_str());
+        agedge(g, node, left_node, nullptr, 1);
+    }
+    if (right_ != nullptr) {
+        agedge(g, node, right_->todot(g), nullptr, 1);
+    } else {
+        auto right_node = agnode(g, (char *) (name + "R").c_str(), 1);
+        agset(right_node, (char *) "label", (char *) std::to_string(id_).c_str());
+        agedge(g, node, right_node, nullptr, 1);
+    }
+    return node;
+}
+
+void walk_tree::todot(std::string path) {
+    GVC_t *gvc = gvContext();
+    Agraph_t *g = agopen((char *) "G", Agdirected, nullptr);
+    agattr(g, AGNODE, (char *) "shape", (char *) "circle");
+
+    todot(g);
+
+    gvLayout(gvc, g, "dot");
+    gvRenderFilename(gvc, g, "dot", path.c_str());
+
+    gvFreeLayout(gvc, g);
+    agclose(g);
+    gvFreeContext(gvc);
+}
+
 } // namespace pivot

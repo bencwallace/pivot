@@ -1,5 +1,7 @@
 #pragma once
 
+#include <gvc.h>
+
 #include "utils.h"
 
 namespace pivot {
@@ -11,6 +13,8 @@ public:
 
     static walk_tree pivot_rep(int num_sites, point *steps);
 
+    void todot(std::string path);
+
 private:
     int id_;
     int num_sites_;
@@ -20,6 +24,8 @@ private:
     rot symm_;
 
     walk_tree(int id, int num_sites, rot symm);
+
+    Agnode_t *todot(Agraph_t *g);
 
 };
 
