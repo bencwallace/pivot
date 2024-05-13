@@ -5,7 +5,7 @@
 
 namespace pivot {
 
-walk_tree walk_tree::line(int num_sites) {
+walk_tree *walk_tree::line(int num_sites, bool balanced) {
     if (num_sites < 2) {
         throw std::invalid_argument("num_sites must be at least 2");
     }
@@ -13,22 +13,43 @@ walk_tree walk_tree::line(int num_sites) {
     for (int i = 0; i < num_sites; ++i) {
         steps[i] = point(i, 0);
     }
-    walk_tree root = pivot_rep(num_sites, steps);
+    walk_tree *root = balanced ? balanced_rep(num_sites, steps) : pivot_rep(num_sites, steps);
     return root;
 }
 
-walk_tree walk_tree::pivot_rep(int num_sites, point *steps) {
+walk_tree *walk_tree::pivot_rep(int num_sites, point *steps) {
     if (num_sites < 2) {
         throw std::invalid_argument("num_sites must be at least 2");
     }
-    walk_tree root = walk_tree(1, num_sites, rot(steps[0], steps[1]));
-    auto node = &root;
+    walk_tree *root = new walk_tree(1, num_sites, rot(steps[0], steps[1]));
+    auto node = root;
     for (int i = 0; i < num_sites - 2; ++i) {
         node->right_ = new walk_tree(i + 2, num_sites - i - 1, rot(steps[i + 1], steps[i + 2]));
         node->right_->parent_ = node;
         node = node->right_;
     }
     return root;
+}
+
+walk_tree *walk_tree::balanced_rep(int num_sites, point *steps, int start) {
+    if (num_sites < 2) {
+        throw std::invalid_argument("num_sites must be at least 2");
+    }
+    int n = std::floor((1 + num_sites) / 2.0);
+    walk_tree *root = new walk_tree(start + n, num_sites, rot(steps[n - 1], steps[n]));
+    if (n > 1) {
+        root->left_ = balanced_rep(n, steps, start);
+        root->left_->parent_ = root;
+    }
+    if (num_sites - n > 1) {
+        root->right_ = balanced_rep(num_sites - n, steps + n, start + n);
+        root->right_->parent_ = root;
+    }
+    return root;
+}
+
+walk_tree *walk_tree::balanced_rep(int num_sites, point *steps) {
+    return balanced_rep(num_sites, steps, 0);
 }
 
 walk_tree::walk_tree(int id, int num_sites, rot symm) : id_(id), num_sites_(num_sites), symm_(symm) {}

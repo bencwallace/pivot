@@ -9,9 +9,11 @@ namespace pivot {
 class walk_tree {
 
 public:
-    static walk_tree line(int num_sites);
+    static walk_tree *line(int num_sites, bool balanced = true);
 
-    static walk_tree pivot_rep(int num_sites, point *steps);
+    static walk_tree *pivot_rep(int num_sites, point *steps);
+
+    static walk_tree *balanced_rep(int num_sites, point *steps);
 
     ~walk_tree();
 
@@ -34,6 +36,8 @@ private:
     rot symm_;
 
     walk_tree(int id, int num_sites, rot symm);
+
+    static walk_tree *balanced_rep(int num_sites, point *steps, int start);
 
     void set_left(walk_tree *left);
     void set_right(walk_tree *right);
