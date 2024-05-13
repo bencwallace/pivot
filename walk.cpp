@@ -49,18 +49,6 @@ void walk::do_pivot(int step, point *new_points) {
     }
 }
 
-bool walk::pivot(int step, rot r) {
-    auto new_points = try_pivot(step, r);
-    if (new_points == nullptr) {
-        return false;
-    }
-    for (int i = step + 1; i < num_steps_; ++i) {
-        set(i, new_points[i - step - 1]);
-    }
-    delete[] new_points;
-    return true;
-}
-
 bool walk::rand_pivot() {
     auto [step, new_points] = try_rand_pivot();
     if (new_points == nullptr) {

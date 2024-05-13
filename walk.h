@@ -17,8 +17,6 @@ public:
 
     std::pair<int, point *> try_rand_pivot();
 
-    bool pivot(int step, rot r);
-
     bool rand_pivot();
 
     bool rand_pivot(int num_workers);
