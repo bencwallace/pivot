@@ -34,18 +34,21 @@ walk_tree *walk_tree::pivot_rep(int num_sites, point *steps) {
 }
 
 walk_tree *walk_tree::balanced_rep(int num_sites, point *steps, int start) {
-    if (num_sites < 2) {
-        throw std::invalid_argument("num_sites must be at least 2");
+    if (num_sites < 1) {
+        throw std::invalid_argument("num_sites must be at least 1");
+    }
+    if (num_sites == 1) {
+        return leaf();
     }
     int n = std::floor((1 + num_sites) / 2.0);
     walk_tree *root = new walk_tree(
         start + n - 1, num_sites, rot(steps[n - 1], steps[n]), box(num_sites, steps), steps[num_sites - 1] - steps[0] + point(1, 0)
     );
-    if (n > 1) {
+    if (n >= 1) {
         root->left_ = balanced_rep(n, steps, start);
         root->left_->parent_ = root;
     }
-    if (num_sites - n > 1) {
+    if (num_sites - n >= 1) {
         root->right_ = balanced_rep(num_sites - n, steps + n, start + n);
         root->right_->parent_ = root;
     }
@@ -68,9 +71,13 @@ walk_tree::~walk_tree() {
     }
 }
 
+bool walk_tree::is_leaf() const {
+    return left_ == nullptr && right_ == nullptr;
+}
+
 void walk_tree::rotate_left() {
-    if (right_ == nullptr) {
-        throw std::invalid_argument("right_ must not be null");
+    if (right_->is_leaf()) {
+        throw std::invalid_argument("can't rotate left on a leaf node");
     }
     auto temp_tree = right_;
 
@@ -95,8 +102,8 @@ void walk_tree::rotate_left() {
 }
 
 void walk_tree::rotate_right() {
-    if (left_ == nullptr) {
-        throw std::invalid_argument("left_ must not be null");
+    if (left_->is_leaf()) {
+        throw std::invalid_argument("can't rotate right on a leaf node");
     }
     auto temp_tree = left_;
 
@@ -121,23 +128,21 @@ void walk_tree::rotate_right() {
 }
 
 void walk_tree::shuffle_up(int id) {
-    int left_sites = left_ == nullptr ? 1 : left_->num_sites_;
-    if (id < left_sites) {
+    if (id < left_->num_sites_) {
         left_->shuffle_up(id);
         rotate_right();
-    } else if (id > left_sites) {
-        right_->shuffle_up(id - left_sites);
+    } else if (id > left_->num_sites_) {
+        right_->shuffle_up(id - left_->num_sites_);
         rotate_left();
     }
 }
 
 void walk_tree::shuffle_down() {
     int id = std::floor((num_sites_ + 1) / 2.0);
-    int left_sites = left_ == nullptr ? 1 : left_->num_sites_;
-    if (id < left_sites) {
+    if (id < left_->num_sites_) {
         rotate_right();
         right_->shuffle_down();
-    } else if (id > left_sites) {
+    } else if (id > left_->num_sites_) {
         rotate_left();
         left_->shuffle_down();
     }
@@ -158,34 +163,27 @@ void walk_tree::set_right(walk_tree *right) {
 }
 
 void walk_tree::merge() {
-    int left_sites = left_ == nullptr ? 1 : left_->num_sites_;
-    int right_sites = right_ == nullptr ? 1 : right_->num_sites_;
-    num_sites_ = left_sites + right_sites;
+    num_sites_ = left_->num_sites_ + right_->num_sites_;
 
-    auto left_box = left_ == nullptr ? box(interval(1, 1), interval(0, 0)) : left_->bbox_;
-    auto right_box = right_ == nullptr ? box(interval(1, 1), interval(0, 0)) : right_->bbox_;
-    auto left_end = left_ == nullptr ? point(1, 0) : left_->end_;
-    auto right_end = right_ == nullptr ? point(1, 0) : right_->end_;
-    bbox_ = left_box + (left_end + symm_ * right_box);
-    end_ = left_end + symm_ * right_end;
+    bbox_ = left_->bbox_ + (left_->end_ + symm_ * right_->bbox_);
+    end_ = left_->end_ + symm_ * right_->end_;
 }
 
 std::vector<point> walk_tree::steps() const {
     std::vector<point> result;
+    if (is_leaf()) {
+        result.push_back(end_);
+    }
+
     if (left_ != nullptr) {
         auto left_steps = left_->steps();
         result.insert(result.begin(), left_steps.begin(), left_steps.end());
-    } else {
-        result.push_back(point(1, 0));
     }
     if (right_ != nullptr) {
         auto right_steps = right_->steps();
         for (auto &step : right_steps) {
             result.push_back(left_->end_ + symm_ * step);
         }
-    } else {
-        auto left_end = left_ == nullptr ? point(1, 0) : left_->end_;
-        result.push_back(left_end + symm_ * point(1, 0));
     }
     return result;
 }
@@ -211,17 +209,23 @@ Agnode_t *walk_tree::todot(Agraph_t *g) {
     agset(node, (char *) "label", (char *) label.c_str());
 
     if (left_ != nullptr) {
-        agedge(g, node, left_->todot(g), nullptr, 1);
-    } else {
-        auto left_node = agnode(g, (char *) (name + "L").c_str(), 1);
-        agset(left_node, (char *) "label", (char *) std::to_string(id_ - 1).c_str());
+        Agnode_t *left_node;
+        if (left_->is_leaf()) {
+            left_node = agnode(g, (char *) (name + "L").c_str(), 1);
+            agset(left_node, (char *) "label", (char *) std::to_string(id_ - 1).c_str());
+        } else {
+            left_node = left_->todot(g);
+        }
         agedge(g, node, left_node, nullptr, 1);
     }
     if (right_ != nullptr) {
-        agedge(g, node, right_->todot(g), nullptr, 1);
-    } else {
-        auto right_node = agnode(g, (char *) (name + "R").c_str(), 1);
-        agset(right_node, (char *) "label", (char *) std::to_string(id_).c_str());
+        Agnode_t *right_node;
+        if (right_->is_leaf()) {
+            right_node = agnode(g, (char *) (name + "R").c_str(), 1);
+            agset(right_node, (char *) "label", (char *) std::to_string(id_).c_str());
+        } else {
+            right_node = right_->todot(g);
+        }
         agedge(g, node, right_node, nullptr, 1);
     }
     return node;
@@ -242,11 +246,18 @@ void walk_tree::todot(std::string path) {
     gvFreeContext(gvc);
 }
 
+walk_tree *walk_tree::leaf_ = nullptr;
+
+walk_tree *walk_tree::leaf() {
+    if (!leaf_) {
+        leaf_ = new walk_tree(0, 1, rot(), box(interval(1, 1), interval(0, 0)), point(1, 0));
+    }
+    return leaf_;
+}
+
 bool walk_tree::intersect() const {
     // TODO: double check anchor points
-    auto left_end = left_ == nullptr ? point(1, 0) : left_->end_;
-    auto right_symm = right_ == nullptr ? rot() : right_->symm_;
-    return ::pivot::intersect(left_, right_, point(), left_end, rot(), right_symm);
+    return ::pivot::intersect(left_, right_, point(), left_->end_, rot(), right_->symm_);
 }
 
 bool intersect(
@@ -257,10 +268,8 @@ bool intersect(
     const rot &l_symm,
     const rot &r_symm
 ) {
-    auto left_box = l_walk == nullptr ? box(interval(1, 1), interval(0, 0)) : l_walk->bbox_;
-    auto right_box = r_walk == nullptr ? box(interval(1, 1), interval(0, 0)) : r_walk->bbox_;
-    auto l_box = l_anchor + l_symm * left_box;
-    auto r_box = r_anchor + r_symm * right_box;
+    auto l_box = l_anchor + l_symm * l_walk->bbox_;
+    auto r_box = r_anchor + r_symm * r_walk->bbox_;
     if ((l_box * r_box).empty() || (l_walk->num_sites_ <= 2 && r_walk->num_sites_ <= 2)) {
         return false;
     }

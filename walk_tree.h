@@ -19,6 +19,8 @@ public:
 
     ~walk_tree();
 
+    bool is_leaf() const;
+
     void rotate_left();
 
     void rotate_right();
@@ -37,6 +39,8 @@ public:
 
     void todot(std::string path);
 
+    static walk_tree *leaf();
+
     friend bool intersect(
         const walk_tree *l_walk,
         const walk_tree *r_walk,
@@ -54,6 +58,8 @@ private:
     rot symm_;
     box bbox_;
     point end_;
+
+    static walk_tree *leaf_;
 
     walk_tree(int id, int num_sites, rot symm, box bbox, point end);
 
@@ -74,6 +80,5 @@ bool intersect(
     const point &r_anchor,
     const rot &l_symm,
     const rot &r_symm);
-
 
 } // namespace pivot
