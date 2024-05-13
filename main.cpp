@@ -181,18 +181,20 @@ private:
 
 int main(int argc, char **argv) {
     if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " <steps> <iters> [<require_success>]" << std::endl;
+        std::cerr << "Usage: " << argv[0] << " <steps> <iters> [<require_success> [<seed>]]" << std::endl;
         return 1;
     }
 
     int num_steps = std::stoi(argv[1]);
     int iters = std::stoi(argv[2]);
     bool require_success = argc > 3 && std::strcmp(argv[3], "true") == 0;
+    int seed = argc > 4 ? std::stoi(argv[4]) : time(NULL);
     walk w(num_steps);
 
-    int num_success = 0;  // successes
-    int num_iter = 0;  // iterations
+    int num_success = 0;
+    int num_iter = 0;
     auto interval = static_cast<int>(std::pow(10, std::floor(std::log10(iters / 10))));
+    std::srand(seed);
     while (true) {
         if (num_iter % interval == 0) {
             std::cout << "Iterations: " << num_iter << " / Successes: " << num_success << " / Success rate: " << num_success / static_cast<float>(num_iter) << std::endl;
