@@ -30,6 +30,10 @@ private:
 };
 
 struct point_hash {
+    int num_steps_;
+
+    point_hash(int num_steps);
+
     std::size_t operator()(const point &p) const;
 };
 

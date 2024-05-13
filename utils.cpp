@@ -30,8 +30,10 @@ point point::operator-(const point &p) const {
     return point(x_ - p.x(), y_ - p.y());
 }
 
+point_hash::point_hash(int num_steps) : num_steps_(num_steps) {}
+
 std::size_t point_hash::operator()(const point &p) const {
-    return std::hash<int>()(p.x()) ^ std::hash<int>()(p.y());
+    return p.x() + num_steps_ * p.y();
 }
 
 rot::rot() : cos_(1), sin_(0) {}

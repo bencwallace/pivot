@@ -4,7 +4,7 @@
 
 #include "walk.h"
 
-walk::walk(int num_steps) : num_steps_(num_steps) {
+walk::walk(int num_steps) : num_steps_(num_steps), occupied_(num_steps, point_hash(num_steps)) {
     steps_ = new point[num_steps];
     for (int i = 0; i < num_steps; ++i) {
         steps_[i] = point(i, 0);
