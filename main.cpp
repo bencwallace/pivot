@@ -84,7 +84,7 @@ public:
     }
 
     static rot rand() {
-        auto r = std::rand() % 3;
+        auto r = 1 + std::rand() % 3;
         return rot(static_cast<angle>(r));
     }
 
