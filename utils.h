@@ -54,11 +54,15 @@ public:
 
     point operator*(const point &p) const;
 
+    rot operator*(const rot &r) const;
+
     std::string to_string() const;
 
 private:
     int cos_;
     int sin_;
+
+    rot(int cos, int sin);
 
 };
 

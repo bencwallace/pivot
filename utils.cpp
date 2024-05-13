@@ -87,6 +87,8 @@ rot::rot(point p, point q) {
     }
 }
 
+rot::rot(int cos, int sin) : cos_(cos), sin_(sin) {}
+
 rot rot::rand() {
     auto r = 1 + std::rand() % 3;
     return rot(static_cast<angle>(r));
@@ -94,6 +96,10 @@ rot rot::rand() {
 
 point rot::operator*(const point &p) const {
     return point(cos_ * p.x() - sin_ * p.y(), sin_ * p.x() + cos_ * p.y());
+}
+
+rot rot::operator*(const rot &r) const {
+    return rot(cos_ * r.cos_ - sin_ * r.sin_, sin_ * r.cos_ + cos_ * r.sin_);
 }
 
 std::string rot::to_string() const {
