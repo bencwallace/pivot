@@ -13,6 +13,8 @@ public:
 
     static walk_tree pivot_rep(int num_sites, point *steps);
 
+    ~walk_tree();
+
     void rotate_left();
 
     void rotate_right();

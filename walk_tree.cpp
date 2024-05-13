@@ -33,6 +33,15 @@ walk_tree walk_tree::pivot_rep(int num_sites, point *steps) {
 
 walk_tree::walk_tree(int id, int num_sites, rot symm) : id_(id), num_sites_(num_sites), symm_(symm) {}
 
+walk_tree::~walk_tree() {
+    if (left_ != nullptr) {
+        delete left_;
+    }
+    if (right_ != nullptr) {
+        delete right_;
+    }
+}
+
 void walk_tree::rotate_left() {
     if (right_ == nullptr) {
         throw std::invalid_argument("right_ must not be null");
