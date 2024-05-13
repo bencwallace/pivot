@@ -1,0 +1,8 @@
+#!/bin/sh
+
+set -e
+
+for FILE in $(find src -name *.cpp -o -name *.h)
+do
+    clang-format -n --Werror $FILE
+done

@@ -13,98 +13,96 @@ class box;
 class point {
 
 public:
-    point();
+  point();
 
-    point(int x, int y);
+  point(int x, int y);
 
-    int x() const;
+  int x() const;
 
-    int y() const;
+  int y() const;
 
-    bool operator==(const point &p) const;
+  bool operator==(const point &p) const;
 
-    bool operator!=(const point &p) const;
+  bool operator!=(const point &p) const;
 
-    point operator+(const point &p) const;
+  point operator+(const point &p) const;
 
-    box operator+(const box &b) const;
+  box operator+(const box &b) const;
 
-    point operator-(const point &p) const;
+  point operator-(const point &p) const;
 
-    std::string to_string() const;
+  std::string to_string() const;
 
 private:
-    int x_;
-    int y_;
-
+  int x_;
+  int y_;
 };
 
 struct interval {
-    int left_;
-    int right_;
+  int left_;
+  int right_;
 
-    interval();
-    interval(int left, int right);
+  interval();
+  interval(int left, int right);
 
-    bool empty() const;
+  bool empty() const;
 
-    std::string to_string() const;
+  std::string to_string() const;
 };
 
 struct box {
-    interval x_;
-    interval y_;
+  interval x_;
+  interval y_;
 
-    box(interval x, interval y);
+  box(interval x, interval y);
 
-    box(int n, point *points);
+  box(int n, point *points);
 
-    bool empty() const;
+  bool empty() const;
 
-    // union
-    box operator+(const box &b) const;
+  // union
+  box operator+(const box &b) const;
 
-    // intersection
-    box operator*(const box &b) const;
+  // intersection
+  box operator*(const box &b) const;
 
-    std::string to_string() const;
+  std::string to_string() const;
 };
 
 struct point_hash {
-    int num_steps_;
+  int num_steps_;
 
-    point_hash(int num_steps);
+  point_hash(int num_steps);
 
-    std::size_t operator()(const point &p) const;
+  std::size_t operator()(const point &p) const;
 };
 
 class rot {
 
 public:
-    rot();
+  rot();
 
-    rot(angle a);
+  rot(angle a);
 
-    rot(point p, point q);
+  rot(point p, point q);
 
-    static rot rand();
+  static rot rand();
 
-    point operator*(const point &p) const;
+  point operator*(const point &p) const;
 
-    rot operator*(const rot &r) const;
+  rot operator*(const rot &r) const;
 
-    box operator*(const box &b) const;
+  box operator*(const box &b) const;
 
-    rot inverse() const;
+  rot inverse() const;
 
-    std::string to_string() const;
+  std::string to_string() const;
 
 private:
-    int cos_;
-    int sin_;
+  int cos_;
+  int sin_;
 
-    rot(int cos, int sin);
-
+  rot(int cos, int sin);
 };
 
-}
+} // namespace pivot

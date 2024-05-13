@@ -11,78 +11,67 @@ namespace pivot {
 class walk_tree {
 
 public:
-    static walk_tree *line(int num_sites, bool balanced = true);
+  static walk_tree *line(int num_sites, bool balanced = true);
 
-    static walk_tree *pivot_rep(int num_sites, point *steps);
+  static walk_tree *pivot_rep(int num_sites, point *steps);
 
-    static walk_tree *balanced_rep(int num_sites, point *steps);
+  static walk_tree *balanced_rep(int num_sites, point *steps);
 
-    ~walk_tree();
+  ~walk_tree();
 
-    bool is_leaf() const;
+  bool is_leaf() const;
 
-    void rotate_left();
+  void rotate_left();
 
-    void rotate_right();
+  void rotate_right();
 
-    void shuffle_up(int id);
+  void shuffle_up(int id);
 
-    void shuffle_down();
+  void shuffle_down();
 
-    bool intersect() const;
+  bool intersect() const;
 
-    bool try_pivot(int n, rot r);
+  bool try_pivot(int n, rot r);
 
-    bool rand_pivot();
+  bool rand_pivot();
 
-    bool self_avoiding() const;
+  bool self_avoiding() const;
 
-    std::vector<point> steps() const;
+  std::vector<point> steps() const;
 
-    void export_csv(std::string path);
+  void export_csv(std::string path);
 
-    void todot(std::string path);
+  void todot(std::string path);
 
-    static walk_tree *leaf();
+  static walk_tree *leaf();
 
-    friend bool intersect(
-        const walk_tree *l_walk,
-        const walk_tree *r_walk,
-        const point &l_anchor,
-        const point &r_anchor,
-        const rot &l_symm,
-        const rot &r_symm);
+  friend bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_anchor, const point &r_anchor,
+                        const rot &l_symm, const rot &r_symm);
 
 private:
-    int id_;
-    int num_sites_;
-    walk_tree *parent_{};
-    walk_tree *left_{};
-    walk_tree *right_{};
-    rot symm_;
-    box bbox_;
-    point end_;
+  int id_;
+  int num_sites_;
+  walk_tree *parent_{};
+  walk_tree *left_{};
+  walk_tree *right_{};
+  rot symm_;
+  box bbox_;
+  point end_;
 
-    static walk_tree *leaf_;
+  static walk_tree *leaf_;
 
-    walk_tree(int id, int num_sites, rot symm, box bbox, point end);
+  walk_tree(int id, int num_sites, rot symm, box bbox, point end);
 
-    static walk_tree *balanced_rep(int num_sites, point *steps, int start);
+  static walk_tree *balanced_rep(int num_sites, point *steps, int start);
 
-    void set_left(walk_tree *left);
-    void set_right(walk_tree *right);
-    void merge();
+  void set_left(walk_tree *left);
+  void set_right(walk_tree *right);
+  void merge();
 
-    Agnode_t *todot(Agraph_t *g);
-
+  Agnode_t *todot(Agraph_t *g);
 };
 
-bool intersect(
-    const walk_tree *l_walk,
-    const walk_tree *r_walk,
-    const point &l_anchor,
-    const point &r_anchor,
-    const rot &l_symm,
-    const rot &r_symm);
+bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_anchor, const point &r_anchor,
+               const rot &l_symm, const rot &r_symm);
 
 } // namespace pivot

@@ -13,31 +13,30 @@ namespace pivot {
 class walk {
 
 public:
-    walk(int num_steps);
+  walk(int num_steps);
 
-    ~walk();
+  ~walk();
 
-    point *try_pivot(int step, rot r);
+  point *try_pivot(int step, rot r);
 
-    std::pair<int, point *> try_rand_pivot();
+  std::pair<int, point *> try_rand_pivot();
 
-    bool rand_pivot();
+  bool rand_pivot();
 
-    bool rand_pivot(int num_workers);
+  bool rand_pivot(int num_workers);
 
-    bool self_avoiding();
+  bool self_avoiding();
 
-    void export_csv(std::string path);
+  void export_csv(std::string path);
 
 protected:
-    int num_steps_;
-    point *steps_;
-    boost::unordered_map<point, int, point_hash> occupied_;
+  int num_steps_;
+  point *steps_;
+  boost::unordered_map<point, int, point_hash> occupied_;
 
-    void do_pivot(int step, point *new_points);
+  void do_pivot(int step, point *new_points);
 
-    point pivot_point(int step, int i, rot r);
-
+  point pivot_point(int step, int i, rot r);
 };
 
 } // namespace pivot
