@@ -1,4 +1,5 @@
 #include <fstream>
+#include <future>
 #include <unordered_set>
 
 #include "walk.h"
@@ -64,6 +65,37 @@ bool walk::rand_pivot() {
     }
     delete[] new_points;
     return true;
+}
+
+bool walk::rand_pivot(int num_workers) {
+    if (num_workers == 0) {
+        return rand_pivot();
+    }
+
+    int steps[num_workers];
+    point *proposals[num_workers];
+    std::future<std::pair<int, point *>> futures[num_workers];
+    for (int i = 0; i < num_workers; ++i) {
+        futures[i] = std::async(&walk::try_rand_pivot, this);
+    }
+    bool success = false;
+    for (int i = 0; i < num_workers; ++i) {
+        auto [step, new_points] = futures[i].get();
+        proposals[i] = new_points;
+        if (!success && new_points != nullptr) {
+            // TODO: this seems to be a bigger bottleneck than expected
+            for (int j = step + 1; j < num_steps_; ++j) {
+                set(j, new_points[j - step - 1]);
+            }
+            success = true;
+        }
+    }
+    for (int i = 0; i < num_workers; ++i) {
+        if (proposals[i] != nullptr) {
+            delete[] proposals[i];
+        }
+    }
+    return success;
 }
 
 bool walk::self_avoiding() {

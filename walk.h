@@ -21,6 +21,8 @@ public:
 
     bool rand_pivot();
 
+    bool rand_pivot(int num_workers);
+
     bool self_avoiding();
 
     void export_csv(std::string path);
