@@ -10,6 +10,10 @@
 #include <unordered_set>
 #include <vector>
 
+#include <boost/program_options.hpp>
+
+namespace po = boost::program_options;
+
 const int Dim = 2;
 
 class point {
@@ -178,15 +182,28 @@ private:
 };
 
 int main(int argc, char **argv) {
-    if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " <steps> <iters> [<require_success> [<seed>]]" << std::endl;
+    int num_steps;
+    int iters;
+    bool require_success;
+    int seed;
+
+    po::options_description desc("Allowed options");
+    desc.add_options()
+        ("help", "produce help message")
+        ("steps", po::value<int>(&num_steps), "number of steps")
+        ("iters", po::value<int>(&iters), "number of iterations")
+        ("success", po::value<bool>(&require_success), "require success")
+        ("seed", po::value<int>(&seed)->default_value(time(nullptr)), "seed");
+
+    po::variables_map vm;
+    po::store(po::parse_command_line(argc, argv, desc), vm);
+    po::notify(vm);
+
+    if (vm.count("help")) {
+        std::cout << desc << std::endl;
         return 1;
     }
 
-    int num_steps = std::stoi(argv[1]);
-    int iters = std::stoi(argv[2]);
-    bool require_success = argc > 3 && std::strcmp(argv[3], "true") == 0;
-    int seed = argc > 4 ? std::stoi(argv[4]) : time(NULL);
     walk w(num_steps);
 
     int num_success = 0;
