@@ -185,6 +185,8 @@ int main(int argc, char **argv) {
     int num_steps;
     int iters;
     bool require_success;
+    bool verify;
+    bool save;
     int seed;
 
     po::options_description desc("Allowed options");
@@ -192,7 +194,9 @@ int main(int argc, char **argv) {
         ("help", "produce help message")
         ("steps", po::value<int>(&num_steps), "number of steps")
         ("iters", po::value<int>(&iters), "number of iterations")
-        ("success", po::value<bool>(&require_success), "require success")
+        ("success", po::value<bool>(&require_success)->default_value(false), "require success")
+        ("verify", po::value<bool>(&verify)->default_value(false), "verify")
+        ("save", po::value<bool>(&save)->default_value(true), "save")
         ("seed", po::value<int>(&seed)->default_value(time(nullptr)), "seed");
 
     po::variables_map vm;
@@ -226,7 +230,12 @@ int main(int argc, char **argv) {
             break;
         }
     }
-
-    assert(w.self_avoiding());
-    w.export_csv("walk.csv");
+    if (verify) {
+        std::cout << "Verifying self-avoiding\n";
+        assert(w.self_avoiding());
+    }
+    if (save) {
+        std::cout << "Saving to walk.csv\n";
+        w.export_csv("walk.csv");
+    }
 }
