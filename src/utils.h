@@ -8,7 +8,7 @@ namespace pivot {
 
 enum angle { zero, ninety, one_eighty, two_seventy };
 
-class box;
+struct box;
 
 class point {
 

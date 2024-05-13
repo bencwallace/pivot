@@ -26,7 +26,7 @@ std::pair<int, point *> walk::try_rand_pivot() {
 bool walk::rand_pivot() {
   auto [step, new_points] = try_rand_pivot();
   if (new_points == nullptr) {
-    return false;
+    return false; // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
   }
   do_pivot(step, new_points);
   delete[] new_points;

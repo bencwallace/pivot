@@ -17,6 +17,10 @@ public:
 
   static walk_tree *balanced_rep(int num_sites, point *steps);
 
+  walk_tree(const walk_tree &w) = delete;
+  walk_tree(walk_tree &&w) = delete;
+  walk_tree &operator=(const walk_tree &w) = delete;
+
   ~walk_tree();
 
   bool is_leaf() const;
@@ -41,7 +45,7 @@ public:
 
   void export_csv(std::string path);
 
-  void todot(std::string path);
+  void todot(const std::string &path);
 
   static walk_tree *leaf();
 

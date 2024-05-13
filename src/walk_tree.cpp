@@ -168,18 +168,17 @@ std::vector<point> walk_tree::steps() const {
   std::vector<point> result;
   if (is_leaf()) {
     result.push_back(end_);
+    return result;
   }
 
-  if (left_ != nullptr) {
-    auto left_steps = left_->steps();
-    result.insert(result.begin(), left_steps.begin(), left_steps.end());
+  auto left_steps = left_->steps();
+  result.insert(result.begin(), left_steps.begin(), left_steps.end());
+
+  auto right_steps = right_->steps();
+  for (auto &step : right_steps) {
+    result.push_back(left_->end_ + symm_ * step);
   }
-  if (right_ != nullptr) {
-    auto right_steps = right_->steps();
-    for (auto &step : right_steps) {
-      result.push_back(left_->end_ + symm_ * step);
-    }
-  }
+
   return result;
 }
 
@@ -226,7 +225,7 @@ Agnode_t *walk_tree::todot(Agraph_t *g) {
   return node;
 }
 
-void walk_tree::todot(std::string path) {
+void walk_tree::todot(const std::string &path) {
   GVC_t *gvc = gvContext();
   Agraph_t *g = agopen((char *)"G", Agdirected, nullptr);
   agattr(g, AGNODE, (char *)"shape", (char *)"circle");

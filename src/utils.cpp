@@ -43,9 +43,9 @@ box::box(interval x, interval y) : x_(x), y_(y) {}
 
 box::box(int n, point *points) {
   int min_x = points[0].x();
-  int max_x = points[0].x();
+  int max_x = min_x;
   int min_y = points[0].y();
-  int max_y = points[0].y();
+  int max_y = min_y;
   for (int i = 1; i < n; ++i) {
     min_x = std::min(min_x, points[i].x());
     max_x = std::max(max_x, points[i].x());

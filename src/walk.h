@@ -15,6 +15,10 @@ class walk {
 public:
   walk(int num_steps);
 
+  walk(const walk &w) = delete;
+  walk(walk &&w) = delete;
+  walk &operator=(const walk &w) = delete;
+
   ~walk();
 
   point *try_pivot(int step, rot r);
