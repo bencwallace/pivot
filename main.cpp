@@ -1,3 +1,5 @@
+#include <cassert>
+#include <cmath>
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
@@ -141,6 +143,17 @@ public:
         return pivot(step, r);
     }
 
+    bool self_avoiding() {
+        for (int i = 0; i < num_steps_; ++i) {
+            for (int j = i + 1; j < num_steps_; ++j) {
+                if (steps_[i] == steps_[j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     void export_csv(std::string path) {
         std::ofstream file(path);
         for (int i = 0; i < num_steps_; ++i) {
@@ -167,16 +180,36 @@ private:
 };
 
 int main(int argc, char **argv) {
-    if (argc != 3) {
-        std::cerr << "Usage: " << argv[0] << " <steps> <iters>" << std::endl;
+    if (argc < 3) {
+        std::cerr << "Usage: " << argv[0] << " <steps> <iters> [<require_success>]" << std::endl;
         return 1;
     }
 
     int num_steps = std::stoi(argv[1]);
     int iters = std::stoi(argv[2]);
+    bool require_success = argc > 3 && std::strcmp(argv[3], "true") == 0;
     walk w(num_steps);
-    for (int i = 0; i < iters; ++i) {
-        w.rand_pivot();
+
+    int num_success = 0;  // successes
+    int num_iter = 0;  // iterations
+    auto interval = static_cast<int>(std::pow(10, std::floor(std::log10(iters / 10))));
+    while (true) {
+        if (num_iter % interval == 0) {
+            std::cout << "Iterations: " << num_iter << " / Successes: " << num_success << " / Success rate: " << num_success / static_cast<float>(num_iter) << std::endl;
+        }
+
+        num_success += w.rand_pivot();
+        ++num_iter;
+
+        if (require_success) {
+            if (num_success == iters) {
+                break;
+            }
+        } else if (num_iter == iters) {
+            break;
+        }
     }
+
+    assert(w.self_avoiding());
     w.export_csv("walk.csv");
 }
