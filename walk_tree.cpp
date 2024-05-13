@@ -161,8 +161,13 @@ void walk_tree::merge() {
     int left_sites = left_ == nullptr ? 1 : left_->num_sites_;
     int right_sites = right_ == nullptr ? 1 : right_->num_sites_;
     num_sites_ = left_sites + right_sites;
-    bbox_ = left_->bbox_ + (left_->end_ + symm_ * right_->bbox_);
-    end_ = left_->end_ + symm_ * right_->end_;
+
+    auto left_box = left_ == nullptr ? box(interval(1, 1), interval(0, 0)) : left_->bbox_;
+    auto right_box = right_ == nullptr ? box(interval(1, 1), interval(0, 0)) : right_->bbox_;
+    auto left_end = left_ == nullptr ? point(1, 0) : left_->end_;
+    auto right_end = right_ == nullptr ? point(1, 0) : right_->end_;
+    bbox_ = left_box + (left_end + symm_ * right_box);
+    end_ = left_end + symm_ * right_end;
 }
 
 std::vector<point> walk_tree::steps() const {
