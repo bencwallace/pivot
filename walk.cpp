@@ -78,10 +78,15 @@ bool walk::rand_pivot(int num_workers) {
     for (int i = 0; i < num_workers; ++i) {
         futures[i] = std::async(&walk::try_rand_pivot, this);
     }
-    bool success = false;
     for (int i = 0; i < num_workers; ++i) {
         auto [step, new_points] = futures[i].get();
+        steps[i] = step;
         proposals[i] = new_points;
+    }
+    bool success = false;
+    for (int i = 0; i < num_workers; ++i) {
+        auto step = steps[i];
+        auto new_points = proposals[i];
         if (!success && new_points != nullptr) {
             // TODO: this seems to be a bigger bottleneck than expected
             for (int j = step + 1; j < num_steps_; ++j) {
