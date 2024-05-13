@@ -11,7 +11,7 @@ walk_tree *walk_tree::line(int num_sites, bool balanced) {
     }
     point steps[num_sites];
     for (int i = 0; i < num_sites; ++i) {
-        steps[i] = point(i, 0);
+        steps[i] = point(i + 1, 0);
     }
     walk_tree *root = balanced ? balanced_rep(num_sites, steps) : pivot_rep(num_sites, steps);
     return root;
@@ -21,10 +21,11 @@ walk_tree *walk_tree::pivot_rep(int num_sites, point *steps) {
     if (num_sites < 2) {
         throw std::invalid_argument("num_sites must be at least 2");
     }
-    walk_tree *root = new walk_tree(1, num_sites, rot(steps[0], steps[1]));
+    walk_tree *root = new walk_tree(1, num_sites, rot(steps[0], steps[1]), box(num_sites, steps), steps[num_sites - 1]);
     auto node = root;
     for (int i = 0; i < num_sites - 2; ++i) {
-        node->right_ = new walk_tree(i + 2, num_sites - i - 1, rot(steps[i + 1], steps[i + 2]));
+        node->right_ = new walk_tree(
+            i + 2, num_sites - i - 1, rot(steps[i + 1], steps[i + 2]), box(num_sites - i - 1, steps + i + 1), steps[num_sites - 1]);
         node->right_->parent_ = node;
         node = node->right_;
     }
@@ -36,7 +37,9 @@ walk_tree *walk_tree::balanced_rep(int num_sites, point *steps, int start) {
         throw std::invalid_argument("num_sites must be at least 2");
     }
     int n = std::floor((1 + num_sites) / 2.0);
-    walk_tree *root = new walk_tree(start + n, num_sites, rot(steps[n - 1], steps[n]));
+    walk_tree *root = new walk_tree(
+        start + n - 1, num_sites, rot(steps[n - 1], steps[n]), box(num_sites, steps), steps[num_sites - 1] - steps[0] + point(1, 0)
+    );
     if (n > 1) {
         root->left_ = balanced_rep(n, steps, start);
         root->left_->parent_ = root;
@@ -49,10 +52,11 @@ walk_tree *walk_tree::balanced_rep(int num_sites, point *steps, int start) {
 }
 
 walk_tree *walk_tree::balanced_rep(int num_sites, point *steps) {
-    return balanced_rep(num_sites, steps, 0);
+    return balanced_rep(num_sites, steps, 1);
 }
 
-walk_tree::walk_tree(int id, int num_sites, rot symm) : id_(id), num_sites_(num_sites), symm_(symm) {}
+walk_tree::walk_tree(int id, int num_sites, rot symm, box bbox, point end)
+    : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
 
 walk_tree::~walk_tree() {
     if (left_ != nullptr) {
@@ -156,6 +160,8 @@ void walk_tree::merge() {
     int left_sites = left_ == nullptr ? 1 : left_->num_sites_;
     int right_sites = right_ == nullptr ? 1 : right_->num_sites_;
     num_sites_ = left_sites + right_sites;
+    bbox_ = left_->bbox_ + (left_->end_ + symm_ * right_->bbox_);
+    end_ = left_->end_ + symm_ * right_->end_;
 }
 
 Agnode_t *walk_tree::todot(Agraph_t *g) {
@@ -165,7 +171,9 @@ Agnode_t *walk_tree::todot(Agraph_t *g) {
 
     auto label = "id: " + std::to_string(id_) + "\\l";
     label += "num_sites: " + std::to_string(num_sites_) + "\\l";
-    label += "symm: " + symm_.to_string();
+    label += "symm: " + symm_.to_string() + "\\l";
+    label += "box: " + bbox_.to_string() + "\\l";
+    label += "end: " + end_.to_string() + "\\l";
     agset(node, (char *) "label", (char *) label.c_str());
 
     if (left_ != nullptr) {

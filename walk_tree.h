@@ -34,8 +34,10 @@ private:
     walk_tree *left_{};
     walk_tree *right_{};
     rot symm_;
+    box bbox_;
+    point end_;
 
-    walk_tree(int id, int num_sites, rot symm);
+    walk_tree(int id, int num_sites, rot symm, box bbox, point end);
 
     static walk_tree *balanced_rep(int num_sites, point *steps, int start);
 
