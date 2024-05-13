@@ -1,3 +1,4 @@
 pivot
 *.csv
 *.o
+build/
