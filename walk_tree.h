@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include <gvc.h>
 
 #include "utils.h"
@@ -28,6 +30,10 @@ public:
     bool intersect() const;
 
     bool try_pivot(int n, rot r);
+
+    std::vector<point> steps() const;
+
+    void export_csv(std::string path);
 
     void todot(std::string path);
 

@@ -1,3 +1,4 @@
+#include <fstream>
 #include <stdexcept>
 
 #include "utils.h"
@@ -162,6 +163,34 @@ void walk_tree::merge() {
     num_sites_ = left_sites + right_sites;
     bbox_ = left_->bbox_ + (left_->end_ + symm_ * right_->bbox_);
     end_ = left_->end_ + symm_ * right_->end_;
+}
+
+std::vector<point> walk_tree::steps() const {
+    std::vector<point> result;
+    if (left_ != nullptr) {
+        auto left_steps = left_->steps();
+        result.insert(result.begin(), left_steps.begin(), left_steps.end());
+    } else {
+        result.push_back(point(1, 0));
+    }
+    if (right_ != nullptr) {
+        auto right_steps = right_->steps();
+        for (auto &step : right_steps) {
+            result.push_back(left_->end_ + symm_ * step);
+        }
+    } else {
+        auto left_end = left_ == nullptr ? point(1, 0) : left_->end_;
+        result.push_back(left_end + symm_ * point(1, 0));
+    }
+    return result;
+}
+
+void walk_tree::export_csv(std::string path) {
+    std::ofstream file(path);
+    auto steps = this->steps();
+    for (auto &step : steps) {
+        file << step.x() << "," << step.y() << std::endl;
+    }
 }
 
 Agnode_t *walk_tree::todot(Agraph_t *g) {
