@@ -325,4 +325,22 @@ bool walk_tree::try_pivot(int n, rot r) {
     return success;
 }
 
+bool walk_tree::rand_pivot() {
+    auto site = 1 + (std::rand() % (num_sites_ - 1));
+    auto r = rot::rand();
+    return try_pivot(site, r);
+}
+
+bool walk_tree::self_avoiding() const {
+    auto steps = this->steps();
+    for (int i = 0; i < steps.size(); ++i) {
+        for (int j = i + 1; j < steps.size(); ++j) {
+            if (steps[i] == steps[j]) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 } // namespace pivot

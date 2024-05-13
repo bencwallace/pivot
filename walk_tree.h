@@ -33,6 +33,10 @@ public:
 
     bool try_pivot(int n, rot r);
 
+    bool rand_pivot();
+
+    bool self_avoiding() const;
+
     std::vector<point> steps() const;
 
     void export_csv(std::string path);
