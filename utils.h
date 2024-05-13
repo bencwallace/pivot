@@ -2,6 +2,8 @@
 
 #include <cstdlib>
 
+namespace pivot {
+
 enum angle { zero, ninety, one_eighty, two_seventy };
 
 class point {
@@ -53,3 +55,5 @@ private:
     int sin_;
 
 };
+
+}

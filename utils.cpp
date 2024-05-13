@@ -2,6 +2,8 @@
 
 #include "utils.h"
 
+namespace pivot {
+
 point::point() : x_(0), y_(0) {}
 
 point::point(int x, int y) : x_(x), y_(y) {}
@@ -67,3 +69,5 @@ rot rot::rand() {
 point rot::operator*(const point &p) const {
     return point(cos_ * p.x() - sin_ * p.y(), sin_ * p.x() + cos_ * p.y());
 }
+
+} // namespace pivot

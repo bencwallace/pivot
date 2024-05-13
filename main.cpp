@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    walk w(num_steps);
+    pivot::walk w(num_steps);
 
     int num_success = 0;
     int num_iter = 0;

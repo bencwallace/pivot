@@ -4,6 +4,8 @@
 
 #include "walk.h"
 
+namespace pivot {
+
 walk::walk(int num_steps) : num_steps_(num_steps), occupied_(num_steps, point_hash(num_steps)) {
     steps_ = new point[num_steps];
     for (int i = 0; i < num_steps; ++i) {
@@ -111,3 +113,5 @@ void walk::do_pivot(int step, point *new_points) {
         occupied_[steps_[i]] = i;
     }
 }
+
+} // namespace pivot

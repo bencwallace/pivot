@@ -8,6 +8,8 @@
 
 #include "utils.h"
 
+namespace pivot {
+
 class walk {
 
 public:
@@ -37,3 +39,5 @@ protected:
     point pivot_point(int step, int i, rot r);
 
 };
+
+} // namespace pivot
