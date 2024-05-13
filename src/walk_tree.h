@@ -5,10 +5,11 @@
 #include <gvc.h>
 
 #include "utils.h"
+#include "walk_base.h"
 
 namespace pivot {
 
-class walk_tree {
+class walk_tree : public walk_base {
 
 public:
   static walk_tree *line(int num_sites, bool balanced = true);
@@ -37,13 +38,13 @@ public:
 
   bool try_pivot(int n, const rot &r);
 
-  bool rand_pivot();
+  bool rand_pivot() override;
 
-  bool self_avoiding() const;
+  bool self_avoiding() const override;
 
   std::vector<point> steps() const;
 
-  void export_csv(const std::string &path) const;
+  void export_csv(const std::string &path) const override;
 
   void todot(const std::string &path) const;
 

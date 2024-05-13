@@ -7,10 +7,11 @@
 #include <boost/unordered/unordered_map.hpp>
 
 #include "utils.h"
+#include "walk_base.h"
 
 namespace pivot {
 
-class walk {
+class walk : public walk_base {
 
 public:
   walk(int num_steps);
@@ -25,13 +26,13 @@ public:
 
   std::pair<int, point *> try_rand_pivot() const;
 
-  bool rand_pivot();
+  bool rand_pivot() override;
 
   bool rand_pivot(int num_workers);
 
-  bool self_avoiding() const;
+  bool self_avoiding() const override;
 
-  void export_csv(const std::string &path) const;
+  void export_csv(const std::string &path) const override;
 
 protected:
   int num_steps_;
