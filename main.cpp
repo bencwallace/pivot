@@ -2,7 +2,7 @@
 
 #include <boost/program_options.hpp>
 
-#include "walk.h"
+#include "walk_tree.h"
 
 namespace po = boost::program_options;
 
@@ -35,7 +35,7 @@ int main(int argc, char **argv) {
         return 1;
     }
 
-    pivot::walk w(num_steps);
+    pivot::walk_tree *w = pivot::walk_tree::line(num_steps);
 
     int num_success = 0;
     int num_iter = 0;
@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
             std::cout << "Iterations: " << num_iter << " / Successes: " << num_success << " / Success rate: " << num_success / static_cast<float>(num_iter) << std::endl;
         }
 
-        num_success += w.rand_pivot(num_workers);
+        num_success += w->rand_pivot();
         ++num_iter;
 
         if (require_success) {
@@ -59,10 +59,10 @@ int main(int argc, char **argv) {
     }
     if (save) {
         std::cout << "Saving to walk.csv\n";
-        w.export_csv("walk.csv");
+        w->export_csv("walk.csv");
     }
     if (verify) {
         std::cout << "Verifying self-avoiding\n";
-        assert(w.self_avoiding());
+        assert(w->self_avoiding());
     }
 }
