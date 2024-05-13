@@ -15,6 +15,8 @@ public:
 
     virtual point *try_pivot(int step, rot r);
 
+    std::pair<int, point *> try_rand_pivot();
+
     bool pivot(int step, rot r);
 
     bool rand_pivot();

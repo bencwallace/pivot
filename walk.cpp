@@ -32,6 +32,12 @@ point *walk::try_pivot(int step, rot r) {
     return new_points;
 }
 
+std::pair<int, point *> walk::try_rand_pivot() {
+    auto step = std::rand() % num_steps_;
+    auto r = rot::rand();
+    return {step, try_pivot(step, r)};
+}
+
 void walk::set(int i, point p) {
     steps_[i] = p;
 }
@@ -49,9 +55,15 @@ bool walk::pivot(int step, rot r) {
 }
 
 bool walk::rand_pivot() {
-    auto step = std::rand() % num_steps_;
-    auto r = rot::rand();
-    return pivot(step, r);
+    auto [step, new_points] = try_rand_pivot();
+    if (new_points == nullptr) {
+        return false;
+    }
+    for (int i = step + 1; i < num_steps_; ++i) {
+        set(i, new_points[i - step - 1]);
+    }
+    delete[] new_points;
+    return true;
 }
 
 bool walk::self_avoiding() {
