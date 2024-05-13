@@ -96,4 +96,8 @@ point rot::operator*(const point &p) const {
     return point(cos_ * p.x() - sin_ * p.y(), sin_ * p.x() + cos_ * p.y());
 }
 
+std::string rot::to_string() const {
+    return "(" + std::to_string(cos_) + ", " + std::to_string(sin_) + ")";
+}
+
 } // namespace pivot

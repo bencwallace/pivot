@@ -2,6 +2,8 @@
 
 #include <cstdlib>
 
+#include <string>
+
 namespace pivot {
 
 enum angle { zero, ninety, one_eighty, two_seventy };
@@ -51,6 +53,8 @@ public:
     static rot rand();
 
     point operator*(const point &p) const;
+
+    std::string to_string() const;
 
 private:
     int cos_;
