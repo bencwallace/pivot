@@ -143,7 +143,7 @@ point *occupied_walk::try_pivot(int step, rot r) {
     for (int i = step + 1; i < num_steps_; ++i) {
         auto q = pivot_point(step, i, r);
         auto it = occupied_.find(q);
-        if (it != occupied_.end() && *it->second.cbegin() <= step) {
+        if (it != occupied_.end() && it->second <= step) {
             delete[] new_points;
             return nullptr;
         }
@@ -153,22 +153,9 @@ point *occupied_walk::try_pivot(int step, rot r) {
 }
 
 void occupied_walk::set(int i, point p) {
-    auto it = occupied_.find(steps_[i]);
-    if (it != occupied_.end()) {
-        it->second.erase(i);
-        if (it->second.empty()) {
-            occupied_.erase(it);
-        }
-    }
-
+    occupied_.erase(steps_[i]);
     steps_[i] = p;
-
-    auto jt = occupied_.find(p);
-    if (jt != occupied_.end()) {
-        jt->second.insert(i);
-    } else {
-        occupied_[p] = {i};
-    }
+    occupied_[p] = i;
 }
 
 void occupied_walk::do_pivot(int step, point *new_points) {
@@ -177,6 +164,6 @@ void occupied_walk::do_pivot(int step, point *new_points) {
     }
     for (int i = step + 1; i < num_steps_; ++i) {
         steps_[i] = new_points[i - step - 1];
-        occupied_[steps_[i]].insert(i);
+        occupied_[steps_[i]] = i;
     }
 }

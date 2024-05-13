@@ -47,7 +47,7 @@ public:
     point *try_pivot(int step, rot r) override;
 
 private:
-    std::unordered_map<point, std::set<int>, point_hash> occupied_;
+    std::unordered_map<point, int, point_hash> occupied_;
 
     void set(int i, point p) override;
 
