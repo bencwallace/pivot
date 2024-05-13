@@ -11,7 +11,7 @@ public:
 
     ~walk();
 
-    point *try_pivot(int step, rot r);
+    virtual point *try_pivot(int step, rot r);
 
     bool pivot(int step, rot r);
 
@@ -21,7 +21,7 @@ public:
 
     void export_csv(std::string path);
 
-private:
+protected:
     int num_steps_;
     point *steps_;
 

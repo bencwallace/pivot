@@ -72,4 +72,3 @@ point walk::pivot_point(int step, int i, rot r) {
     auto p = steps_[step];
     return p + r * (steps_[i] - p);
 }
-
