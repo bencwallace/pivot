@@ -46,6 +46,8 @@ public:
 
     rot(angle a);
 
+    rot(point p, point q);
+
     static rot rand();
 
     point operator*(const point &p) const;

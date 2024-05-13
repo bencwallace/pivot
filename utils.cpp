@@ -1,4 +1,5 @@
 #include <bitset>
+#include <stdexcept>
 
 #include "utils.h"
 
@@ -58,6 +59,31 @@ rot::rot(angle a) {
             cos_ = 0;
             sin_ = -1;
             break;
+    }
+}
+
+rot::rot(point p, point q) {
+    auto dx = q.x() - p.x();
+    auto dy = q.y() - p.y();
+    if (!(std::abs(dx) == 1 ^ std::abs(dy) == 1)) {
+        throw std::invalid_argument("Points are not adjacent");
+    }
+    if (dx == 0) {
+        if (dy == 1) {
+            cos_ = 0;
+            sin_ = 1;
+        } else if (dy == -1) {
+            cos_ = 0;
+            sin_ = -1;
+        }
+    } else if (dy == 0) {
+        if (dx == 1) {
+            cos_ = 1;
+            sin_ = 0;
+        } else if (dx == -1) {
+            cos_ = -1;
+            sin_ = 0;
+        }
     }
 }
 
