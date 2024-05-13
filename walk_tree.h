@@ -27,6 +27,8 @@ public:
 
     bool intersect() const;
 
+    bool try_pivot(int n, rot r);
+
     void todot(std::string path);
 
     friend bool intersect(

@@ -266,4 +266,15 @@ bool intersect(
     }
 }
 
+bool walk_tree::try_pivot(int n, rot r) {
+    shuffle_up(n);
+    symm_ = symm_ * r;
+    auto success = !intersect();
+    if (!success) {
+        symm_ = symm_ * r.inverse();
+    }
+    shuffle_down();
+    return success;
+}
+
 } // namespace pivot
