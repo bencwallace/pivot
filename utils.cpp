@@ -51,6 +51,10 @@ interval::interval() : interval(0, 0) {}
 
 interval::interval(int left, int right) : left_(left), right_(right) {}
 
+bool interval::empty() const {
+    return left_ > right_;
+}
+
 std::string interval::to_string() const {
     return "[" + std::to_string(left_) + ", " + std::to_string(right_) + "]";
 }
@@ -76,11 +80,23 @@ box::box(int n, point *points) {
     y_.right_ = max_y - points[0].y();
 }
 
+bool box::empty() const {
+    return x_.empty() || y_.empty();
+}
+
 box box::operator+(const box &b1) const {
     int min_x = std::min(x_.left_, b1.x_.left_);
     int max_x = std::max(x_.right_, b1.x_.right_);
     int min_y = std::min(y_.left_, b1.y_.left_);
     int max_y = std::max(y_.right_, b1.y_.right_);
+    return box(interval(min_x, max_x), interval(min_y, max_y));
+}
+
+box box::operator*(const box &b1) const {
+    int min_x = std::max(x_.left_, b1.x_.left_);
+    int max_x = std::min(x_.right_, b1.x_.right_);
+    int min_y = std::max(y_.left_, b1.y_.left_);
+    int max_y = std::min(y_.right_, b1.y_.right_);
     return box(interval(min_x, max_x), interval(min_y, max_y));
 }
 

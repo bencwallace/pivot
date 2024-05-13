@@ -25,7 +25,17 @@ public:
 
     void shuffle_down();
 
+    bool intersect() const;
+
     void todot(std::string path);
+
+    friend bool intersect(
+        const walk_tree *l_walk,
+        const walk_tree *r_walk,
+        const point &l_anchor,
+        const point &r_anchor,
+        const rot &l_symm,
+        const rot &r_symm);
 
 private:
     int id_;
@@ -48,5 +58,14 @@ private:
     Agnode_t *todot(Agraph_t *g);
 
 };
+
+bool intersect(
+    const walk_tree *l_walk,
+    const walk_tree *r_walk,
+    const point &l_anchor,
+    const point &r_anchor,
+    const rot &l_symm,
+    const rot &r_symm);
+
 
 } // namespace pivot

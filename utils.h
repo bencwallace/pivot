@@ -46,6 +46,8 @@ struct interval {
     interval();
     interval(int left, int right);
 
+    bool empty() const;
+
     std::string to_string() const;
 };
 
@@ -57,7 +59,13 @@ struct box {
 
     box(int n, point *points);
 
+    bool empty() const;
+
+    // union
     box operator+(const box &b) const;
+
+    // intersection
+    box operator*(const box &b) const;
 
     std::string to_string() const;
 };

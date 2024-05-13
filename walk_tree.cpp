@@ -208,4 +208,62 @@ void walk_tree::todot(std::string path) {
     gvFreeContext(gvc);
 }
 
+bool walk_tree::intersect() const {
+    // TODO: double check anchor points
+    auto left_end = left_ == nullptr ? point(1, 0) : left_->end_;
+    auto right_symm = right_ == nullptr ? rot() : right_->symm_;
+    return ::pivot::intersect(left_, right_, point(), left_end, rot(), right_symm);
+}
+
+bool intersect(
+    const walk_tree *l_walk,
+    const walk_tree *r_walk,
+    const point &l_anchor,
+    const point &r_anchor,
+    const rot &l_symm,
+    const rot &r_symm
+) {
+    auto left_box = l_walk == nullptr ? box(interval(1, 1), interval(0, 0)) : l_walk->bbox_;
+    auto right_box = r_walk == nullptr ? box(interval(1, 1), interval(0, 0)) : r_walk->bbox_;
+    auto l_box = l_anchor + l_symm * left_box;
+    auto r_box = r_anchor + r_symm * right_box;
+    if ((l_box * r_box).empty() || (l_walk->num_sites_ <= 2 && r_walk->num_sites_ <= 2)) {
+        return false;
+    }
+
+    if (l_walk->num_sites_ >= r_walk->num_sites_) {
+        return intersect(
+                l_walk->right_,
+                r_walk,
+                l_anchor + l_symm * l_walk->left_->end_,
+                r_anchor,
+                l_symm * l_walk->symm_,
+                r_symm
+            ) || intersect(
+                l_walk->left_,
+                r_walk,
+                l_anchor,
+                r_anchor,
+                l_symm,
+                r_symm
+            );
+    } else {
+        return intersect(
+                l_walk,
+                r_walk->left_,
+                l_anchor,
+                r_anchor,
+                l_symm,
+                r_symm * r_walk->symm_
+            ) || intersect(
+                l_walk,
+                r_walk->right_,
+                l_anchor,
+                r_anchor + r_symm * r_walk->left_->end_,
+                l_symm,
+                r_symm * r_walk->symm_
+            );
+    }
+}
+
 } // namespace pivot
