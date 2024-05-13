@@ -212,7 +212,7 @@ int main(int argc, char **argv) {
 
     int num_success = 0;
     int num_iter = 0;
-    auto interval = static_cast<int>(std::pow(10, std::floor(std::log10(iters / 10))));
+    auto interval = static_cast<int>(std::pow(10, std::floor(std::log10(std::max(iters / 10, 1)))));
     std::srand(seed);
     while (true) {
         if (num_iter % interval == 0) {
