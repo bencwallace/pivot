@@ -4,6 +4,8 @@
 #include <string>
 #include <unordered_map>
 
+#include <boost/unordered/unordered_map.hpp>
+
 #include "utils.h"
 
 class walk {
@@ -28,7 +30,7 @@ public:
 protected:
     int num_steps_;
     point *steps_;
-    std::unordered_map<point, int, point_hash> occupied_;
+    boost::unordered_map<point, int, point_hash> occupied_;
 
     void do_pivot(int step, point *new_points);
 
