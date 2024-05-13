@@ -85,6 +85,29 @@ void walk_tree::rotate_right() {
     right_->id_ = temp_id;
 }
 
+void walk_tree::shuffle_up(int id) {
+    int left_sites = left_ == nullptr ? 1 : left_->num_sites_;
+    if (id < left_sites) {
+        left_->shuffle_up(id);
+        rotate_right();
+    } else if (id > left_sites) {
+        right_->shuffle_up(id - left_sites);
+        rotate_left();
+    }
+}
+
+void walk_tree::shuffle_down() {
+    int id = std::floor((num_sites_ + 1) / 2.0);
+    int left_sites = left_ == nullptr ? 1 : left_->num_sites_;
+    if (id < left_sites) {
+        rotate_right();
+        right_->shuffle_down();
+    } else if (id > left_sites) {
+        rotate_left();
+        left_->shuffle_down();
+    }
+}
+
 void walk_tree::set_left(walk_tree *left) {
     left_ = left;
     if (left != nullptr) {

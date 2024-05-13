@@ -17,6 +17,10 @@ public:
 
     void rotate_right();
 
+    void shuffle_up(int id);
+
+    void shuffle_down();
+
     void todot(std::string path);
 
 private:
