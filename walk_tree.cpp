@@ -256,8 +256,7 @@ walk_tree *walk_tree::leaf() {
 }
 
 bool walk_tree::intersect() const {
-    // TODO: double check anchor points
-    return ::pivot::intersect(left_, right_, point(), left_->end_, rot(), right_->symm_);
+    return ::pivot::intersect(left_, right_, point(), left_->end_, rot(), symm_);
 }
 
 bool intersect(
@@ -270,8 +269,12 @@ bool intersect(
 ) {
     auto l_box = l_anchor + l_symm * l_walk->bbox_;
     auto r_box = r_anchor + r_symm * r_walk->bbox_;
-    if ((l_box * r_box).empty() || (l_walk->num_sites_ <= 2 && r_walk->num_sites_ <= 2)) {
+    if ((l_box * r_box).empty()) {
         return false;
+    }
+
+    if (l_walk->num_sites_ <= 2 && r_walk->num_sites_ <= 2) {
+        return true;
     }
 
     if (l_walk->num_sites_ >= r_walk->num_sites_) {
@@ -297,7 +300,7 @@ bool intersect(
                 l_anchor,
                 r_anchor,
                 l_symm,
-                r_symm * r_walk->symm_
+                r_symm
             ) || intersect(
                 l_walk,
                 r_walk->right_,
@@ -315,6 +318,8 @@ bool walk_tree::try_pivot(int n, rot r) {
     auto success = !intersect();
     if (!success) {
         symm_ = symm_ * r.inverse();
+    } else {
+        merge();
     }
     shuffle_down();
     return success;
