@@ -33,6 +33,78 @@ walk_tree walk_tree::pivot_rep(int num_sites, point *steps) {
 
 walk_tree::walk_tree(int id, int num_sites, rot symm) : id_(id), num_sites_(num_sites), symm_(symm) {}
 
+void walk_tree::rotate_left() {
+    if (right_ == nullptr) {
+        throw std::invalid_argument("right_ must not be null");
+    }
+    auto temp_tree = right_;
+
+    // update pointers
+    set_right(temp_tree->right_);
+    temp_tree->right_ = temp_tree->left_;  // temp_tree->set_right(temp_tree->left_) sets parent unnecessarily
+    temp_tree->set_left(left_);
+    left_ = temp_tree;  // set_left(temp_tree) sets parent unnecessarily
+
+    // update symmetries
+    auto temp_symm = symm_;
+    symm_ = temp_symm * left_->symm_;
+    left_->symm_ = temp_symm;
+
+    // merge
+    left_->merge();
+
+    // update IDs
+    int temp_id = id_;
+    id_ = left_->id_;
+    left_->id_ = temp_id;
+}
+
+void walk_tree::rotate_right() {
+    if (left_ == nullptr) {
+        throw std::invalid_argument("left_ must not be null");
+    }
+    auto temp_tree = left_;
+
+    // update pointers
+    set_left(temp_tree->left_);
+    temp_tree->left_ = temp_tree->right_;  // temp_tree->set_left(temp_tree->right_) sets parent unnecessarily
+    temp_tree->set_right(right_);
+    right_ = temp_tree;  // set_right(temp_tree) sets parent unnecessarily
+
+    // update symmetries
+    auto temp_symm = symm_;
+    symm_ = right_->symm_;
+    right_->symm_ = symm_.inverse() * temp_symm;
+
+    // merge
+    right_->merge();
+
+    // update IDs
+    int temp_id = id_;
+    id_ = right_->id_;
+    right_->id_ = temp_id;
+}
+
+void walk_tree::set_left(walk_tree *left) {
+    left_ = left;
+    if (left != nullptr) {
+        left->parent_ = this;
+    }
+}
+
+void walk_tree::set_right(walk_tree *right) {
+    right_ = right;
+    if (right != nullptr) {
+        right->parent_ = this;
+    }
+}
+
+void walk_tree::merge() {
+    int left_sites = left_ == nullptr ? 1 : left_->num_sites_;
+    int right_sites = right_ == nullptr ? 1 : right_->num_sites_;
+    num_sites_ = left_sites + right_sites;
+}
+
 Agnode_t *walk_tree::todot(Agraph_t *g) {
     auto name = std::to_string(id_);
     Agnode_t *node = agnode(g, (char *) name.c_str(), 1);

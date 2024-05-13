@@ -13,6 +13,10 @@ public:
 
     static walk_tree pivot_rep(int num_sites, point *steps);
 
+    void rotate_left();
+
+    void rotate_right();
+
     void todot(std::string path);
 
 private:
@@ -24,6 +28,10 @@ private:
     rot symm_;
 
     walk_tree(int id, int num_sites, rot symm);
+
+    void set_left(walk_tree *left);
+    void set_right(walk_tree *right);
+    void merge();
 
     Agnode_t *todot(Agraph_t *g);
 
