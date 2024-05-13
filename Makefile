@@ -1,14 +1,17 @@
+CXX := clang++
+CXXFLAGS := -std=c++17 -stdlib=libstdc++ -O3
+
 pivot: main.o utils.o walk.o Makefile
-	g++ -o pivot main.o utils.o walk.o -std=c++17 -lboost_program_options
+	$(CXX) $(CXXFLAGS) -o pivot main.o utils.o walk.o -lboost_program_options
 
 main.o: main.cpp Makefile
-	g++ -c main.cpp -std=c++17
+	$(CXX) $(CXXFLAGS) -c main.cpp
 
-walk.o: walk.cpp Makefile
-	g++ -c walk.cpp -std=c++17
+walk.o: walk.h walk.cpp Makefile
+	$(CXX) $(CXXFLAGS) -c walk.cpp
 
-utils.o: utils.cpp Makefile
-	g++ -c utils.cpp -std=c++17
+utils.o: utils.h utils.cpp Makefile
+	$(CXX) $(CXXFLAGS) -c utils.cpp
 
 clean:
 	rm -f pivot main.o utils.o
