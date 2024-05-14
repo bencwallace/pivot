@@ -46,6 +46,11 @@ int main(int argc, char **argv) {
     w = new pivot::walk(num_steps);
   }
 
+  std::vector<pivot::point> endpoints;
+  if (require_success) {
+    endpoints.reserve(iters);
+  }
+
   int num_success = 0;
   int num_iter = 0;
   auto interval = static_cast<int>(std::pow(10, std::floor(std::log10(std::max(iters / 10, 1)))));
@@ -56,7 +61,11 @@ int main(int argc, char **argv) {
                 << " / Success rate: " << num_success / static_cast<float>(num_iter) << std::endl;
     }
 
-    num_success += w->rand_pivot();
+    auto success = w->rand_pivot();
+    if (success) {
+      endpoints.push_back(w->endpoint());
+      ++num_success;
+    }
     ++num_iter;
 
     if (require_success) {
@@ -70,6 +79,7 @@ int main(int argc, char **argv) {
   if (save) {
     std::cout << "Saving to walk.csv\n";
     w->export_csv("walk.csv");
+    pivot::to_csv("endpoints.csv", endpoints);
   }
   if (verify) {
     std::cout << "Verifying self-avoiding\n";

@@ -70,6 +70,8 @@ walk_tree::~walk_tree() {
 
 bool walk_tree::is_leaf() const { return left_ == nullptr && right_ == nullptr; }
 
+point walk_tree::endpoint() const { return end_; }
+
 void walk_tree::rotate_left() {
   if (right_->is_leaf()) {
     throw std::invalid_argument("can't rotate left on a leaf node");

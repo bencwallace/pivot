@@ -1,5 +1,7 @@
 #include <algorithm>
+#include <fstream>
 #include <stdexcept>
+#include <vector>
 
 #include "utils.h"
 
@@ -161,5 +163,12 @@ box rot::operator*(const box &b) const {
 rot rot::inverse() const { return rot(cos_, -sin_); }
 
 std::string rot::to_string() const { return "(" + std::to_string(cos_) + ", " + std::to_string(sin_) + ")"; }
+
+void to_csv(const std::string &path, const std::vector<point> &points) {
+  std::ofstream file(path);
+  for (const auto &p : points) {
+    file << p.x() << "," << p.y() << std::endl;
+  }
+}
 
 } // namespace pivot

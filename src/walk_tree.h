@@ -26,6 +26,8 @@ public:
 
   bool is_leaf() const;
 
+  point endpoint() const override;
+
   void rotate_left();
 
   void rotate_right();

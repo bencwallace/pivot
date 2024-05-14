@@ -17,6 +17,8 @@ walk::walk(int num_steps) : num_steps_(num_steps), occupied_(num_steps, point_ha
 
 walk::~walk() { delete[] steps_; }
 
+point walk::endpoint() const { return steps_[num_steps_ - 1]; }
+
 std::pair<int, point *> walk::try_rand_pivot() const {
   auto step = std::rand() % num_steps_;
   auto r = rot::rand();

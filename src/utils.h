@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdlib>
+#include <vector>
 
 #include <string>
 
@@ -104,5 +105,7 @@ private:
 
   rot(int cos, int sin);
 };
+
+void to_csv(const std::string &path, const std::vector<point> &points);
 
 } // namespace pivot

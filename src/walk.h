@@ -22,6 +22,8 @@ public:
 
   ~walk();
 
+  point endpoint() const override;
+
   point *try_pivot(int step, const rot &r) const;
 
   std::pair<int, point *> try_rand_pivot() const;
