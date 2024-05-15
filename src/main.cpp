@@ -15,7 +15,7 @@ int main(int argc, char **argv) {
   int num_workers;
   bool require_success;
   bool verify;
-  bool save;
+  std::string out_dir;
   int seed;
 
   po::options_description desc("Allowed options");
@@ -27,7 +27,7 @@ int main(int argc, char **argv) {
   op("workers", po::value<int>(&num_workers)->default_value(0), "number of workers");
   op("success", po::value<bool>(&require_success)->default_value(false), "require success");
   op("verify", po::value<bool>(&verify)->default_value(false), "verify");
-  op("save", po::value<bool>(&save)->default_value(true), "save");
+  op("out", po::value<std::string>(&out_dir)->default_value(""), "output directory");
   op("seed", po::value<int>(&seed)->default_value(time(nullptr)), "seed");
 
   po::variables_map vm;
@@ -76,10 +76,10 @@ int main(int argc, char **argv) {
       break;
     }
   }
-  if (save) {
-    std::cout << "Saving to walk.csv\n";
-    w->export_csv("walk.csv");
-    pivot::to_csv("endpoints.csv", endpoints);
+  if (!out_dir.empty()) {
+    std::cout << "Saving to: " << out_dir << '\n';
+    w->export_csv(out_dir + "/walk.csv");
+    pivot::to_csv(out_dir + "/endpoints.csv", endpoints);
   }
   if (verify) {
     std::cout << "Verifying self-avoiding\n";

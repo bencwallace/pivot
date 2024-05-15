@@ -80,6 +80,7 @@ bool walk::self_avoiding() const {
 }
 
 void walk::export_csv(const std::string &path) const {
+  // TODO: use pivot::to_csv
   std::ofstream file(path);
   for (int i = 0; i < num_steps_; ++i) {
     file << steps_[i].x() << "," << steps_[i].y() << std::endl;
