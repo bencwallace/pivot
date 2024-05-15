@@ -34,6 +34,8 @@ For usage instructions, run the following command:
 
 ## Examples
 
+**Plotting a walk**
+
 Attempt 100000 pivots on a 1000000 step walk:
 
 ```
@@ -45,3 +47,50 @@ Plot the output:
 ```
 python plot.py walk.csv
 ```
+
+**Estimating critical exponents**
+
+The expected squared end-to-end distance of a self-avoiding walk is believed to obey a power law
+governed by the critical exponent $\nu$. This exponent can be estimated from samples gathered
+by running the pivot algorithm over varying lengths (numbers of steps).
+
+In the example below, we increase the number of samples with the walk length as the pivot algorithm
+needs a longer warm-up period to attain the equilibrium distribution.
+
+```bash
+mkdir data
+for i in $(seq 0 10)
+do
+  steps=$((1000 * 2 ** i))
+  ./build/pivot --success 1 --steps ${steps} --iters $((2 * steps)) --out data
+  mv data/endpoints.csv data/${steps}.csv
+done
+```
+
+The resulting data can be analyzed using the tools of your choice. For instance, we can use Python
+with numpy and scipy. Note that we ignore the warm-up samples for the purpose of this estimate.
+
+```python
+import csv
+import numpy as np
+from scipy.optimize import curve_fit
+
+num_steps = [1000 * 2 ** i for i in range(11)]
+data = {}
+for n in num_steps:
+  with open(f"data/{n}.csv") as f:
+    reader = csv.reader(f)
+    entries = [[int(x), int(y)] for x, y in list(reader)]
+    data[n] = np.array(entries[(len(entries) // 2):])
+
+squared_dists = {key: np.linalg.norm(val, ord=2, axis=1) ** 2 for key, val in data.items()}
+mean_sq_dists = {key: np.mean(val) for key, val in squared_dists.items()}
+
+def f(n, nu, C):
+  return C * n ** (2 * nu)
+
+params, _ = curve_fit(f, list(mean_sq_dists.keys()), list(mean_sq_dists.values()))
+print(f"nu estimate: {params[0]}")
+```
+
+The output should be close to 0.75, the predicted value for $\nu$ in 2 dimensions.
