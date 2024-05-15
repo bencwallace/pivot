@@ -94,3 +94,16 @@ print(f"nu estimate: {params[0]}")
 ```
 
 The output should be close to 0.75, the predicted value for $\nu$ in 2 dimensions.
+
+## Limitations and future work
+
+I hope to make the following changes in the future:
+
+* Lift restriction to $d = 2$ dimensions
+* Use Clisby's `fast_pivot` method
+* Improve initialization methods (e.g. Clisby's `pseudo_dimerize` method)
+* Add Python bindings
+* Support multithreaded pivot proposals
+* Support non-cubic lattices
+* Allow long-range step distributions
+* Allow soft-core interactions (weak SAW / Domb-Joyce model)
