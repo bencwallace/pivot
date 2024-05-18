@@ -29,16 +29,20 @@ CMake and a suitable C/C++ compiler toolchain are required.
 The following third-party dependencies are needed:
 
 * [boost](https://www.boost.org/doc/libs/1_85_0/more/getting_started/unix-variants.html)
-  * boost-unordered
-  * boost-program-options
+  * Headers: boost-unordered
+  * Libraries: boost-program-options
 * [libgraphviz](https://gitlab.com/graphviz/graphviz)
 
-For plotting, Python (with matplotlib) is needed as well.
+On Debian/Ubuntu, these requirements can be installed as follows:
+
+```bash
+sudo apt-get update && apt-get install libboost-all-dev libgraphviz-dev
+```
 
 **Build**
 
 ```
-cmake -S . -B build
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build
 ```
 
