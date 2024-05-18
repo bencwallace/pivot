@@ -2,6 +2,8 @@
 
 #include <string>
 
+#include "utils.h"
+
 namespace pivot {
 
 class walk_base {

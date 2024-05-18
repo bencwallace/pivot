@@ -59,14 +59,19 @@ walk_tree *walk_tree::balanced_rep(int num_sites, point *steps) { return balance
 walk_tree::walk_tree(int id, int num_sites, rot symm, box bbox, point end)
     : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
 
+// NOLINTBEGIN(clang-analyzer-cplusplus.NewDelete)
 walk_tree::~walk_tree() {
-  if (left_ != nullptr) {
+  if (left_ != nullptr && left_ != leaf_) {
     delete left_;
   }
-  if (right_ != nullptr) {
+  if (right_ != nullptr && right_ != leaf_) {
     delete right_;
   }
+  if (parent_ == nullptr) {
+    delete leaf_;
+  }
 }
+// NOLINTEND(clang-analyzer-cplusplus.NewDelete)
 
 bool walk_tree::is_leaf() const { return left_ == nullptr && right_ == nullptr; }
 
