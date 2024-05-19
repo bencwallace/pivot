@@ -25,6 +25,4 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           files: ${{github.workspace}}/build/pivot
-          release_name: ${{github.ref}}
-          tag: ${{github.ref}}
           body: "Release ${{github.ref}}"
