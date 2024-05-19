@@ -7,7 +7,12 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact-suffix: linux-x86_64
+    runs-on: ${{matrix.os}}
     permissions:
       contents: write
     steps:
@@ -21,10 +26,11 @@ jobs:
         run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
       
       - name: Build
-        run: cmake --build ${{github.workspace}}/build --config Release --target pivot -j
+        run: |
+            cmake --build ${{github.workspace}}/build --config Release --target pivot -j
+            tar -czf ${{github.workspace}}/build/pivot-${{matrix.artifact-suffix}}.tar.gz -C ${{github.workspace}}/build/{pivot,libpivot.a}
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{github.workspace}}/build/pivot
-          body: "Release ${{github.ref}}"
+          files: ${{github.workspace}}/build/pivot-${{matrix.artifact-suffix}}
