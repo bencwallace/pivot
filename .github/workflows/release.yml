@@ -28,7 +28,7 @@ jobs:
       - name: Build
         run: |
             cmake --build ${{github.workspace}}/build --config Release --target pivot -j
-            tar -czf ${{github.workspace}}/build/pivot-${{matrix.artifact-suffix}}.tar.gz -C ${{github.workspace}}/build/{pivot,libpivot.a}
+            tar -czf ${{github.workspace}}/build/pivot-${{matrix.artifact-suffix}}.tar.gz ${{github.workspace}}/build/{pivot,libpivot.a}
 
       - name: Release
         uses: softprops/action-gh-release@v2
