@@ -15,6 +15,6 @@ include(CTest)
 
 add_executable(test_pivot int_test.cpp)
 target_include_directories(test_pivot PRIVATE ${CMAKE_SOURCE_DIR}/src)
-target_link_libraries(test_pivot pivot_lib GTest::gtest_main)
+target_link_libraries(test_pivot pivot GTest::gtest_main)
 
 gtest_discover_tests(test_pivot)
