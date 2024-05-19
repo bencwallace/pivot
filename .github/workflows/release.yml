@@ -1,0 +1,30 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: InstallDeps
+        run: sudo apt-get update && sudo apt-get install -y libboost-all-dev libgraphviz-dev
+      
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
+      
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config Release --target pivot -j
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{github.workspace}}/build/pivot
+          release_name: ${{github.ref}}
+          tag: ${{github.ref}}
+          body: "Release ${{github.ref}}"
