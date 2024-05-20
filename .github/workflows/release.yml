@@ -27,7 +27,7 @@ jobs:
       
       - name: Build
         run: |
-            cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target pivot_exec -j
+            cmake --build ${{github.workspace}}/build --config Release --target pivot_exec -j
             tar vczf ${{github.workspace}}/build/pivot-${{matrix.artifact-suffix}}.tar.gz -C ${{github.workspace}}/build pivot libpivot.a
 
       - name: Release
