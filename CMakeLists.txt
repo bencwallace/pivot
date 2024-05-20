@@ -15,16 +15,25 @@ elseif(CMAKE_BUILD_TYPE STREQUAL Debug)
   message(WARNING "Compiling without clang. Disabling sanitizers.")
 endif()
 
-find_package(Boost COMPONENTS program_options REQUIRED)
+include(FetchContent)
+FetchContent_Declare(
+    cli11_proj
+    QUIET
+    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
+    GIT_TAG ccd6801
+)
+FetchContent_MakeAvailable(cli11_proj)
+
+find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories("/usr/include/graphviz")
 
 file(GLOB_RECURSE pivot_lib_SRC "src/utils.cpp" "src/walk.cpp" "src/walk_tree.cpp")
 add_library(pivot ${pivot_lib_SRC})
+target_link_libraries(pivot PRIVATE "gvc" "cgraph")
+
 add_executable(pivot_exec "src/main.cpp")
 set_property(TARGET pivot_exec PROPERTY OUTPUT_NAME pivot)
-target_link_libraries(pivot_exec pivot ${Boost_LIBRARIES})
-target_link_libraries(pivot ${Boost_LIBRARIES})
-target_link_libraries(pivot "gvc" "cgraph")
+target_link_libraries(pivot_exec PUBLIC pivot PRIVATE CLI11::CLI11)
 
 add_subdirectory(tests)
