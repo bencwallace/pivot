@@ -1,43 +1,34 @@
 #include <iostream>
 
-#include <boost/program_options.hpp>
+#include <CLI/CLI.hpp>
 
 #include "walk.h"
 #include "walk_base.h"
 #include "walk_tree.h"
 
-namespace po = boost::program_options;
-
 int main(int argc, char **argv) {
   int num_steps;
   int iters;
-  bool fast;
-  int num_workers;
-  bool require_success;
-  bool verify;
-  std::string out_dir;
+  bool fast{true};
+  int num_workers{0};
+  bool require_success{false};
+  bool verify{false};
+  std::string out_dir{""};
   int seed;
 
-  po::options_description desc("Allowed options");
-  auto op = desc.add_options();
-  op("help", "produce help message");
-  op("steps", po::value<int>(&num_steps), "number of steps");
-  op("iters", po::value<int>(&iters), "number of iterations");
-  op("fast", po::value<bool>(&fast)->default_value(true), "use tree-walk implementation");
-  op("workers", po::value<int>(&num_workers)->default_value(0), "number of workers");
-  op("success", po::value<bool>(&require_success)->default_value(false), "require success");
-  op("verify", po::value<bool>(&verify)->default_value(false), "verify");
-  op("out", po::value<std::string>(&out_dir)->default_value(""), "output directory");
-  op("seed", po::value<int>(&seed)->default_value(time(nullptr)), "seed");
+  CLI::App app{"Implementation of the pivot algorithm"};
+  argv = app.ensure_utf8(argv);
 
-  po::variables_map vm;
-  po::store(po::parse_command_line(argc, argv, desc), vm);
-  po::notify(vm);
+  app.add_option("-s,--steps", num_steps, "number of steps")->required();
+  app.add_option("-i,--iters", iters, "number of iterations")->required();
+  app.add_flag("--fast", fast, "use tree-walk implementation");
+  app.add_option("-w,--workers", num_workers, "number of workers");
+  app.add_flag("--success", require_success, "require success");
+  app.add_flag("--verify", verify, "verify");
+  app.add_option("--out", out_dir, "output directory");
+  app.add_option("--seed", seed, "seed")->default_val(time(nullptr));
 
-  if (vm.count("help")) {
-    std::cout << desc << std::endl;
-    return 1;
-  }
+  CLI11_PARSE(app, argc, argv);
 
   pivot::walk_base *w;
   if (fast) {
