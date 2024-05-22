@@ -236,7 +236,7 @@ void walk_tree::todot(const std::string &path) const {
   cgraph_t &cgraph = cgraph_t::load();
 
   GVC_t *context = gvc.gvContext();
-  Agraph_t *g = cgraph.agopen((char *)"G", gvc.Agdirected, nullptr);
+  Agraph_t *g = cgraph.agopen((char *)"G", cgraph.Agdirected, nullptr);
   cgraph.agattr(g, AGNODE, (char *)"shape", (char *)"circle");
 
   todot(g, cgraph);

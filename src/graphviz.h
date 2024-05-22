@@ -20,7 +20,6 @@ public:
   gvRenderFilename_t gvRenderFilename;
   gvFreeLayout_t gvFreeLayout;
   gvFreeContext_t gvFreeContext;
-  Agdesc_t Agdirected;
 
 private:
   gvc_t();

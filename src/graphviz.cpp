@@ -41,7 +41,7 @@ cgraph_t::cgraph_t() {
   agnode = reinterpret_cast<agnode_t>(dlsym(handle, "agnode"));
   agset = reinterpret_cast<agset_t>(dlsym(handle, "agset"));
   agedge = reinterpret_cast<agedge_t>(dlsym(handle, "agedge"));
-  Agdirected = *reinterpret_cast<Agdesc_t *>(dlsym(handle, "Agdirected"));
+  this->Agdirected = *reinterpret_cast<Agdesc_t *>(dlsym(handle, "Agdirected"));
 }
 
 } // namespace pivot
