@@ -28,9 +28,8 @@ find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories("/usr/include/graphviz")
 
-file(GLOB_RECURSE pivot_lib_SRC "src/utils.cpp" "src/walk.cpp" "src/walk_tree.cpp")
+file(GLOB_RECURSE pivot_lib_SRC "src/graphviz.cpp" "src/utils.cpp" "src/walk.cpp" "src/walk_tree.cpp")
 add_library(pivot ${pivot_lib_SRC})
-target_link_libraries(pivot PRIVATE "gvc" "cgraph")
 
 add_executable(pivot_exec "src/main.cpp")
 set_property(TARGET pivot_exec PROPERTY OUTPUT_NAME pivot)
