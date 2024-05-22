@@ -29,16 +29,6 @@ public:
 
   point endpoint() const override;
 
-  void rotate_left();
-
-  void rotate_right();
-
-  void shuffle_up(int id);
-
-  void shuffle_down();
-
-  bool intersect() const;
-
   bool try_pivot(int n, const rot &r);
 
   bool rand_pivot() override;
@@ -50,11 +40,6 @@ public:
   void export_csv(const std::string &path) const override;
 
   void todot(const std::string &path) const;
-
-  static walk_tree &leaf();
-
-  friend bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_anchor, const point &r_anchor,
-                        const rot &l_symm, const rot &r_symm);
 
 private:
   int id_;
@@ -70,9 +55,24 @@ private:
 
   static walk_tree *balanced_rep(int num_sites, point *steps, int start);
 
+  void rotate_left();
+
+  void rotate_right();
+
+  void shuffle_up(int id);
+
+  void shuffle_down();
+
+  bool intersect() const;
+
+  friend bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_anchor, const point &r_anchor,
+                        const rot &l_symm, const rot &r_symm);
+
   void set_left(walk_tree *left);
   void set_right(walk_tree *right);
   void merge();
+
+  static walk_tree &leaf();
 
   Agnode_t *todot(Agraph_t *g, const cgraph_t &cgraph) const;
 };
