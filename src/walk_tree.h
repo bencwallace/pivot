@@ -4,6 +4,7 @@
 
 #include <gvc.h>
 
+#include "graphviz.h"
 #include "utils.h"
 #include "walk_base.h"
 
@@ -75,7 +76,7 @@ private:
   void set_right(walk_tree *right);
   void merge();
 
-  Agnode_t *todot(Agraph_t *g) const;
+  Agnode_t *todot(Agraph_t *g, const cgraph_t &cgraph) const;
 };
 
 bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_anchor, const point &r_anchor,
