@@ -31,7 +31,7 @@ std::string point::to_string() const { return "(" + std::to_string(x_) + ", " + 
 
 point_hash::point_hash(int num_steps) : num_steps_(num_steps) {}
 
-std::size_t point_hash::operator()(const point &p) const { return p.x() + num_steps_ * p.y(); }
+std::size_t point_hash::operator()(const point &p) const { return p.x() + static_cast<size_t>(num_steps_) * p.y(); }
 
 interval::interval() : interval(0, 0) {}
 
