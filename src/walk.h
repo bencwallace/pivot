@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -20,13 +21,15 @@ public:
   walk(walk &&w) = delete;
   walk &operator=(const walk &w) = delete;
 
-  ~walk();
+  ~walk() = default;
+
+  int num_steps() const;
 
   point endpoint() const override;
 
-  point *try_pivot(int step, const rot &r) const;
+  std::optional<std::vector<point>> try_pivot(int step, const rot &r) const;
 
-  std::pair<int, point *> try_rand_pivot() const;
+  std::pair<int, std::optional<std::vector<point>>> try_rand_pivot() const;
 
   bool rand_pivot() override;
 
@@ -37,11 +40,10 @@ public:
   void export_csv(const std::string &path) const override;
 
 protected:
-  int num_steps_;
-  point *steps_;
+  std::vector<point> steps_;
   boost::unordered_map<point, int, point_hash> occupied_;
 
-  void do_pivot(int step, point *new_points);
+  void do_pivot(int step, std::vector<point> &new_points);
 
   point pivot_point(int step, int i, rot r) const;
 };

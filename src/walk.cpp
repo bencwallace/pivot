@@ -3,35 +3,35 @@
 #include <unordered_set>
 #include <vector>
 
+#include "utils.h"
 #include "walk.h"
 
 namespace pivot {
 
-walk::walk(int num_steps) : num_steps_(num_steps), occupied_(num_steps, point_hash(num_steps)) {
-  steps_ = new point[num_steps];
+walk::walk(int num_steps) : steps_(num_steps), occupied_(num_steps, point_hash(num_steps)) {
   for (int i = 0; i < num_steps; ++i) {
     steps_[i] = point(i, 0);
     occupied_[steps_[i]] = i;
   }
 }
 
-walk::~walk() { delete[] steps_; }
+int walk::num_steps() const { return steps_.size(); }
 
-point walk::endpoint() const { return steps_[num_steps_ - 1]; }
+point walk::endpoint() const { return steps_.back(); }
 
-std::pair<int, point *> walk::try_rand_pivot() const {
-  auto step = std::rand() % num_steps_;
+std::pair<int, std::optional<std::vector<point>>> walk::try_rand_pivot() const {
+  auto step = std::rand() % num_steps();
   auto r = rot::rand();
   return {step, try_pivot(step, r)};
 }
 
 bool walk::rand_pivot() {
   auto [step, new_points] = try_rand_pivot();
-  if (new_points == nullptr) {
+  if (!new_points) {
     return false; // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
   }
-  do_pivot(step, new_points);
-  delete[] new_points;
+  new_points.value();
+  do_pivot(step, new_points.value());
   return true;
 }
 
@@ -41,8 +41,8 @@ bool walk::rand_pivot(int num_workers) {
   }
 
   std::vector<int> steps(num_workers);
-  std::vector<point *> proposals(num_workers);
-  std::vector<std::future<std::pair<int, point *>>> futures(num_workers);
+  std::vector<std::optional<std::vector<point>>> proposals(num_workers);
+  std::vector<std::future<std::pair<int, std::optional<std::vector<point>>>>> futures(num_workers);
   for (int i = 0; i < num_workers; ++i) {
     futures[i] = std::async(&walk::try_rand_pivot, this);
   }
@@ -55,22 +55,18 @@ bool walk::rand_pivot(int num_workers) {
   for (int i = 0; i < num_workers; ++i) {
     auto step = steps[i];
     auto new_points = proposals[i];
-    if (!success && new_points != nullptr) {
-      do_pivot(step, new_points);
+    if (new_points) {
+      do_pivot(step, new_points.value());
       success = true;
-    }
-  }
-  for (int i = 0; i < num_workers; ++i) {
-    if (proposals[i] != nullptr) {
-      delete[] proposals[i];
+      break;
     }
   }
   return success;
 }
 
 bool walk::self_avoiding() const {
-  for (int i = 0; i < num_steps_; ++i) {
-    for (int j = i + 1; j < num_steps_; ++j) {
+  for (int i = 0; i < num_steps(); ++i) {
+    for (int j = i + 1; j < num_steps(); ++j) {
       if (steps_[i] == steps_[j]) {
         return false;
       }
@@ -79,38 +75,31 @@ bool walk::self_avoiding() const {
   return true;
 }
 
-void walk::export_csv(const std::string &path) const {
-  // TODO: use pivot::to_csv
-  std::ofstream file(path);
-  for (int i = 0; i < num_steps_; ++i) {
-    file << steps_[i].x() << "," << steps_[i].y() << std::endl;
-  }
-}
+void walk::export_csv(const std::string &path) const { return to_csv(path, steps_); }
 
 point walk::pivot_point(int step, int i, rot r) const {
   auto p = steps_[step];
   return p + r * (steps_[i] - p);
 }
 
-point *walk::try_pivot(int step, const rot &r) const {
-  point *new_points = new point[num_steps_ - step - 1];
-  for (int i = step + 1; i < num_steps_; ++i) {
+std::optional<std::vector<point>> walk::try_pivot(int step, const rot &r) const {
+  std::vector<point> new_points(num_steps() - step - 1);
+  for (int i = step + 1; i < num_steps(); ++i) {
     auto q = pivot_point(step, i, r);
     auto it = occupied_.find(q);
     if (it != occupied_.end() && it->second <= step) {
-      delete[] new_points;
-      return nullptr;
+      return {};
     }
     new_points[i - step - 1] = q;
   }
   return new_points;
 }
 
-void walk::do_pivot(int step, point *new_points) {
-  for (int i = step + 1; i < num_steps_; ++i) {
-    occupied_.erase(steps_[i]);
+void walk::do_pivot(int step, std::vector<point> &new_points) {
+  for (auto it = steps_.begin() + step + 1; it != steps_.end(); ++it) {
+    occupied_.erase(*it);
   }
-  for (int i = step + 1; i < num_steps_; ++i) {
+  for (int i = step + 1; i < num_steps(); ++i) {
     steps_[i] = new_points[i - step - 1];
     occupied_[steps_[i]] = i;
   }

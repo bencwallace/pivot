@@ -9,7 +9,7 @@
 int main(int argc, char **argv) {
   int num_steps;
   int iters;
-  bool fast{true};
+  bool naive{false};
   int num_workers{0};
   bool require_success{false};
   bool verify{false};
@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 
   app.add_option("-s,--steps", num_steps, "number of steps")->required();
   app.add_option("-i,--iters", iters, "number of iterations")->required();
-  app.add_flag("--fast", fast, "use tree-walk implementation");
+  app.add_flag("--naive", naive, "use naive implementation (slower)");
   app.add_option("-w,--workers", num_workers, "number of workers");
   app.add_flag("--success", require_success, "require success");
   app.add_flag("--verify", verify, "verify");
@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
   CLI11_PARSE(app, argc, argv);
 
   pivot::walk_base *w;
-  if (fast) {
+  if (!naive) {
     w = pivot::walk_tree::line(num_steps);
   } else {
     w = new pivot::walk(num_steps);
