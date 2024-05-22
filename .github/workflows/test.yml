@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  debug:
+  debug-test:
     runs-on: ubuntu-22.04
 
     env:
@@ -36,7 +36,8 @@ jobs:
     - name: Test
       working-directory: ${{github.workspace}}/build
       run: ctest -C ${{env.BUILD_TYPE}}
-  release:
+
+  release-build:
     runs-on: ubuntu-22.04
 
     env:
@@ -55,7 +56,27 @@ jobs:
       
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}} --target test_pivot -j
-      
+
+      - name: Upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: test_pivot
+          path: ${{github.workspace}}/build/tests/test_pivot
+
+  release-test:
+    runs-on: ubuntu-22.04
+
+    needs: release-build
+
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: test_pivot
+
+      - name: InstallDeps
+        run: sudo apt-get update && sudo apt-get install -y valgrind
+
       - name: Test
-        working-directory: ${{github.workspace}}/build
-        run: valgrind --leak-check=full --show-leak-kinds=all --errors-for-leak-kinds=all --error-exitcode=1 ./tests/test_pivot
+        run: |
+            chmod +x ./test_pivot
+            valgrind --leak-check=full --show-leak-kinds=all --errors-for-leak-kinds=all --error-exitcode=1 ./test_pivot
