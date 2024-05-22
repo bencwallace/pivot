@@ -51,7 +51,7 @@ public:
 
   void todot(const std::string &path) const;
 
-  static walk_tree *leaf();
+  static walk_tree &leaf();
 
   friend bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_anchor, const point &r_anchor,
                         const rot &l_symm, const rot &r_symm);
@@ -65,8 +65,6 @@ private:
   rot symm_;
   box bbox_;
   point end_;
-
-  static walk_tree *leaf_;
 
   walk_tree(int id, int num_sites, rot symm, box bbox, point end);
 

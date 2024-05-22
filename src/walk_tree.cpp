@@ -38,7 +38,7 @@ walk_tree *walk_tree::balanced_rep(int num_sites, point *steps, int start) {
     throw std::invalid_argument("num_sites must be at least 1");
   }
   if (num_sites == 1) {
-    return leaf();
+    return &leaf();
   }
   int n = std::floor((1 + num_sites) / 2.0);
   walk_tree *root = new walk_tree(start + n - 1, num_sites, rot(steps[n - 1], steps[n]), box(num_sites, steps),
@@ -61,14 +61,11 @@ walk_tree::walk_tree(int id, int num_sites, rot symm, box bbox, point end)
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDelete)
 walk_tree::~walk_tree() {
-  if (left_ != nullptr && left_ != leaf_) {
+  if (left_ != nullptr && left_ != &leaf()) {
     delete left_;
   }
-  if (right_ != nullptr && right_ != leaf_) {
+  if (right_ != nullptr && right_ != &leaf()) {
     delete right_;
-  }
-  if (parent_ == nullptr) {
-    delete leaf_;
   }
 }
 // NOLINTEND(clang-analyzer-cplusplus.NewDelete)
@@ -252,12 +249,8 @@ void walk_tree::todot(const std::string &path) const {
   gvc.gvFreeContext(context);
 }
 
-walk_tree *walk_tree::leaf_ = nullptr;
-
-walk_tree *walk_tree::leaf() {
-  if (!leaf_) {
-    leaf_ = new walk_tree(0, 1, rot(), box(interval(1, 1), interval(0, 0)), point(1, 0));
-  }
+walk_tree &walk_tree::leaf() {
+  static auto leaf_ = walk_tree(0, 1, rot(), box(interval(1, 1), interval(0, 0)), point(1, 0));
   return leaf_;
 }
 
