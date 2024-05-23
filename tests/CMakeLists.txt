@@ -11,7 +11,6 @@ FetchContent_MakeAvailable(googletest)
 enable_testing()
 
 include(GoogleTest)
-include(CTest)
 
 add_executable(test_pivot int_test.cpp)
 target_include_directories(test_pivot PRIVATE ${CMAKE_SOURCE_DIR}/src)
