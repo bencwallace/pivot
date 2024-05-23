@@ -15,6 +15,8 @@ elseif(CMAKE_BUILD_TYPE STREQUAL Debug)
   message(WARNING "Compiling without clang. Disabling sanitizers.")
 endif()
 
+include(CTest)
+
 include(FetchContent)
 FetchContent_Declare(
     cli11_proj
