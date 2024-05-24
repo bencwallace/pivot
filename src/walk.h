@@ -25,11 +25,11 @@ public:
 
   int num_steps() const;
 
-  point endpoint() const override;
+  point<2> endpoint() const override;
 
-  std::optional<std::vector<point>> try_pivot(int step, const rot &r) const;
+  std::optional<std::vector<point<2>>> try_pivot(int step, const rot &r) const;
 
-  std::pair<int, std::optional<std::vector<point>>> try_rand_pivot() const;
+  std::pair<int, std::optional<std::vector<point<2>>>> try_rand_pivot() const;
 
   bool rand_pivot() override;
 
@@ -40,12 +40,12 @@ public:
   void export_csv(const std::string &path) const override;
 
 protected:
-  std::vector<point> steps_;
-  boost::unordered_map<point, int, point_hash> occupied_;
+  std::vector<point<2>> steps_;
+  boost::unordered_map<point<2>, int, point_hash> occupied_;
 
-  void do_pivot(int step, std::vector<point> &new_points);
+  void do_pivot(int step, std::vector<point<2>> &new_points);
 
-  point pivot_point(int step, int i, rot r) const;
+  point<2> pivot_point(int step, int i, rot r) const;
 };
 
 } // namespace pivot

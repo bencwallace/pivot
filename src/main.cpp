@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
     w = new pivot::walk(num_steps);
   }
 
-  std::vector<pivot::point> endpoints;
+  std::vector<pivot::point<2>> endpoints;
   if (require_success) {
     endpoints.reserve(iters);
   }
