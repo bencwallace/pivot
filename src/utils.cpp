@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <fstream>
+#include <limits>
 #include <stdexcept>
 #include <vector>
 
@@ -43,16 +44,16 @@ std::string interval::to_string() const { return "[" + std::to_string(left_) + "
 
 box::box(interval x, interval y) : x_(x), y_(y) {}
 
-box::box(int n, point *points) {
-  int min_x = points[0].x();
-  int max_x = min_x;
-  int min_y = points[0].y();
-  int max_y = min_y;
-  for (int i = 1; i < n; ++i) {
-    min_x = std::min(min_x, points[i].x());
-    max_x = std::max(max_x, points[i].x());
-    min_y = std::min(min_y, points[i].y());
-    max_y = std::max(max_y, points[i].y());
+box::box(std::span<const point> points) {
+  int min_x = std::numeric_limits<int>::max();
+  int max_x = std::numeric_limits<int>::min();
+  int min_y = std::numeric_limits<int>::max();
+  int max_y = std::numeric_limits<int>::min();
+  for (const auto &p : points) {
+    min_x = std::min(min_x, p.x());
+    max_x = std::max(max_x, p.x());
+    min_y = std::min(min_y, p.y());
+    max_y = std::max(max_y, p.y());
   }
 
   // anchor at (1, 0)

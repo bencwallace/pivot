@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdlib>
+#include <span>
 #include <vector>
 
 #include <string>
@@ -57,7 +58,7 @@ struct box {
 
   box(interval x, interval y);
 
-  box(int n, point *points);
+  box(std::span<const point> points);
 
   bool empty() const;
 
