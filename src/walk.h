@@ -27,7 +27,7 @@ public:
 
   point<2> endpoint() const override;
 
-  std::optional<std::vector<point<2>>> try_pivot(int step, const rot &r) const;
+  std::optional<std::vector<point<2>>> try_pivot(int step, const transform<2> &trans) const;
 
   std::pair<int, std::optional<std::vector<point<2>>>> try_rand_pivot() const;
 
@@ -45,7 +45,7 @@ protected:
 
   void do_pivot(int step, std::vector<point<2>> &new_points);
 
-  point<2> pivot_point(int step, int i, rot r) const;
+  point<2> pivot_point(int step, int i, const transform<2> &trans) const;
 };
 
 } // namespace pivot
