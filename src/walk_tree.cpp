@@ -14,26 +14,28 @@ walk_tree *walk_tree::line(int num_sites, bool balanced) {
   for (int i = 0; i < num_sites; ++i) {
     steps[i] = point(i + 1, 0);
   }
-  walk_tree *root = balanced ? balanced_rep(num_sites, &steps[0]) : pivot_rep(num_sites, &steps[0]);
+  walk_tree *root = balanced ? balanced_rep(steps) : pivot_rep(steps);
   return root;
 }
 
-walk_tree *walk_tree::pivot_rep(int num_sites, point *steps) {
+walk_tree *walk_tree::pivot_rep(const std::vector<point> &steps) {
+  int num_sites = steps.size();
   if (num_sites < 2) {
     throw std::invalid_argument("num_sites must be at least 2");
   }
-  walk_tree *root = new walk_tree(1, num_sites, rot(steps[0], steps[1]), box(num_sites, steps), steps[num_sites - 1]);
+  walk_tree *root = new walk_tree(1, num_sites, rot(steps[0], steps[1]), box(steps), steps[num_sites - 1]);
   auto node = root;
   for (int i = 0; i < num_sites - 2; ++i) {
     node->right_ = new walk_tree(i + 2, num_sites - i - 1, rot(steps[i + 1], steps[i + 2]),
-                                 box(num_sites - i - 1, steps + i + 1), steps[num_sites - 1]);
+                                 box(std::span<const point>(steps).subspan(i + 1)), steps[num_sites - 1]);
     node->right_->parent_ = node;
     node = node->right_;
   }
   return root;
 }
 
-walk_tree *walk_tree::balanced_rep(int num_sites, point *steps, int start) {
+walk_tree *walk_tree::balanced_rep(std::span<const point> steps, int start) {
+  int num_sites = steps.size(); // TODO: double check (does start need to be subtracted?)
   if (num_sites < 1) {
     throw std::invalid_argument("num_sites must be at least 1");
   }
@@ -41,20 +43,20 @@ walk_tree *walk_tree::balanced_rep(int num_sites, point *steps, int start) {
     return &leaf();
   }
   int n = std::floor((1 + num_sites) / 2.0);
-  walk_tree *root = new walk_tree(start + n - 1, num_sites, rot(steps[n - 1], steps[n]), box(num_sites, steps),
+  walk_tree *root = new walk_tree(start + n - 1, num_sites, rot(steps[n - 1], steps[n]), box(steps),
                                   steps[num_sites - 1] - steps[0] + point(1, 0));
   if (n >= 1) {
-    root->left_ = balanced_rep(n, steps, start);
+    root->left_ = balanced_rep(steps.subspan(0, n), start);
     root->left_->parent_ = root;
   }
   if (num_sites - n >= 1) {
-    root->right_ = balanced_rep(num_sites - n, steps + n, start + n);
+    root->right_ = balanced_rep(steps.subspan(n), start + n);
     root->right_->parent_ = root;
   }
   return root;
 }
 
-walk_tree *walk_tree::balanced_rep(int num_sites, point *steps) { return balanced_rep(num_sites, steps, 1); }
+walk_tree *walk_tree::balanced_rep(const std::vector<point> &steps) { return balanced_rep(steps, 1); }
 
 walk_tree::walk_tree(int id, int num_sites, rot symm, box bbox, point end)
     : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}

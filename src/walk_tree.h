@@ -15,9 +15,9 @@ class walk_tree : public walk_base {
 public:
   static walk_tree *line(int num_sites, bool balanced = true);
 
-  static walk_tree *pivot_rep(int num_sites, point *steps);
+  static walk_tree *pivot_rep(const std::vector<point> &steps);
 
-  static walk_tree *balanced_rep(int num_sites, point *steps);
+  static walk_tree *balanced_rep(const std::vector<point> &steps);
 
   walk_tree(const walk_tree &w) = delete;
   walk_tree(walk_tree &&w) = delete;
@@ -53,7 +53,7 @@ private:
 
   walk_tree(int id, int num_sites, rot symm, box bbox, point end);
 
-  static walk_tree *balanced_rep(int num_sites, point *steps, int start);
+  static walk_tree *balanced_rep(std::span<const point> steps, int start);
 
   void rotate_left();
 
