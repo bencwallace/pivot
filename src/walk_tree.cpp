@@ -188,13 +188,7 @@ std::vector<point> walk_tree::steps() const {
   return result;
 }
 
-void walk_tree::export_csv(const std::string &path) const {
-  std::ofstream file(path);
-  auto steps = this->steps();
-  for (auto &step : steps) {
-    file << step.x() << "," << step.y() << std::endl;
-  }
-}
+void walk_tree::export_csv(const std::string &path) const { return to_csv(path, steps()); }
 
 Agnode_t *walk_tree::todot(Agraph_t *g, const cgraph_t &cgraph) const {
   auto name = std::to_string(id_);
