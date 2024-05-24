@@ -26,14 +26,17 @@ CMake and a suitable C/C++ compiler toolchain are required.
 
 **Dependencies**
 
-The following third-party dependencies are needed:
+The following third-party dependencies are used:
 
 * [boost](https://www.boost.org/doc/libs/1_85_0/more/getting_started/unix-variants.html)
-  * Headers: boost-unordered
-  * Libraries: boost-program-options
+  * Header-only (specifically, [boost-unordered](https://www.boost.org/doc/libs/1_84_0/libs/unordered/doc/html/unordered.html))
 * [libgraphviz](https://gitlab.com/graphviz/graphviz)
+  * Only needed at build time (optional at runtime)
+* [CLI11](https://github.com/CLIUtils/CLI11)
+  * Included via CMake
 
-On Debian/Ubuntu, these requirements can be installed as follows:
+Only the first two requirements must be explicitly installed prior to building. On Debian/Ubuntu,
+this can be accomplished as follows:
 
 ```bash
 sudo apt-get update && apt-get install libboost-all-dev libgraphviz-dev
