@@ -12,7 +12,7 @@ enable_testing()
 
 include(GoogleTest)
 
-add_executable(test_pivot int_test.cpp walk_tree_test.cpp)
+add_executable(test_pivot int_test.cpp utils_test.cpp walk_tree_test.cpp)
 target_include_directories(test_pivot PRIVATE ${CMAKE_SOURCE_DIR}/src)
 target_link_libraries(test_pivot pivot GTest::gtest_main)
 

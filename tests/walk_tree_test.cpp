@@ -19,7 +19,8 @@ TEST(WalkTreeInit, Line) {
 
 TEST(WalkTreePivot, PivotLine) {
     walk_tree *w = walk_tree::line(2);
-    EXPECT_TRUE(w->try_pivot(1, angle::ninety));
+    pivot::transform<2> trans = transform<2>({1, 0}, {-1, 1});
+    EXPECT_TRUE(w->try_pivot(1, trans));
     auto steps = w->steps();
     EXPECT_EQ(steps.size(), 2);
     EXPECT_EQ(steps[0], pivot::point<2>({1, 0}));
@@ -29,7 +30,8 @@ TEST(WalkTreePivot, PivotLine) {
 
 TEST(WalkTreePivot, PivotLineFail) {
     walk_tree *w = walk_tree::line(3);
-    EXPECT_FALSE(w->try_pivot(2, angle::one_eighty));
+    pivot::transform<2> trans = transform<2>({0, 1}, {-1, 1});
+    EXPECT_FALSE(w->try_pivot(2, trans));
     auto steps = w->steps();
     EXPECT_EQ(steps.size(), 3);
     EXPECT_EQ(steps[0], pivot::point<2>({1, 0}));

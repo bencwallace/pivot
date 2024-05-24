@@ -29,7 +29,7 @@ public:
 
   point<2> endpoint() const override;
 
-  bool try_pivot(int n, const rot &r);
+  bool try_pivot(int n, const transform<2> &r);
 
   bool rand_pivot() override;
 
@@ -47,11 +47,11 @@ private:
   walk_tree *parent_{};
   walk_tree *left_{};
   walk_tree *right_{};
-  rot symm_;
+  transform<2> symm_;
   box<2> bbox_;
   point<2> end_;
 
-  walk_tree(int id, int num_sites, rot symm, box<2> bbox, point<2> end);
+  walk_tree(int id, int num_sites, const transform<2> &symm, box<2> bbox, point<2> end);
 
   static walk_tree *balanced_rep(std::span<const point<2>> steps, int start);
 
@@ -66,7 +66,7 @@ private:
   bool intersect() const;
 
   friend bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point<2> &l_anchor,
-                        const point<2> &r_anchor, const rot &l_symm, const rot &r_symm);
+                        const point<2> &r_anchor, const transform<2> &l_symm, const transform<2> &r_symm);
 
   void set_left(walk_tree *left);
   void set_right(walk_tree *right);
@@ -78,6 +78,6 @@ private:
 };
 
 bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point<2> &l_anchor, const point<2> &r_anchor,
-               const rot &l_symm, const rot &r_symm);
+               const transform<2> &l_symm, const transform<2> &r_symm);
 
 } // namespace pivot

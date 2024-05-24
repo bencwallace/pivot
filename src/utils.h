@@ -5,14 +5,13 @@
 #include <cstdlib>
 #include <fstream>
 #include <limits>
+#include <random>
 #include <span>
 #include <vector>
 
 #include <string>
 
 namespace pivot {
-
-enum angle { zero, ninety, one_eighty, two_seventy };
 
 template <int Dim> struct box;
 
@@ -158,32 +157,119 @@ struct point_hash {
   }
 };
 
-class rot {
+template <int Dim> class transform {
 
 public:
-  rot();
+  transform() {
+    for (int i = 0; i < Dim; ++i) {
+      perm_[i] = i;
+      signs_[i] = 1;
+    }
+  }
 
-  rot(angle a);
+  transform(std::array<int, Dim> perm, std::array<int, Dim> signs) : perm_(perm), signs_(signs) {}
 
-  rot(point<2> p, point<2> q);
+  transform(const point<Dim> &p, const point<Dim> &q) : transform() {
+    point<Dim> diff = q - p;
+    int idx = -1;
+    for (int i = 0; i < Dim; ++i) {
+      if (std::abs(diff[i]) == 1) {
+        if (idx == -1) {
+          idx = i;
+        } else { // a differing coordinate has already been found
+          throw std::invalid_argument("Points are not adjacent");
+        }
+      }
+    }
+    if (idx == -1) {
+      throw std::invalid_argument("Points are not adjacent");
+    }
+    perm_[0] = idx;
+    perm_[idx] = 0;
+    signs_[0] = -diff[idx];
+    signs_[idx] = diff[idx];
+  }
 
-  static rot rand();
+  static transform rand() {
+    std::array<int, Dim> perm;
+    std::array<int, Dim> signs;
+    for (int i = 0; i < Dim; ++i) {
+      perm[i] = i;
+      signs[i] = 2 * (std::rand() % 2) - 1;
+    }
+    std::random_shuffle(perm.begin(), perm.end()); // NOLINT(clang-diagnostic-deprecated-declarations)
+    return transform(perm, signs);
+  }
 
-  point<2> operator*(const point<2> &p) const;
+  bool operator==(const transform &t) const { return perm_ == t.perm_ && signs_ == t.signs_; }
 
-  rot operator*(const rot &r) const;
+  point<Dim> operator*(const point<Dim> &p) const {
+    std::array<int, Dim> coords;
+    for (int i = 0; i < Dim; ++i) {
+      coords[i] = signs_[i] * p[perm_[i]];
+    }
+    return point<Dim>(coords);
+  }
 
-  box<2> operator*(const box<2> &b) const;
+  transform operator*(const transform &t) const {
+    std::array<int, Dim> perm;
+    std::array<int, Dim> signs;
+    for (int i = 0; i < Dim; ++i) {
+      perm[i] = perm_[t.perm_[i]];
+      signs[perm[i]] = signs_[perm[i]] * t.signs_[t.perm_[i]];
+    }
+    return transform(perm, signs);
+  }
 
-  rot inverse() const;
+  box<Dim> operator*(const box<Dim> &b) const {
+    // TODO: test this
+    std::array<interval, Dim> intervals;
+    for (int i = 0; i < Dim; ++i) {
+      int x = signs_[perm_[i]] * b.intervals_[i].left_;
+      int y = signs_[perm_[i]] * b.intervals_[i].right_;
+      intervals[perm_[i]] = interval(std::min(x, y), std::max(x, y));
+    }
+    return box<Dim>(intervals);
+  }
 
-  std::string to_string() const;
+  transform inverse() const {
+    std::array<int, Dim> perm;
+    std::array<int, Dim> signs;
+    for (int i = 0; i < Dim; ++i) {
+      perm[perm_[i]] = i;
+      signs[i] = signs_[perm_[i]];
+    }
+    return transform(perm, signs);
+  }
+
+  std::array<std::array<int, Dim>, Dim> to_matrix() const {
+    std::array<std::array<int, Dim>, Dim> matrix = {};
+    for (int i = 0; i < Dim; ++i) {
+      matrix[perm_[i]][i] = signs_[perm_[i]];
+    }
+    return matrix;
+  }
+
+  std::string to_string() const {
+    auto matrix = to_matrix();
+    std::string s = "[";
+    for (int i = 0; i < Dim; ++i) {
+      s += "[";
+      for (int j = 0; j < Dim - 1; ++j) {
+        s += std::to_string(matrix[i][j]) + ", ";
+      }
+      s += std::to_string(matrix[i][Dim - 1]) + "]";
+      if (i < Dim - 1) {
+        s += ", ";
+      }
+    }
+    s += "]";
+    return s;
+  }
 
 private:
-  int cos_;
-  int sin_;
-
-  rot(int cos, int sin);
+  std::array<int, Dim> perm_;
+  std::array<int, Dim> signs_;
 };
 
 template <int Dim> void to_csv(const std::string &path, const std::vector<point<Dim>> &points) {

@@ -21,7 +21,7 @@ point<2> walk::endpoint() const { return steps_.back(); }
 
 std::pair<int, std::optional<std::vector<point<2>>>> walk::try_rand_pivot() const {
   auto step = std::rand() % num_steps();
-  auto r = rot::rand();
+  auto r = transform<2>::rand();
   return {step, try_pivot(step, r)};
 }
 
@@ -77,15 +77,15 @@ bool walk::self_avoiding() const {
 
 void walk::export_csv(const std::string &path) const { return to_csv(path, steps_); }
 
-point<2> walk::pivot_point(int step, int i, rot r) const {
+point<2> walk::pivot_point(int step, int i, const transform<2> &trans) const {
   auto p = steps_[step];
-  return p + r * (steps_[i] - p);
+  return p + trans * (steps_[i] - p);
 }
 
-std::optional<std::vector<point<2>>> walk::try_pivot(int step, const rot &r) const {
+std::optional<std::vector<point<2>>> walk::try_pivot(int step, const transform<2> &trans) const {
   std::vector<point<2>> new_points(num_steps() - step - 1);
   for (int i = step + 1; i < num_steps(); ++i) {
-    auto q = pivot_point(step, i, r);
+    auto q = pivot_point(step, i, trans);
     auto it = occupied_.find(q);
     if (it != occupied_.end() && it->second <= step) {
       return {};
