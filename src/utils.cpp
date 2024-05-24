@@ -1,6 +1,3 @@
-#include <algorithm>
-#include <fstream>
-#include <limits>
 #include <stdexcept>
 #include <vector>
 
@@ -8,31 +5,7 @@
 
 namespace pivot {
 
-point::point() : x_(0), y_(0) {}
-
-point::point(int x, int y) : x_(x), y_(y) {}
-
-int point::x() const { return x_; }
-
-int point::y() const { return y_; }
-
-bool point::operator==(const point &p) const { return x_ == p.x() && y_ == p.y(); }
-
-bool point::operator!=(const point &p) const { return x_ != p.x() || y_ != p.y(); }
-
-point point::operator+(const point &p) const { return point(x_ + p.x(), y_ + p.y()); }
-
-box point::operator+(const box &b) const {
-  return box(interval(x_ + b.x_.left_, x_ + b.x_.right_), interval(y_ + b.y_.left_, y_ + b.y_.right_));
-}
-
-point point::operator-(const point &p) const { return point(x_ - p.x(), y_ - p.y()); }
-
-std::string point::to_string() const { return "(" + std::to_string(x_) + ", " + std::to_string(y_) + ")"; }
-
 point_hash::point_hash(int num_steps) : num_steps_(num_steps) {}
-
-std::size_t point_hash::operator()(const point &p) const { return p.x() + static_cast<size_t>(num_steps_) * p.y(); }
 
 interval::interval() : interval(0, 0) {}
 
@@ -41,47 +14,6 @@ interval::interval(int left, int right) : left_(left), right_(right) {}
 bool interval::empty() const { return left_ > right_; }
 
 std::string interval::to_string() const { return "[" + std::to_string(left_) + ", " + std::to_string(right_) + "]"; }
-
-box::box(interval x, interval y) : x_(x), y_(y) {}
-
-box::box(std::span<const point> points) {
-  int min_x = std::numeric_limits<int>::max();
-  int max_x = std::numeric_limits<int>::min();
-  int min_y = std::numeric_limits<int>::max();
-  int max_y = std::numeric_limits<int>::min();
-  for (const auto &p : points) {
-    min_x = std::min(min_x, p.x());
-    max_x = std::max(max_x, p.x());
-    min_y = std::min(min_y, p.y());
-    max_y = std::max(max_y, p.y());
-  }
-
-  // anchor at (1, 0)
-  x_.left_ = min_x - points[0].x() + 1;
-  x_.right_ = max_x - points[0].x() + 1;
-  y_.left_ = min_y - points[0].y();
-  y_.right_ = max_y - points[0].y();
-}
-
-bool box::empty() const { return x_.empty() || y_.empty(); }
-
-box box::operator+(const box &b1) const {
-  int min_x = std::min(x_.left_, b1.x_.left_);
-  int max_x = std::max(x_.right_, b1.x_.right_);
-  int min_y = std::min(y_.left_, b1.y_.left_);
-  int max_y = std::max(y_.right_, b1.y_.right_);
-  return box(interval(min_x, max_x), interval(min_y, max_y));
-}
-
-box box::operator*(const box &b1) const {
-  int min_x = std::max(x_.left_, b1.x_.left_);
-  int max_x = std::min(x_.right_, b1.x_.right_);
-  int min_y = std::max(y_.left_, b1.y_.left_);
-  int max_y = std::min(y_.right_, b1.y_.right_);
-  return box(interval(min_x, max_x), interval(min_y, max_y));
-}
-
-std::string box::to_string() const { return x_.to_string() + " x " + y_.to_string(); }
 
 rot::rot() : cos_(1), sin_(0) {}
 
@@ -106,9 +38,9 @@ rot::rot(angle a) {
   }
 }
 
-rot::rot(point p, point q) {
-  auto dx = q.x() - p.x();
-  auto dy = q.y() - p.y();
+rot::rot(point<2> p, point<2> q) {
+  auto dx = q[0] - p[0];
+  auto dy = q[1] - p[1];
   if (!((std::abs(dx) == 1) ^ (std::abs(dy) == 1))) {
     throw std::invalid_argument("Points are not adjacent");
   }
@@ -138,39 +70,33 @@ rot rot::rand() {
   return rot(static_cast<angle>(r));
 }
 
-point rot::operator*(const point &p) const { return point(cos_ * p.x() - sin_ * p.y(), sin_ * p.x() + cos_ * p.y()); }
+point<2> rot::operator*(const point<2> &p) const {
+  return point<2>({cos_ * p[0] - sin_ * p[1], sin_ * p[0] + cos_ * p[1]});
+}
 
 rot rot::operator*(const rot &r) const { return rot(cos_ * r.cos_ - sin_ * r.sin_, sin_ * r.cos_ + cos_ * r.sin_); }
 
-box rot::operator*(const box &b) const {
-  auto p1 = point(b.x_.left_, b.y_.left_);
-  auto p2 = point(b.x_.right_, b.y_.left_);
-  auto p3 = point(b.x_.right_, b.y_.right_);
-  auto p4 = point(b.x_.left_, b.y_.right_);
+box<2> rot::operator*(const box<2> &b) const {
+  auto p1 = point<2>({b[0].left_, b[1].left_});
+  auto p2 = point<2>({b[0].right_, b[1].left_});
+  auto p3 = point<2>({b[0].right_, b[1].right_});
+  auto p4 = point<2>({b[0].left_, b[1].right_});
 
   auto q1 = *this * p1;
   auto q2 = *this * p2;
   auto q3 = *this * p3;
   auto q4 = *this * p4;
 
-  int min_x = std::min({q1.x(), q2.x(), q3.x(), q4.x()});
-  int max_x = std::max({q1.x(), q2.x(), q3.x(), q4.x()});
-  int min_y = std::min({q1.y(), q2.y(), q3.y(), q4.y()});
-  int max_y = std::max({q1.y(), q2.y(), q3.y(), q4.y()});
+  int min_x = std::min({q1[0], q2[0], q3[0], q4[0]});
+  int max_x = std::max({q1[0], q2[0], q3[0], q4[0]});
+  int min_y = std::min({q1[1], q2[1], q3[1], q4[1]});
+  int max_y = std::max({q1[1], q2[1], q3[1], q4[1]});
 
-  return box(interval(min_x, max_x), interval(min_y, max_y));
+  return box<2>({interval(min_x, max_x), interval(min_y, max_y)});
 }
 
 rot rot::inverse() const { return rot(cos_, -sin_); }
 
 std::string rot::to_string() const { return "(" + std::to_string(cos_) + ", " + std::to_string(sin_) + ")"; }
-
-void to_csv(const std::string &path, const std::vector<point> &points) {
-  // TODO: check path exists
-  std::ofstream file(path);
-  for (const auto &p : points) {
-    file << p.x() << "," << p.y() << std::endl;
-  }
-}
 
 } // namespace pivot
