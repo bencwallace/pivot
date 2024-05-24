@@ -61,13 +61,14 @@ For usage instructions, run the following command:
 Attempt $10^5$ pivots on a $10^6$ step walk:
 
 ```
-./build/pivot --steps 1000000 --iters 100000
+mkdir out
+./build/pivot --steps 1000000 --iters 100000 --out out
 ```
 
 Plot the output:
 
 ```
-python plot.py walk.csv
+python plot.py out/walk.csv
 ```
 
 **Estimating critical exponents**
@@ -86,7 +87,7 @@ mkdir data
 for i in $(seq 0 10)
 do
   steps=$((1000 * 2 ** i))
-  ./build/pivot --success 1 --steps ${steps} --iters $((2 * steps)) --out data
+  ./build/pivot --success -s ${steps} -i $((2 * steps)) --out data
   mv data/endpoints.csv data/${steps}.csv
 done
 ```
