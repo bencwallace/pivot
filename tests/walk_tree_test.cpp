@@ -5,7 +5,7 @@
 using namespace pivot;
 
 TEST(WalkTreeInit, Line) {
-    walk_tree *w = walk_tree::line(5);
+    walk_tree<2> *w = walk_tree<2>::line(5);
     ASSERT_TRUE(w->self_avoiding());
     auto steps = w->steps();
     EXPECT_EQ(steps.size(), 5);
@@ -18,7 +18,7 @@ TEST(WalkTreeInit, Line) {
 }
 
 TEST(WalkTreePivot, PivotLine) {
-    walk_tree *w = walk_tree::line(2);
+    walk_tree<2> *w = walk_tree<2>::line(2);
     pivot::transform<2> trans = transform<2>({1, 0}, {-1, 1});
     EXPECT_TRUE(w->try_pivot(1, trans));
     auto steps = w->steps();
@@ -29,7 +29,7 @@ TEST(WalkTreePivot, PivotLine) {
 }
 
 TEST(WalkTreePivot, PivotLineFail) {
-    walk_tree *w = walk_tree::line(3);
+    walk_tree<2> *w = walk_tree<2>::line(3);
     pivot::transform<2> trans = transform<2>({0, 1}, {-1, 1});
     EXPECT_FALSE(w->try_pivot(2, trans));
     auto steps = w->steps();

@@ -30,11 +30,11 @@ int main(int argc, char **argv) {
 
   CLI11_PARSE(app, argc, argv);
 
-  pivot::walk_base *w;
+  pivot::walk_base<2> *w;
   if (!naive) {
-    w = pivot::walk_tree::line(num_steps);
+    w = pivot::walk_tree<2>::line(num_steps);
   } else {
-    w = new pivot::walk(num_steps);
+    w = new pivot::walk<2>(num_steps);
   }
 
   std::vector<pivot::point<2>> endpoints;
