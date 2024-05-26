@@ -6,7 +6,7 @@
 using namespace pivot;
 
 TEST(IntTest, Walk) {
-  walk w(100);
+  walk<2> w(100);
   for (int i = 0; i < 10; ++i) {
     for (int j = 0; j < 100; j++) {
       w.rand_pivot();
@@ -16,7 +16,7 @@ TEST(IntTest, Walk) {
 }
 
 TEST(IntTest, WalkTree) {
-  walk_tree *w = walk_tree::line(2);
+  walk_tree<2> *w = walk_tree<2>::line(2);
   for (int i = 0; i < 10; ++i) {
     for (int j = 0; j < 100; j++) {
       w->rand_pivot();

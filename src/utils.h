@@ -34,6 +34,12 @@ public:
 
   point(std::array<int, Dim> coords) : coords_(coords) {}
 
+  static point unit(int i) {
+    point<Dim> result;
+    result.coords_[i] = 1;
+    return result;
+  }
+
   int operator[](int i) const { return coords_[i]; }
 
   bool operator==(const point &p) const { return coords_ == p.coords_; }
@@ -62,6 +68,14 @@ public:
       diff[i] = coords_[i] - p.coords_[i];
     }
     return point(diff);
+  }
+
+  friend point operator*(int k, const point &p) {
+    std::array<int, Dim> coords;
+    for (int i = 0; i < Dim; ++i) {
+      coords[i] = k * p.coords_[i];
+    }
+    return point(coords);
   }
 
   std::string to_string() const {
