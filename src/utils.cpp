@@ -13,6 +13,7 @@ interval::interval(int left, int right) : left_(left), right_(right) {}
 
 bool interval::empty() const { return left_ > right_; }
 
+/** @brief Returns the string of the form "[{left_}, {right_}]". */
 std::string interval::to_string() const { return "[" + std::to_string(left_) + ", " + std::to_string(right_) + "]"; }
 
 } // namespace pivot
