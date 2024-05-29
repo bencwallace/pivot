@@ -8,20 +8,20 @@
 
 namespace pivot {
 
-enum angle { zero, ninety, one_eighty, two_seventy };
-
 struct box;
 
 class point {
 
 public:
-  point();
+  point(int dim);
 
-  point(int x, int y);
+  point(std::vector<int> &&coords);
 
-  int x() const;
+  static point unit(int dim, int i);
 
-  int y() const;
+  int dim() const;
+
+  int operator[](int i) const;
 
   bool operator==(const point &p) const;
 
@@ -33,11 +33,12 @@ public:
 
   point operator-(const point &p) const;
 
+  friend point operator*(int k, const point &p);
+
   std::string to_string() const;
 
 private:
-  int x_;
-  int y_;
+  std::vector<int> coords_;
 };
 
 struct interval {
@@ -53,12 +54,13 @@ struct interval {
 };
 
 struct box {
-  interval x_;
-  interval y_;
+  std::vector<interval> intervals_;
 
-  box(interval x, interval y);
+  box(std::vector<interval> &&intervals);
 
   box(std::span<const point> points);
+
+  int dim() const;
 
   bool empty() const;
 
@@ -79,32 +81,36 @@ struct point_hash {
   std::size_t operator()(const point &p) const;
 };
 
-class rot {
+class transform {
 
 public:
-  rot();
+  transform(int dim);
 
-  rot(angle a);
+  transform(std::vector<int> &&perm, std::vector<int> &&signs);
 
-  rot(point p, point q);
+  transform(const point &p, const point &q);
 
-  static rot rand();
+  static transform rand(int dim);
+
+  int dim() const;
+
+  bool operator==(const transform &t) const;
 
   point operator*(const point &p) const;
 
-  rot operator*(const rot &r) const;
+  transform operator*(const transform &t) const;
 
   box operator*(const box &b) const;
 
-  rot inverse() const;
+  transform inverse() const;
+
+  std::vector<std::vector<int>> to_matrix() const;
 
   std::string to_string() const;
 
 private:
-  int cos_;
-  int sin_;
-
-  rot(int cos, int sin);
+  std::vector<int> perm_;
+  std::vector<int> signs_;
 };
 
 void to_csv(const std::string &path, const std::vector<point> &points);

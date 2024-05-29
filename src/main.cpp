@@ -7,6 +7,7 @@
 #include "walk_tree.h"
 
 int main(int argc, char **argv) {
+  int dim;
   int num_steps;
   int iters;
   bool naive{false};
@@ -19,6 +20,7 @@ int main(int argc, char **argv) {
   CLI::App app{"Implementation of the pivot algorithm"};
   argv = app.ensure_utf8(argv);
 
+  app.add_option("-d,--dim", dim, "dimension")->required();
   app.add_option("-s,--steps", num_steps, "number of steps")->required();
   app.add_option("-i,--iters", iters, "number of iterations")->required();
   app.add_flag("--naive", naive, "use naive implementation (slower)");
@@ -32,9 +34,9 @@ int main(int argc, char **argv) {
 
   pivot::walk_base *w;
   if (!naive) {
-    w = pivot::walk_tree::line(num_steps);
+    w = pivot::walk_tree::line(dim, num_steps);
   } else {
-    w = new pivot::walk(num_steps);
+    w = new pivot::walk(dim, num_steps);
   }
 
   std::vector<pivot::point> endpoints;

@@ -4,35 +4,91 @@
 #include <stdexcept>
 #include <vector>
 
+#include <boost/unordered_map.hpp>
+
 #include "utils.h"
 
 namespace pivot {
 
-point::point() : x_(0), y_(0) {}
+/* point and point_hash */
 
-point::point(int x, int y) : x_(x), y_(y) {}
+point::point(int dim) : coords_(dim) {}
 
-int point::x() const { return x_; }
+point::point(std::vector<int> &&coords) : coords_(std::move(coords)) {}
 
-int point::y() const { return y_; }
-
-bool point::operator==(const point &p) const { return x_ == p.x() && y_ == p.y(); }
-
-bool point::operator!=(const point &p) const { return x_ != p.x() || y_ != p.y(); }
-
-point point::operator+(const point &p) const { return point(x_ + p.x(), y_ + p.y()); }
-
-box point::operator+(const box &b) const {
-  return box(interval(x_ + b.x_.left_, x_ + b.x_.right_), interval(y_ + b.y_.left_, y_ + b.y_.right_));
+point point::unit(int dim, int i) {
+  std::vector<int> coords(dim, 0);
+  coords[i] = 1;
+  return point(std::move(coords));
 }
 
-point point::operator-(const point &p) const { return point(x_ - p.x(), y_ - p.y()); }
+int point::dim() const { return coords_.size(); }
 
-std::string point::to_string() const { return "(" + std::to_string(x_) + ", " + std::to_string(y_) + ")"; }
+int point::operator[](int i) const { return coords_[i]; }
+
+bool point::operator==(const point &p) const { return coords_ == p.coords_; }
+
+bool point::operator!=(const point &p) const { return coords_ != p.coords_; }
+
+point point::operator+(const point &p) const {
+  std::vector<int> sum;
+  sum.reserve(dim());
+  for (int i = 0; i < dim(); ++i) {
+    sum.push_back(coords_[i] + p[i]);
+  }
+  return point(std::move(sum));
+}
+
+box point::operator+(const box &b) const {
+  std::vector<interval> intervals;
+  intervals.reserve(dim());
+  for (int i = 0; i < dim(); ++i) {
+    intervals.push_back(interval(coords_[i] + b.intervals_[i].left_, coords_[i] + b.intervals_[i].right_));
+  }
+  return box(std::move(intervals));
+}
+
+point point::operator-(const point &p) const {
+  std::vector<int> diff;
+  diff.reserve(dim());
+  for (int i = 0; i < dim(); ++i) {
+    diff.push_back(coords_[i] - p[i]);
+  }
+  return point(std::move(diff));
+}
+
+point operator*(int k, const point &p) {
+  std::vector<int> coords;
+  coords.reserve(p.dim());
+  for (int i = 0; i < p.dim(); ++i) {
+    coords.push_back(k * p[i]);
+  }
+  return point(std::move(coords));
+}
+
+std::string point::to_string() const {
+  std::string s = "(";
+  for (int i = 0; i < dim(); ++i) {
+    s += std::to_string(coords_[i]);
+    if (i < dim() - 1) {
+      s += ", ";
+    }
+  }
+  s += ")";
+  return s;
+}
 
 point_hash::point_hash(int num_steps) : num_steps_(num_steps) {}
 
-std::size_t point_hash::operator()(const point &p) const { return p.x() + static_cast<size_t>(num_steps_) * p.y(); }
+std::size_t point_hash::operator()(const point &p) const {
+  std::size_t seed = 0;
+  for (int i = 0; i < p.dim(); ++i) {
+    boost::hash_combine(seed, p[i]);
+  }
+  return seed;
+}
+
+/* interval and box */
 
 interval::interval() : interval(0, 0) {}
 
@@ -42,135 +98,195 @@ bool interval::empty() const { return left_ > right_; }
 
 std::string interval::to_string() const { return "[" + std::to_string(left_) + ", " + std::to_string(right_) + "]"; }
 
-box::box(interval x, interval y) : x_(x), y_(y) {}
+box::box(std::vector<interval> &&intervals) : intervals_(std::move(intervals)) {}
+
+int box::dim() const { return intervals_.size(); }
 
 box::box(std::span<const point> points) {
-  int min_x = std::numeric_limits<int>::max();
-  int max_x = std::numeric_limits<int>::min();
-  int min_y = std::numeric_limits<int>::max();
-  int max_y = std::numeric_limits<int>::min();
+  int dim = points[0].dim();
+  std::vector<int> min(dim);
+  std::vector<int> max(dim);
+  for (int i = 0; i < dim; ++i) {
+    min[i] = std::numeric_limits<int>::max();
+    max[i] = std::numeric_limits<int>::min();
+  }
   for (const auto &p : points) {
-    min_x = std::min(min_x, p.x());
-    max_x = std::max(max_x, p.x());
-    min_y = std::min(min_y, p.y());
-    max_y = std::max(max_y, p.y());
+    for (int i = 0; i < dim; ++i) {
+      min[i] = std::min(min[i], p[i]);
+      max[i] = std::max(max[i], p[i]);
+    }
   }
 
-  // anchor at (1, 0)
-  x_.left_ = min_x - points[0].x() + 1;
-  x_.right_ = max_x - points[0].x() + 1;
-  y_.left_ = min_y - points[0].y();
-  y_.right_ = max_y - points[0].y();
+  intervals_.resize(dim);
+  // anchor at (1, 0, ..., 0)
+  intervals_[0] = interval(min[0] - points[0][0] + 1, max[0] - points[0][0] + 1);
+  for (int i = 1; i < dim; ++i) {
+
+    intervals_[i] = interval(min[i] - points[0][i], max[i] - points[0][i]);
+  }
 }
 
-bool box::empty() const { return x_.empty() || y_.empty(); }
+bool box::empty() const {
+  return std::any_of(intervals_.begin(), intervals_.end(), [](const interval &i) { return i.empty(); });
+}
 
 box box::operator+(const box &b1) const {
-  int min_x = std::min(x_.left_, b1.x_.left_);
-  int max_x = std::max(x_.right_, b1.x_.right_);
-  int min_y = std::min(y_.left_, b1.y_.left_);
-  int max_y = std::max(y_.right_, b1.y_.right_);
-  return box(interval(min_x, max_x), interval(min_y, max_y));
+  std::vector<interval> intervals;
+  intervals.reserve(dim());
+  for (int i = 0; i < dim(); ++i) {
+    intervals.push_back(interval(std::min(intervals_[i].left_, b1.intervals_[i].left_),
+                                 std::max(intervals_[i].right_, b1.intervals_[i].right_)));
+  }
+  return box(std::move(intervals));
 }
 
 box box::operator*(const box &b1) const {
-  int min_x = std::max(x_.left_, b1.x_.left_);
-  int max_x = std::min(x_.right_, b1.x_.right_);
-  int min_y = std::max(y_.left_, b1.y_.left_);
-  int max_y = std::min(y_.right_, b1.y_.right_);
-  return box(interval(min_x, max_x), interval(min_y, max_y));
+  std::vector<interval> intervals;
+  intervals.reserve(dim());
+  for (int i = 0; i < dim(); ++i) {
+    intervals.push_back(interval(std::max(intervals_[i].left_, b1.intervals_[i].left_),
+                                 std::min(intervals_[i].right_, b1.intervals_[i].right_)));
+  }
+  return box(std::move(intervals));
 }
 
-std::string box::to_string() const { return x_.to_string() + " x " + y_.to_string(); }
+std::string box::to_string() const {
+  std::string s = "";
+  for (int i = 0; i < dim(); ++i) {
+    s += intervals_[i].to_string();
+    if (i < dim() - 1) {
+      s += " x ";
+    }
+  }
+  return s;
+}
 
-rot::rot() : cos_(1), sin_(0) {}
+/* transform */
 
-rot::rot(angle a) {
-  switch (a) {
-  case zero:
-    cos_ = 1;
-    sin_ = 0;
-    break;
-  case ninety:
-    cos_ = 0;
-    sin_ = 1;
-    break;
-  case one_eighty:
-    cos_ = -1;
-    sin_ = 0;
-    break;
-  case two_seventy:
-    cos_ = 0;
-    sin_ = -1;
-    break;
+transform::transform(int dim) : perm_(), signs_(dim, 1) {
+  for (int i = 0; i < dim; ++i) {
+    perm_.push_back(i);
   }
 }
 
-rot::rot(point p, point q) {
-  auto dx = q.x() - p.x();
-  auto dy = q.y() - p.y();
-  if (!((std::abs(dx) == 1) ^ (std::abs(dy) == 1))) {
+transform::transform(std::vector<int> &&perm, std::vector<int> &&signs)
+    : perm_(std::move(perm)), signs_(std::move(signs)) {}
+
+transform::transform(const point &p, const point &q) : transform(p.dim()) {
+  point diff = q - p;
+  int idx = -1;
+  for (int i = 0; i < dim(); ++i) {
+    if (std::abs(diff[i]) == 1) {
+      if (idx == -1) {
+        idx = i;
+      } else { // a differing coordinate has already been found
+        throw std::invalid_argument("Points are not adjacent");
+      }
+    }
+  }
+  if (idx == -1) {
     throw std::invalid_argument("Points are not adjacent");
   }
-  if (dx == 0) {
-    if (dy == 1) {
-      cos_ = 0;
-      sin_ = 1;
-    } else if (dy == -1) {
-      cos_ = 0;
-      sin_ = -1;
+  perm_[0] = idx;
+  perm_[idx] = 0;
+  signs_[0] = -diff[idx];
+  signs_[idx] = diff[idx];
+}
+
+transform transform::rand(int dim) {
+  std::vector<int> perm(dim);
+  std::vector<int> signs(dim);
+  for (int i = 0; i < dim; ++i) {
+    perm[i] = i;
+    signs[i] = 2 * (std::rand() % 2) - 1;
+  }
+  std::random_shuffle(perm.begin(), perm.end());
+  return transform(std::move(perm), std::move(signs));
+}
+
+int transform::dim() const { return perm_.size(); }
+
+bool transform::operator==(const transform &t) const { return perm_ == t.perm_ && signs_ == t.signs_; }
+
+point transform::operator*(const point &p) const {
+  std::vector<int> coords(dim());
+  for (int i = 0; i < dim(); ++i) {
+    coords[i] = signs_[i] * p[perm_[i]];
+  }
+  return point(std::move(coords));
+}
+
+box transform::operator*(const box &b) const {
+  // TODO: test this
+  std::vector<interval> intervals(dim());
+  for (int i = 0; i < dim(); ++i) {
+    int x = signs_[perm_[i]] * b.intervals_[i].left_;
+    int y = signs_[perm_[i]] * b.intervals_[i].right_;
+    intervals[perm_[i]] = interval(std::min(x, y), std::max(x, y));
+  }
+  return box(std::move(intervals));
+}
+
+transform transform::operator*(const transform &t) const {
+  std::vector<int> perm(dim());
+  std::vector<int> signs(dim());
+  for (int i = 0; i < dim(); ++i) {
+    perm[i] = perm_[t.perm_[i]];
+    signs[perm[i]] = signs_[perm[i]] * t.signs_[t.perm_[i]];
+  }
+  return transform(std::move(perm), std::move(signs));
+}
+
+transform transform::inverse() const {
+  std::vector<int> perm(dim());
+  std::vector<int> signs(dim());
+  for (int i = 0; i < dim(); ++i) {
+    perm[perm_[i]] = i;
+    signs[i] = signs_[perm_[i]];
+  }
+  return transform(std::move(perm), std::move(signs));
+}
+
+std::vector<std::vector<int>> transform::to_matrix() const {
+  std::vector<std::vector<int>> matrix(dim(), std::vector<int>(dim(), 0));
+  for (int i = 0; i < dim(); ++i) {
+    matrix[perm_[i]][i] = signs_[perm_[i]];
+  }
+  return matrix;
+}
+
+std::string transform::to_string() const {
+  auto matrix = to_matrix();
+  std::string s = "[";
+  for (int i = 0; i < dim(); ++i) {
+    s += "[";
+    for (int j = 0; j < dim() - 1; ++j) {
+      s += std::to_string(matrix[i][j]) + ", ";
     }
-  } else if (dy == 0) {
-    if (dx == 1) {
-      cos_ = 1;
-      sin_ = 0;
-    } else if (dx == -1) {
-      cos_ = -1;
-      sin_ = 0;
+    s += std::to_string(matrix[i][dim() - 1]) + "]";
+    if (i < dim() - 1) {
+      s += ", ";
     }
   }
+  s += "]";
+  return s;
 }
 
-rot::rot(int cos, int sin) : cos_(cos), sin_(sin) {}
-
-rot rot::rand() {
-  auto r = 1 + std::rand() % 3;
-  return rot(static_cast<angle>(r));
-}
-
-point rot::operator*(const point &p) const { return point(cos_ * p.x() - sin_ * p.y(), sin_ * p.x() + cos_ * p.y()); }
-
-rot rot::operator*(const rot &r) const { return rot(cos_ * r.cos_ - sin_ * r.sin_, sin_ * r.cos_ + cos_ * r.sin_); }
-
-box rot::operator*(const box &b) const {
-  auto p1 = point(b.x_.left_, b.y_.left_);
-  auto p2 = point(b.x_.right_, b.y_.left_);
-  auto p3 = point(b.x_.right_, b.y_.right_);
-  auto p4 = point(b.x_.left_, b.y_.right_);
-
-  auto q1 = *this * p1;
-  auto q2 = *this * p2;
-  auto q3 = *this * p3;
-  auto q4 = *this * p4;
-
-  int min_x = std::min({q1.x(), q2.x(), q3.x(), q4.x()});
-  int max_x = std::max({q1.x(), q2.x(), q3.x(), q4.x()});
-  int min_y = std::min({q1.y(), q2.y(), q3.y(), q4.y()});
-  int max_y = std::max({q1.y(), q2.y(), q3.y(), q4.y()});
-
-  return box(interval(min_x, max_x), interval(min_y, max_y));
-}
-
-rot rot::inverse() const { return rot(cos_, -sin_); }
-
-std::string rot::to_string() const { return "(" + std::to_string(cos_) + ", " + std::to_string(sin_) + ")"; }
+/* misc */
 
 void to_csv(const std::string &path, const std::vector<point> &points) {
   // TODO: check path exists
   std::ofstream file(path);
   for (const auto &p : points) {
-    file << p.x() << "," << p.y() << std::endl;
+    for (int i = 0; i < p.dim(); ++i) {
+      file << p[i];
+      if (i < p.dim() - 1) {
+        file << ",";
+      }
+    }
+    file << std::endl;
   }
+  file.close();
 }
 
 } // namespace pivot

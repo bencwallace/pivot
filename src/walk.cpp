@@ -8,12 +8,15 @@
 
 namespace pivot {
 
-walk::walk(int num_steps) : steps_(num_steps), occupied_(num_steps, point_hash(num_steps)) {
+walk::walk(int dim, int num_steps) : steps_(), occupied_(num_steps, point_hash(num_steps)) {
+  steps_.reserve(num_steps);
   for (int i = 0; i < num_steps; ++i) {
-    steps_[i] = point(i, 0);
+    steps_.push_back(i * point::unit(dim, 0));
     occupied_[steps_[i]] = i;
   }
 }
+
+int walk::dim() const { return steps_[0].dim(); }
 
 int walk::num_steps() const { return steps_.size(); }
 
@@ -21,8 +24,8 @@ point walk::endpoint() const { return steps_.back(); }
 
 std::pair<int, std::optional<std::vector<point>>> walk::try_rand_pivot() const {
   auto step = std::rand() % num_steps();
-  auto r = rot::rand();
-  return {step, try_pivot(step, r)};
+  auto t = transform::rand(dim());
+  return {step, try_pivot(step, t)};
 }
 
 bool walk::rand_pivot() {
@@ -77,20 +80,21 @@ bool walk::self_avoiding() const {
 
 void walk::export_csv(const std::string &path) const { return to_csv(path, steps_); }
 
-point walk::pivot_point(int step, int i, rot r) const {
+point walk::pivot_point(int step, int i, const transform &t) const {
   auto p = steps_[step];
-  return p + r * (steps_[i] - p);
+  return p + t * (steps_[i] - p);
 }
 
-std::optional<std::vector<point>> walk::try_pivot(int step, const rot &r) const {
-  std::vector<point> new_points(num_steps() - step - 1);
+std::optional<std::vector<point>> walk::try_pivot(int step, const transform &t) const {
+  std::vector<point> new_points;
+  new_points.reserve(num_steps() - step - 1);
   for (int i = step + 1; i < num_steps(); ++i) {
-    auto q = pivot_point(step, i, r);
+    auto q = pivot_point(step, i, t);
     auto it = occupied_.find(q);
     if (it != occupied_.end() && it->second <= step) {
       return {};
     }
-    new_points[i - step - 1] = q;
+    new_points.push_back(q);
   }
   return new_points;
 }

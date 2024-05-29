@@ -15,7 +15,7 @@ namespace pivot {
 class walk : public walk_base {
 
 public:
-  walk(int num_steps);
+  walk(int dim, int num_steps);
 
   walk(const walk &w) = delete;
   walk(walk &&w) = delete;
@@ -23,11 +23,13 @@ public:
 
   ~walk() = default;
 
+  int dim() const;
+
   int num_steps() const;
 
   point endpoint() const override;
 
-  std::optional<std::vector<point>> try_pivot(int step, const rot &r) const;
+  std::optional<std::vector<point>> try_pivot(int step, const transform &t) const;
 
   std::pair<int, std::optional<std::vector<point>>> try_rand_pivot() const;
 
@@ -45,7 +47,7 @@ protected:
 
   void do_pivot(int step, std::vector<point> &new_points);
 
-  point pivot_point(int step, int i, rot r) const;
+  point pivot_point(int step, int i, const transform &t) const;
 };
 
 } // namespace pivot

@@ -5,35 +5,37 @@
 using namespace pivot;
 
 TEST(WalkTreeInit, Line) {
-    walk_tree *w = walk_tree::line(5);
+    walk_tree *w = walk_tree::line(2, 5);
     ASSERT_TRUE(w->self_avoiding());
     auto steps = w->steps();
     EXPECT_EQ(steps.size(), 5);
     for (int i = 0; i < 5; i++) {
-        EXPECT_EQ(steps[i], pivot::point(i + 1, 0));
+        EXPECT_EQ(steps[i], pivot::point({i + 1, 0}));
     }
     EXPECT_FALSE(w->is_leaf());
-    EXPECT_EQ(w->endpoint(), pivot::point(5, 0));
+    EXPECT_EQ(w->endpoint(), pivot::point({5, 0}));
     delete w;
 }
 
 TEST(WalkTreePivot, PivotLine) {
-    walk_tree *w = walk_tree::line(2);
-    EXPECT_TRUE(w->try_pivot(1, angle::ninety));
+    walk_tree *w = walk_tree::line(2, 2);
+    transform t({1, 0}, {-1, 1});
+    EXPECT_TRUE(w->try_pivot(1, t));
     auto steps = w->steps();
     EXPECT_EQ(steps.size(), 2);
-    EXPECT_EQ(steps[0], pivot::point(1, 0));
-    EXPECT_EQ(steps[1], pivot::point(1, 1));
+    EXPECT_EQ(steps[0], pivot::point({1, 0}));
+    EXPECT_EQ(steps[1], pivot::point({1, 1}));
     delete w;
 }
 
 TEST(WalkTreePivot, PivotLineFail) {
-    walk_tree *w = walk_tree::line(3);
-    EXPECT_FALSE(w->try_pivot(2, angle::one_eighty));
+    walk_tree *w = walk_tree::line(2, 3);
+    transform t({0, 1}, {-1, 1});
+    EXPECT_FALSE(w->try_pivot(2, t));
     auto steps = w->steps();
     EXPECT_EQ(steps.size(), 3);
-    EXPECT_EQ(steps[0], pivot::point(1, 0));
-    EXPECT_EQ(steps[1], pivot::point(2, 0));
-    EXPECT_EQ(steps[2], pivot::point(3, 0));
+    EXPECT_EQ(steps[0], pivot::point({1, 0}));
+    EXPECT_EQ(steps[1], pivot::point({2, 0}));
+    EXPECT_EQ(steps[2], pivot::point({3, 0}));
     delete w;
 }

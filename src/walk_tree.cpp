@@ -6,13 +6,14 @@
 
 namespace pivot {
 
-walk_tree *walk_tree::line(int num_sites, bool balanced) {
+walk_tree *walk_tree::line(int dim, int num_sites, bool balanced) {
   if (num_sites < 2) {
     throw std::invalid_argument("num_sites must be at least 2");
   }
-  std::vector<point> steps(num_sites);
+  std::vector<point> steps;
+  steps.reserve(num_sites);
   for (int i = 0; i < num_sites; ++i) {
-    steps[i] = point(i + 1, 0);
+    steps.push_back((i + 1) * point::unit(dim, 0));
   }
   walk_tree *root = balanced ? balanced_rep(steps) : pivot_rep(steps);
   return root;
@@ -23,10 +24,10 @@ walk_tree *walk_tree::pivot_rep(const std::vector<point> &steps) {
   if (num_sites < 2) {
     throw std::invalid_argument("num_sites must be at least 2");
   }
-  walk_tree *root = new walk_tree(1, num_sites, rot(steps[0], steps[1]), box(steps), steps[num_sites - 1]);
+  walk_tree *root = new walk_tree(1, num_sites, transform(steps[0], steps[1]), box(steps), steps[num_sites - 1]);
   auto node = root;
   for (int i = 0; i < num_sites - 2; ++i) {
-    node->right_ = new walk_tree(i + 2, num_sites - i - 1, rot(steps[i + 1], steps[i + 2]),
+    node->right_ = new walk_tree(i + 2, num_sites - i - 1, transform(steps[i + 1], steps[i + 2]),
                                  box(std::span<const point>(steps).subspan(i + 1)), steps[num_sites - 1]);
     node->right_->parent_ = node;
     node = node->right_;
@@ -40,11 +41,11 @@ walk_tree *walk_tree::balanced_rep(std::span<const point> steps, int start) {
     throw std::invalid_argument("num_sites must be at least 1");
   }
   if (num_sites == 1) {
-    return &leaf();
+    return &leaf(steps[0].dim());
   }
   int n = std::floor((1 + num_sites) / 2.0);
-  walk_tree *root = new walk_tree(start + n - 1, num_sites, rot(steps[n - 1], steps[n]), box(steps),
-                                  steps[num_sites - 1] - steps[0] + point(1, 0));
+  walk_tree *root = new walk_tree(start + n - 1, num_sites, transform(steps[n - 1], steps[n]), box(steps),
+                                  steps[num_sites - 1] - steps[0] + point::unit(steps[0].dim(), 0));
   if (n >= 1) {
     root->left_ = balanced_rep(steps.subspan(0, n), start);
     root->left_->parent_ = root;
@@ -58,19 +59,21 @@ walk_tree *walk_tree::balanced_rep(std::span<const point> steps, int start) {
 
 walk_tree *walk_tree::balanced_rep(const std::vector<point> &steps) { return balanced_rep(steps, 1); }
 
-walk_tree::walk_tree(int id, int num_sites, rot symm, box bbox, point end)
+walk_tree::walk_tree(int id, int num_sites, const transform &symm, const box &bbox, const point &end)
     : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
 
 // NOLINTBEGIN(clang-analyzer-cplusplus.NewDelete)
 walk_tree::~walk_tree() {
-  if (left_ != nullptr && left_ != &leaf()) {
+  if (left_ != nullptr && left_ != &leaf(dim())) {
     delete left_;
   }
-  if (right_ != nullptr && right_ != &leaf()) {
+  if (right_ != nullptr && right_ != &leaf(dim())) {
     delete right_;
   }
 }
 // NOLINTEND(clang-analyzer-cplusplus.NewDelete)
+
+int walk_tree::dim() const { return end_.dim(); }
 
 bool walk_tree::is_leaf() const { return left_ == nullptr && right_ == nullptr; }
 
@@ -245,15 +248,24 @@ void walk_tree::todot(const std::string &path) const {
   gvc.gvFreeContext(context);
 }
 
-walk_tree &walk_tree::leaf() {
-  static auto leaf_ = walk_tree(0, 1, rot(), box(interval(1, 1), interval(0, 0)), point(1, 0));
+walk_tree &walk_tree::leaf(int dim) {
+  // TODO: don't pass in dim
+  std::vector<interval> intervals;
+  intervals.reserve(dim);
+  intervals.push_back(interval(1, 1));
+  for (int i = 1; i < dim; ++i) {
+    intervals.push_back(interval(0, 0));
+  }
+  static auto leaf_ = walk_tree(0, 1, transform(dim), box(std::move(intervals)), point::unit(dim, 0));
   return leaf_;
 }
 
-bool walk_tree::intersect() const { return ::pivot::intersect(left_, right_, point(), left_->end_, rot(), symm_); }
+bool walk_tree::intersect() const {
+  return ::pivot::intersect(left_, right_, point(dim()), left_->end_, transform(dim()), symm_);
+}
 
 bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_anchor, const point &r_anchor,
-               const rot &l_symm, const rot &r_symm) {
+               const transform &l_symm, const transform &r_symm) {
   auto l_box = l_anchor + l_symm * l_walk->bbox_;
   auto r_box = r_anchor + r_symm * r_walk->bbox_;
   if ((l_box * r_box).empty()) {
@@ -275,12 +287,12 @@ bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_
   }
 }
 
-bool walk_tree::try_pivot(int n, const rot &r) {
+bool walk_tree::try_pivot(int n, const transform &t) {
   shuffle_up(n);
-  symm_ = symm_ * r;
+  symm_ = symm_ * t;
   auto success = !intersect();
   if (!success) {
-    symm_ = symm_ * r.inverse();
+    symm_ = symm_ * t.inverse();
   } else {
     merge();
   }
@@ -290,8 +302,8 @@ bool walk_tree::try_pivot(int n, const rot &r) {
 
 bool walk_tree::rand_pivot() {
   auto site = 1 + (std::rand() % (num_sites_ - 1));
-  auto r = rot::rand();
-  return try_pivot(site, r);
+  auto t = transform::rand(dim());
+  return try_pivot(site, t);
 }
 
 bool walk_tree::self_avoiding() const {
