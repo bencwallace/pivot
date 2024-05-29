@@ -74,6 +74,10 @@ int main(int argc, char **argv) {
   }
   if (verify) {
     std::cout << "Verifying self-avoiding\n";
-    assert(w->self_avoiding());
+    if (!w->self_avoiding()) {
+      std::cerr << "Walk is not self-avoiding\n";
+      return 1;
+    }
   }
+  delete w;
 }
