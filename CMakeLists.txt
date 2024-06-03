@@ -11,6 +11,9 @@ set(SANITIZE_FLAGS "-fsanitize=address,leak,undefined -fno-omit-frame-pointer -f
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${DEBUG_FLAGS}")
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
   add_definitions(-Wno-deprecated-declarations)  # TODO: re-enable this
+  if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
+    message(WARNING "clang-13 or less is recommended.")
+  endif()
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${SANITIZE_FLAGS}")
 elseif(CMAKE_BUILD_TYPE STREQUAL Debug)
   message(WARNING "Compiling without clang. Disabling sanitizers.")
