@@ -12,8 +12,8 @@ jobs:
 
     env:
       BUILD_TYPE: Debug
-      CC: clang
-      CXX: clang++
+      CC: clang-13
+      CXX: clang++-13
 
     steps:
     - uses: actions/checkout@v4
