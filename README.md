@@ -90,7 +90,7 @@ mkdir data
 for i in $(seq 0 10)
 do
   steps=$((1000 * 2 ** i))
-  ./build/pivot --success -s ${steps} -i $((2 * steps)) --out data
+  ./build/pivot --success -d 2 -s ${steps} -i $((2 * steps)) --out data
   mv data/endpoints.csv data/${steps}.csv
 done
 ```
@@ -129,7 +129,6 @@ The output should be close to 3/4, the predicted value for $\nu$ in 2 dimensions
 
 I hope to make the following changes in the future:
 
-* Lift restriction to $d = 2$ dimensions
 * Use Clisby's `fast_pivot` method
 * Improve initialization methods (e.g. Clisby's `pseudo_dimerize` method)
 * Add Python bindings
