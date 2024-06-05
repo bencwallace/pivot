@@ -40,7 +40,7 @@ template <int Dim> class point {
 public:
   point() = default;
 
-  point(std::array<int, Dim> coords) : coords_(coords) {}
+  point(const std::array<int, Dim> &coords) : coords_(coords) {}
 
   /**
    * @brief Returns the unit vector e_i.
@@ -120,7 +120,7 @@ template <int Dim> struct box {
 
   box() = delete;
 
-  box(std::array<interval, Dim> intervals) : intervals_(intervals) {}
+  box(const std::array<interval, Dim> &intervals) : intervals_(intervals) {}
 
   /**
    * @brief Constructs the smallest box containing a sequence of Dim-dimensional points.
@@ -236,7 +236,7 @@ public:
   }
 
   // TODO: this should be private
-  transform(std::array<int, Dim> perm, std::array<int, Dim> signs) : perm_(perm), signs_(signs) {}
+  transform(const std::array<int, Dim> &perm, const std::array<int, Dim> &signs) : perm_(perm), signs_(signs) {}
 
   /**
    * @brief Constructs a "pivot" transformation from two input points.
