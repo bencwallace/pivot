@@ -114,6 +114,8 @@ private:
   std::array<int, Dim> coords_{};
 };
 
+template <typename S, typename T, T Dim> point(std::array<S, Dim>) -> point<Dim>;
+
 /** @brief Represents a Dim-dimensional box. */
 template <int Dim> struct box {
   std::array<interval, Dim> intervals_;
@@ -193,6 +195,8 @@ template <int Dim> struct box {
     return s;
   }
 };
+
+template <typename S, typename T, S Dim, T N> box(std::array<point<Dim>, N>) -> box<Dim>;
 
 struct point_hash {
   int num_steps_;
