@@ -11,6 +11,11 @@ interval::interval() : interval(0, 0) {}
 
 interval::interval(int left, int right) : left_(left), right_(right) {}
 
+// TODO: don't distinguish empty intervals
+bool interval::operator==(const interval &other) const { return left_ == other.left_ && right_ == other.right_; }
+
+bool interval::operator!=(const interval &other) const { return !(*this == other); }
+
 bool interval::empty() const { return left_ > right_; }
 
 /** @brief Returns the string of the form "[{left_}, {right_}]". */

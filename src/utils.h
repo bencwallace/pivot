@@ -27,6 +27,10 @@ struct interval {
   interval();
   interval(int left, int right);
 
+  bool operator==(const interval &i) const;
+
+  bool operator!=(const interval &i) const;
+
   bool empty() const;
 
   std::string to_string() const;
@@ -148,6 +152,10 @@ template <int Dim> struct box {
       intervals_[i] = interval(min[i] - points[0][i], max[i] - points[0][i]);
     }
   }
+
+  bool operator==(const box &b) const { return intervals_ == b.intervals_; }
+
+  bool operator!=(const box &b) const { return intervals_ != b.intervals_; }
 
   interval operator[](int i) const { return intervals_[i]; }
 

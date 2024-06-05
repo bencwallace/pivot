@@ -146,6 +146,68 @@ TEST(BoxTest, ToString) {
     EXPECT_EQ(b2.to_string(), "[-1, 1] x [0, 1]");
 }
 
+TEST(TransformTest, Pivot2D) {
+    auto e0 = point<2>::unit(0);
+
+    point<2> p1({3, 4});
+    point<2> p2({4, 4});
+    transform t1(p1, p2);
+    EXPECT_EQ(p1 + t1 * e0, p2);
+
+    point<2> p3({3, 5});
+    transform t2(p1, p3);
+    EXPECT_EQ(p1 + t2 * e0, p3);
+}
+
+TEST(TransformTest, Pivot3D) {
+    auto e0 = point<3>::unit(0);
+
+    point<3> p1({3, 4, 5});
+    point<3> p2({4, 4, 5});
+    transform t1(p1, p2);
+    EXPECT_EQ(p1 + t1 * e0, p2);
+
+    point<3> p3({3, 5, 5});
+    transform t2(p1, p3);
+    EXPECT_EQ(p1 + t2 * e0, p3);
+}
+
+TEST(TransformTest, Compose) {
+    auto t1 = transform<2>::rand();
+    auto t2 = transform<2>::rand();
+    auto t3 = t1 * t2;
+    auto p = point<2>({1, 2});
+    EXPECT_EQ(t3 * p, t1 * (t2 * p)) << "t1: " << t1.to_string() << ", t2: " << t2.to_string();
+}
+
+TEST(TransformTest, Box2D) {
+    box<2> b({interval{1, 5}, interval{2, 4}});
+
+    point<2> p1({0, 0});
+    point<2> p2({0, 1});
+    transform<2> t1(p1, p2);
+    EXPECT_EQ(t1 * b, box<2>({interval{-4, -2}, interval{1, 5}}));
+
+    transform<2> t2({0, 1}, {-1, 1});
+    EXPECT_EQ(t2 * b, box<2>({interval{-5, -1}, interval{2, 4}}));
+}
+
+TEST(TransformTest, Span3D) {
+    auto e0 = point<3>::unit(0);
+
+    auto p1 = point<3>({1, 2, 3});
+    auto p2 = point<3>({4, 5, 6});
+    auto bp = (p1 - e0) + box(std::array{p1, p2}); // undo anchoring
+
+    auto t = transform<3>::rand();
+    auto tbp = t * bp;
+    auto tp1 = t * p1;
+    auto tp2 = t * p2;
+    auto btp = (tp1 - e0) + box(std::array{tp1, tp2}); // undo anchoring
+
+    EXPECT_EQ(btp, tbp) << "t: " << t.to_string();
+}
+
 TEST(TransformTest, Inverse2D) {
     transform<2> id({0, 1}, {1, 1});
     auto o = point<2>({0, 0});
