@@ -16,12 +16,11 @@ TEST(IntTest, Walk) {
 }
 
 TEST(IntTest, WalkTree) {
-  walk_node<2> *w = walk_node<2>::line(2);
+  auto w = walk_tree<2>(2);
   for (int i = 0; i < 10; ++i) {
     for (int j = 0; j < 100; j++) {
-      w->rand_pivot();
+      w.rand_pivot();
     }
-    EXPECT_TRUE(w->self_avoiding());
+    EXPECT_TRUE(w.self_avoiding());
   }
-  delete w;
 }

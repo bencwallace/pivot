@@ -55,7 +55,7 @@ public:
   bool rand_pivot() override {
     auto [step, new_points] = try_rand_pivot();
     if (!new_points) {
-      return false; // NOLINT(clang-analyzer-cplusplus.NewDeleteLeaks)
+      return false;
     }
     do_pivot(step, new_points.value());
     return true;

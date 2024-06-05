@@ -12,25 +12,15 @@ namespace pivot {
 
 template <int Dim> class walk_node;
 
+template <int Dim> class walk_tree;
+
 template <int Dim>
 bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point<Dim> &l_anchor,
                const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm);
 
-template <int Dim> class walk_node : public walk_base<Dim> {
+template <int Dim> class walk_node {
 
 public:
-  static walk_node *line(int num_sites, bool balanced = true) {
-    if (num_sites < 2) {
-      throw std::invalid_argument("num_sites must be at least 2");
-    }
-    std::vector<point<Dim>> steps(num_sites);
-    for (int i = 0; i < num_sites; ++i) {
-      steps[i] = (i + 1) * point<Dim>::unit(0);
-    }
-    walk_node *root = balanced ? balanced_rep(steps) : pivot_rep(steps);
-    return root;
-  }
-
   static walk_node *pivot_rep(const std::vector<point<Dim>> &steps) {
     int num_sites = steps.size();
     if (num_sites < 2) {
@@ -54,7 +44,6 @@ public:
   walk_node(walk_node &&w) = delete;
   walk_node &operator=(const walk_node &w) = delete;
 
-  // NOLINTBEGIN(clang-analyzer-cplusplus.NewDelete)
   ~walk_node() {
     if (left_ != nullptr && left_ != &leaf()) {
       delete left_;
@@ -63,42 +52,10 @@ public:
       delete right_;
     }
   }
-  // NOLINTEND(clang-analyzer-cplusplus.NewDelete)
 
   bool is_leaf() const { return left_ == nullptr && right_ == nullptr; }
 
-  point<Dim> endpoint() const override { return end_; }
-
-  bool try_pivot(int n, const transform<Dim> &r) {
-    shuffle_up(n);
-    symm_ = symm_ * r; // modify in-place
-    auto success = !intersect();
-    if (!success) {
-      symm_ = symm_ * r.inverse(); // TODO: backup symm_
-    } else {
-      merge();
-    }
-    shuffle_down();
-    return success;
-  }
-
-  bool rand_pivot() override {
-    auto site = 1 + (std::rand() % (num_sites_ - 1)); // NOLINT(clang-analyzer-core.DivideZero)
-    auto r = transform<Dim>::rand();
-    return try_pivot(site, r);
-  }
-
-  bool self_avoiding() const override {
-    auto steps = this->steps();
-    for (size_t i = 0; i < steps.size(); ++i) {
-      for (size_t j = i + 1; j < steps.size(); ++j) {
-        if (steps[i] == steps[j]) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
+  point<Dim> endpoint() const { return end_; }
 
   std::vector<point<Dim>> steps() const {
     std::vector<point<Dim>> result;
@@ -117,8 +74,6 @@ public:
 
     return result;
   }
-
-  void export_csv(const std::string &path) const override { return to_csv(path, steps()); }
 
   void todot(const std::string &path) const {
     gvc_t &gvc = gvc_t::load();
@@ -147,6 +102,8 @@ private:
   transform<Dim> symm_;
   box<Dim> bbox_;
   point<Dim> end_;
+
+  friend class walk_tree<Dim>;
 
   walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end)
       : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
@@ -346,5 +303,66 @@ bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const
                      r_symm * r_walk->symm_);
   }
 }
+
+template <int Dim> class walk_tree : public walk_base<Dim> {
+
+public:
+  walk_tree(int num_sites, bool balanced = true) {
+    if (num_sites < 2) {
+      throw std::invalid_argument("num_sites must be at least 2");
+    }
+    std::vector<point<Dim>> steps(num_sites);
+    for (int i = 0; i < num_sites; ++i) {
+      steps[i] = (i + 1) * point<Dim>::unit(0);
+    }
+    root_ = balanced ? walk_node<Dim>::balanced_rep(steps) : walk_node<Dim>::pivot_rep(steps);
+  }
+
+  ~walk_tree() override { delete root_; }
+
+  point<Dim> endpoint() const override { return root_->endpoint(); }
+
+  bool is_leaf() const { return root_->is_leaf(); }
+
+  bool try_pivot(int n, const transform<Dim> &r) {
+    root_->shuffle_up(n);
+    root_->symm_ = root_->symm_ * r; // modify in-place
+    auto success = !root_->intersect();
+    if (!success) {
+      root_->symm_ = root_->symm_ * r.inverse(); // TODO: backup symm_
+    } else {
+      root_->merge();
+    }
+    root_->shuffle_down();
+    return success;
+  }
+
+  bool rand_pivot() override {
+    auto site = 1 + (std::rand() % (root_->num_sites_ - 1)); // NOLINT(clang-analyzer-core.DivideZero)
+    auto r = transform<Dim>::rand();
+    return try_pivot(site, r);
+  }
+
+  std::vector<point<Dim>> steps() const { return root_->steps(); }
+
+  bool self_avoiding() const override {
+    auto steps = this->steps();
+    for (size_t i = 0; i < steps.size(); ++i) {
+      for (size_t j = i + 1; j < steps.size(); ++j) {
+        if (steps[i] == steps[j]) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  void export_csv(const std::string &path) const override { return to_csv(path, steps()); }
+
+private:
+  walk_node<Dim> *root_;
+
+  walk_tree(walk_node<Dim> *root) : root_(root) {}
+};
 
 } // namespace pivot
