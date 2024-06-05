@@ -11,7 +11,7 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
               const std::string &out_dir) {
   pivot::walk_base<Dim> *w;
   if (!naive) {
-    w = pivot::walk_tree<Dim>::line(num_steps);
+    w = pivot::walk_node<Dim>::line(num_steps);
   } else {
     w = new pivot::walk<Dim>(num_steps);
   }
