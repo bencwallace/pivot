@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+#include <random>
 #include <vector>
 
 #include <gvc.h>
@@ -307,7 +309,7 @@ bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const
 template <int Dim> class walk_tree : public walk_base<Dim> {
 
 public:
-  walk_tree(int num_sites, bool balanced = true) {
+  walk_tree(int num_sites, std::optional<unsigned int> seed = std::nullopt, bool balanced = true) {
     if (num_sites < 2) {
       throw std::invalid_argument("num_sites must be at least 2");
     }
@@ -316,6 +318,9 @@ public:
       steps[i] = (i + 1) * point<Dim>::unit(0);
     }
     root_ = balanced ? walk_node<Dim>::balanced_rep(steps) : walk_node<Dim>::pivot_rep(steps);
+
+    rng_ = std::mt19937(seed.value_or(std::random_device()()));
+    dist_ = std::uniform_int_distribution<int>(1, num_sites - 1);
   }
 
   ~walk_tree() override { delete root_; }
@@ -338,8 +343,8 @@ public:
   }
 
   bool rand_pivot() override {
-    auto site = 1 + (std::rand() % (root_->num_sites_ - 1)); // NOLINT(clang-analyzer-core.DivideZero)
-    auto r = transform<Dim>::rand();
+    auto site = dist_(rng_);
+    auto r = transform<Dim>::rand(rng_);
     return try_pivot(site, r);
   }
 
@@ -361,6 +366,8 @@ public:
 
 private:
   walk_node<Dim> *root_;
+  std::mt19937 rng_;
+  std::uniform_int_distribution<int> dist_;
 
   walk_tree(walk_node<Dim> *root) : root_(root) {}
 };

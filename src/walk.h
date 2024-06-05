@@ -2,6 +2,7 @@
 
 #include <future>
 #include <optional>
+#include <random>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -16,11 +17,15 @@ namespace pivot {
 template <int Dim> class walk : public walk_base<Dim> {
 
 public:
-  walk(int num_steps) : steps_(num_steps), occupied_(num_steps, point_hash(num_steps)) {
+  walk(int num_steps, std::optional<unsigned int> seed = std::nullopt)
+      : steps_(num_steps), occupied_(num_steps, point_hash(num_steps)) {
     for (int i = 0; i < num_steps; ++i) {
       steps_[i] = i * point<Dim>::unit(0);
       occupied_[steps_[i]] = i;
     }
+
+    rng_ = std::mt19937(seed.value_or(std::random_device()()));
+    dist_ = std::uniform_int_distribution<int>(0, num_steps - 1);
   }
 
   walk(const walk &w) = delete;
@@ -47,8 +52,8 @@ public:
   }
 
   std::pair<int, std::optional<std::vector<point<Dim>>>> try_rand_pivot() const {
-    auto step = std::rand() % num_steps();
-    auto r = transform<Dim>::rand();
+    auto step = dist_(rng_);
+    auto r = transform<Dim>::rand(rng_);
     return {step, try_pivot(step, r)};
   }
 
@@ -106,6 +111,9 @@ public:
 protected:
   std::vector<point<Dim>> steps_;
   boost::unordered_map<point<Dim>, int, point_hash> occupied_;
+
+  mutable std::mt19937 rng_;
+  mutable std::uniform_int_distribution<int> dist_;
 
   void do_pivot(int step, std::vector<point<Dim>> &new_points) {
     for (auto it = steps_.begin() + step + 1; it != steps_.end(); ++it) {
