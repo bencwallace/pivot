@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <CLI/CLI.hpp>
+#include <random>
 
 #include "walk.h"
 #include "walk_base.h"
@@ -11,9 +12,9 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
               const std::string &out_dir) {
   pivot::walk_base<Dim> *w;
   if (!naive) {
-    w = new pivot::walk_tree<Dim>(num_steps);
+    w = new pivot::walk_tree<Dim>(num_steps, seed);
   } else {
-    w = new pivot::walk<Dim>(num_steps);
+    w = new pivot::walk<Dim>(num_steps, seed);
   }
 
   std::vector<pivot::point<Dim>> endpoints;
@@ -24,7 +25,6 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
   int num_success = 0;
   int num_iter = 0;
   auto interval = static_cast<int>(std::pow(10, std::floor(std::log10(std::max(iters / 10, 1)))));
-  std::srand(seed);
   while (true) {
     if (num_iter % interval == 0) {
       std::cout << "Iterations: " << num_iter << " / Successes: " << num_success
@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
   bool require_success{false};
   bool verify{false};
   std::string out_dir{""};
-  int seed;
+  unsigned int seed;
 
   CLI::App app{"Implementation of the pivot algorithm"};
   argv = app.ensure_utf8(argv);
@@ -84,7 +84,7 @@ int main(int argc, char **argv) {
   app.add_flag("--success", require_success, "require success");
   app.add_flag("--verify", verify, "verify");
   app.add_option("--out", out_dir, "output directory");
-  app.add_option("--seed", seed, "seed")->default_val(time(nullptr));
+  app.add_option("--seed", seed, "seed")->default_val(std::random_device()());
 
   CLI11_PARSE(app, argc, argv);
 

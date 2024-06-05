@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <fstream>
 #include <limits>
+#include <optional>
 #include <random>
 #include <span>
 #include <vector>
@@ -284,15 +285,21 @@ public:
   }
 
   /** @brief Produce a uniformly random transfom.*/
-  static transform rand() {
+  template <typename Gen> static transform rand(Gen &gen) {
     std::array<int, Dim> perm;
     std::array<int, Dim> signs;
     for (int i = 0; i < Dim; ++i) {
       perm[i] = i;
       signs[i] = 2 * (std::rand() % 2) - 1;
     }
-    std::random_shuffle(perm.begin(), perm.end()); // NOLINT(clang-diagnostic-deprecated-declarations)
+    std::shuffle(perm.begin(), perm.end(), gen);
     return transform(perm, signs);
+  }
+
+  static transform rand() {
+    static std::random_device rd;
+    static std::mt19937 gen(rd());
+    return rand(gen);
   }
 
   bool operator==(const transform &t) const { return perm_ == t.perm_ && signs_ == t.signs_; }
