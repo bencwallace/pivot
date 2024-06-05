@@ -10,16 +10,16 @@
 
 namespace pivot {
 
-template <int Dim> class walk_tree;
+template <int Dim> class walk_node;
 
 template <int Dim>
-bool intersect(const walk_tree<Dim> *l_walk, const walk_tree<Dim> *r_walk, const point<Dim> &l_anchor,
+bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point<Dim> &l_anchor,
                const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm);
 
-template <int Dim> class walk_tree : public walk_base<Dim> {
+template <int Dim> class walk_node : public walk_base<Dim> {
 
 public:
-  static walk_tree *line(int num_sites, bool balanced = true) {
+  static walk_node *line(int num_sites, bool balanced = true) {
     if (num_sites < 2) {
       throw std::invalid_argument("num_sites must be at least 2");
     }
@@ -27,19 +27,19 @@ public:
     for (int i = 0; i < num_sites; ++i) {
       steps[i] = (i + 1) * point<Dim>::unit(0);
     }
-    walk_tree *root = balanced ? balanced_rep(steps) : pivot_rep(steps);
+    walk_node *root = balanced ? balanced_rep(steps) : pivot_rep(steps);
     return root;
   }
 
-  static walk_tree *pivot_rep(const std::vector<point<Dim>> &steps) {
+  static walk_node *pivot_rep(const std::vector<point<Dim>> &steps) {
     int num_sites = steps.size();
     if (num_sites < 2) {
       throw std::invalid_argument("num_sites must be at least 2");
     }
-    walk_tree *root = new walk_tree(1, num_sites, transform(steps[0], steps[1]), box<Dim>(steps), steps[num_sites - 1]);
+    walk_node *root = new walk_node(1, num_sites, transform(steps[0], steps[1]), box<Dim>(steps), steps[num_sites - 1]);
     auto node = root;
     for (int i = 0; i < num_sites - 2; ++i) {
-      node->right_ = new walk_tree(i + 2, num_sites - i - 1, transform(steps[i + 1], steps[i + 2]),
+      node->right_ = new walk_node(i + 2, num_sites - i - 1, transform(steps[i + 1], steps[i + 2]),
                                    box(std::span<const point<Dim>>(steps).subspan(i + 1)),
                                    steps[num_sites - 1]); // TODO: double-check this
       node->right_->parent_ = node;
@@ -48,14 +48,14 @@ public:
     return root;
   }
 
-  static walk_tree *balanced_rep(const std::vector<point<Dim>> &steps) { return balanced_rep(steps, 1); }
+  static walk_node *balanced_rep(const std::vector<point<Dim>> &steps) { return balanced_rep(steps, 1); }
 
-  walk_tree(const walk_tree &w) = delete;
-  walk_tree(walk_tree &&w) = delete;
-  walk_tree &operator=(const walk_tree &w) = delete;
+  walk_node(const walk_node &w) = delete;
+  walk_node(walk_node &&w) = delete;
+  walk_node &operator=(const walk_node &w) = delete;
 
   // NOLINTBEGIN(clang-analyzer-cplusplus.NewDelete)
-  ~walk_tree() {
+  ~walk_node() {
     if (left_ != nullptr && left_ != &leaf()) {
       delete left_;
     }
@@ -141,17 +141,17 @@ public:
 private:
   int id_;
   int num_sites_;
-  walk_tree *parent_{};
-  walk_tree *left_{};
-  walk_tree *right_{};
+  walk_node *parent_{};
+  walk_node *left_{};
+  walk_node *right_{};
   transform<Dim> symm_;
   box<Dim> bbox_;
   point<Dim> end_;
 
-  walk_tree(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end)
+  walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end)
       : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
 
-  static walk_tree *balanced_rep(std::span<const point<Dim>> steps, int start) {
+  static walk_node *balanced_rep(std::span<const point<Dim>> steps, int start) {
     int num_sites = steps.size();
     if (num_sites < 1) {
       throw std::invalid_argument("num_sites must be at least 1");
@@ -160,7 +160,7 @@ private:
       return &leaf();
     }
     int n = std::floor((1 + num_sites) / 2.0);
-    walk_tree *root = new walk_tree(start + n - 1, num_sites, transform(steps[n - 1], steps[n]), box(steps),
+    walk_node *root = new walk_node(start + n - 1, num_sites, transform(steps[n - 1], steps[n]), box(steps),
                                     steps[num_sites - 1] - steps[0] + point<Dim>::unit(0));
     if (n >= 1) {
       root->left_ = balanced_rep(steps.subspan(0, n), start);
@@ -250,14 +250,14 @@ private:
     return ::pivot::intersect<Dim>(left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_);
   }
 
-  void set_left(walk_tree *left) {
+  void set_left(walk_node *left) {
     left_ = left;
     if (left != nullptr) {
       left->parent_ = this;
     }
   }
 
-  void set_right(walk_tree *right) {
+  void set_right(walk_node *right) {
     right_ = right;
     if (right != nullptr) {
       right->parent_ = this;
@@ -271,13 +271,13 @@ private:
     end_ = left_->end_ + symm_ * right_->end_;
   }
 
-  static walk_tree &leaf() {
+  static walk_node &leaf() {
     std::array<interval, Dim> intervals;
     intervals[0] = interval(1, 1);
     for (int i = 1; i < Dim; ++i) {
       intervals[i] = interval(0, 0);
     }
-    static auto leaf_ = walk_tree(0, 1, transform<Dim>(), box<Dim>(intervals), point<Dim>::unit(0));
+    static auto leaf_ = walk_node(0, 1, transform<Dim>(), box<Dim>(intervals), point<Dim>::unit(0));
     return leaf_;
   }
 
@@ -319,12 +319,12 @@ private:
   }
 
   template <int D>
-  friend bool intersect(const walk_tree<D> *l_walk, const walk_tree<D> *r_walk, const point<D> &l_anchor,
+  friend bool intersect(const walk_node<D> *l_walk, const walk_node<D> *r_walk, const point<D> &l_anchor,
                         const point<D> &r_anchor, const transform<D> &l_symm, const transform<D> &r_symm);
 };
 
 template <int Dim>
-bool intersect(const walk_tree<Dim> *l_walk, const walk_tree<Dim> *r_walk, const point<Dim> &l_anchor,
+bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point<Dim> &l_anchor,
                const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
   auto l_box = l_anchor + l_symm * l_walk->bbox_;
   auto r_box = r_anchor + r_symm * r_walk->bbox_;
