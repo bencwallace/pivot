@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <optional>
 #include <random>
 #include <vector>
@@ -317,13 +318,12 @@ public:
     for (int i = 0; i < num_sites; ++i) {
       steps[i] = (i + 1) * point<Dim>::unit(0);
     }
-    root_ = balanced ? walk_node<Dim>::balanced_rep(steps) : walk_node<Dim>::pivot_rep(steps);
+    root_ = balanced ? std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::balanced_rep(steps))
+                     : std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::pivot_rep(steps));
 
     rng_ = std::mt19937(seed.value_or(std::random_device()()));
     dist_ = std::uniform_int_distribution<int>(1, num_sites - 1);
   }
-
-  ~walk_tree() override { delete root_; }
 
   point<Dim> endpoint() const override { return root_->endpoint(); }
 
@@ -365,7 +365,7 @@ public:
   void export_csv(const std::string &path) const override { return to_csv(path, steps()); }
 
 private:
-  walk_node<Dim> *root_;
+  std::unique_ptr<walk_node<Dim>> root_;
   std::mt19937 rng_;
   std::uniform_int_distribution<int> dist_;
 
