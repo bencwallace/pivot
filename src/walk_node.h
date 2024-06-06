@@ -110,43 +110,6 @@ public:
     gvc.gvFreeContext(context);
   }
 
-private:
-  int id_;
-  int num_sites_;
-  walk_node *parent_{};
-  walk_node *left_{};
-  walk_node *right_{};
-  transform<Dim> symm_;
-  box<Dim> bbox_;
-  point<Dim> end_;
-
-  friend class walk_tree<Dim>;
-
-  walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end)
-      : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
-
-  static walk_node *balanced_rep(std::span<const point<Dim>> steps, int start) {
-    int num_sites = steps.size();
-    if (num_sites < 1) {
-      throw std::invalid_argument("num_sites must be at least 1");
-    }
-    if (num_sites == 1) {
-      return &leaf();
-    }
-    int n = std::floor((1 + num_sites) / 2.0);
-    walk_node *root = new walk_node(start + n - 1, num_sites, transform(steps[n - 1], steps[n]), box(steps),
-                                    steps[num_sites - 1] - steps[0] + point<Dim>::unit(0));
-    if (n >= 1) {
-      root->left_ = balanced_rep(steps.subspan(0, n), start);
-      root->left_->parent_ = root;
-    }
-    if (num_sites - n >= 1) {
-      root->right_ = balanced_rep(steps.subspan(n), start + n);
-      root->right_->parent_ = root;
-    }
-    return root;
-  }
-
   void rotate_left() {
     if (right_->is_leaf()) {
       throw std::invalid_argument("can't rotate left on a leaf node");
@@ -222,6 +185,43 @@ private:
 
   bool intersect() const {
     return ::pivot::intersect<Dim>(left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_);
+  }
+
+private:
+  int id_;
+  int num_sites_;
+  walk_node *parent_{};
+  walk_node *left_{};
+  walk_node *right_{};
+  transform<Dim> symm_;
+  box<Dim> bbox_;
+  point<Dim> end_;
+
+  friend class walk_tree<Dim>;
+
+  walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end)
+      : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
+
+  static walk_node *balanced_rep(std::span<const point<Dim>> steps, int start) {
+    int num_sites = steps.size();
+    if (num_sites < 1) {
+      throw std::invalid_argument("num_sites must be at least 1");
+    }
+    if (num_sites == 1) {
+      return &leaf();
+    }
+    int n = std::floor((1 + num_sites) / 2.0);
+    walk_node *root = new walk_node(start + n - 1, num_sites, transform(steps[n - 1], steps[n]), box(steps),
+                                    steps[num_sites - 1] - steps[0] + point<Dim>::unit(0));
+    if (n >= 1) {
+      root->left_ = balanced_rep(steps.subspan(0, n), start);
+      root->left_->parent_ = root;
+    }
+    if (num_sites - n >= 1) {
+      root->right_ = balanced_rep(steps.subspan(n), start + n);
+      root->right_->parent_ = root;
+    }
+    return root;
   }
 
   void set_left(walk_node *left) {
