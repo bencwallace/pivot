@@ -70,9 +70,17 @@ public:
     }
   }
 
-  bool is_leaf() const { return left_ == nullptr && right_ == nullptr; }
+  const box<Dim> &bbox() const { return bbox_; }
 
-  point<Dim> endpoint() const { return end_; }
+  const point<Dim> &endpoint() const { return end_; }
+
+  const transform<Dim> &symm() const { return symm_; }
+
+  walk_node *left() const { return left_; }
+
+  walk_node *right() const { return right_; }
+
+  bool is_leaf() const { return left_ == nullptr && right_ == nullptr; }
 
   std::vector<point<Dim>> steps() const {
     std::vector<point<Dim>> result;
