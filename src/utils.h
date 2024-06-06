@@ -100,6 +100,14 @@ public:
     return point(coords);
   }
 
+  int norm() const {
+    int sum = 0;
+    for (int i = 0; i < Dim; ++i) {
+      sum += coords_[i] * coords_[i];
+    }
+    return sum;
+  }
+
   /** @brief Returns the string of the form "({coords_[0]}, ..., {coords_[Dim - 1]})" */
   std::string to_string() const {
     std::string s = "(";
