@@ -87,6 +87,14 @@ public:
 
   walk_node *right() const { return right_; }
 
+  bool operator==(const walk_node &other) const {
+    if (is_leaf() && other.is_leaf()) {
+      return true;
+    }
+    return id_ == other.id_ && num_sites_ == other.num_sites_ && symm_ == other.symm_ && bbox_ == other.bbox_ &&
+           end_ == other.end_ && *left_ == *other.left_ && *right_ == *other.right_;
+  }
+
   bool is_leaf() const { return left_ == nullptr && right_ == nullptr; }
 
   std::vector<point<Dim>> steps() const {
