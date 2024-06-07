@@ -125,7 +125,7 @@ public:
     gvc.gvFreeContext(context);
   }
 
-  void rotate_left() {
+  walk_node *rotate_left() {
     if (right_->is_leaf()) {
       throw std::invalid_argument("can't rotate left on a leaf node");
     }
@@ -149,9 +149,11 @@ public:
     int temp_id = id_;
     id_ = left_->id_;
     left_->id_ = temp_id;
+
+    return this;
   }
 
-  void rotate_right() {
+  walk_node *rotate_right() {
     if (left_->is_leaf()) {
       throw std::invalid_argument("can't rotate right on a leaf node");
     }
@@ -175,9 +177,11 @@ public:
     int temp_id = id_;
     id_ = right_->id_;
     right_->id_ = temp_id;
+
+    return this;
   }
 
-  void shuffle_up(int id) {
+  walk_node *shuffle_up(int id) {
     if (id < left_->num_sites_) {
       left_->shuffle_up(id);
       rotate_right();
@@ -185,9 +189,11 @@ public:
       right_->shuffle_up(id - left_->num_sites_);
       rotate_left();
     }
+
+    return this;
   }
 
-  void shuffle_down() {
+  walk_node *shuffle_down() {
     int id = std::floor((num_sites_ + 1) / 2.0);
     if (id < left_->num_sites_) {
       rotate_right();
@@ -196,6 +202,8 @@ public:
       rotate_left();
       left_->shuffle_down();
     }
+
+    return this;
   }
 
   bool intersect() const {
