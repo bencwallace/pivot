@@ -254,7 +254,8 @@ private:
     auto glob_inv = glob_symm.inverse();
     auto rel_symm = glob_inv * abs_symm;
     auto rel_end = glob_inv * (steps.back() - steps.front()) + pivot::point<Dim>::unit(0);
-    walk_node *root = new walk_node(start + n - 1, num_sites, rel_symm, box(steps), rel_end);
+    auto rel_box = point<Dim>::unit(0) + glob_inv * (point<Dim>() - point<Dim>::unit(0) + box(steps));
+    walk_node *root = new walk_node(start + n - 1, num_sites, rel_symm, rel_box, rel_end);
 
     if (n >= 1) {
       root->left_ = balanced_rep(steps.subspan(0, n), start, glob_symm);
