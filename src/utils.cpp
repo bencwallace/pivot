@@ -273,6 +273,19 @@ template <int Dim> std::string transform<Dim>::to_string() const {
   return s;
 }
 
+/* misc */
+
+template <int Dim> void to_csv(const std::string &path, const std::vector<point<Dim>> &points) {
+  // TODO: check path exists
+  std::ofstream file(path);
+  for (const auto &p : points) {
+    for (int i = 0; i < Dim - 1; ++i) {
+      file << p[i] << ",";
+    }
+    file << p[Dim - 1] << std::endl;
+  }
+}
+
 /* explicit instantiation */
 
 template class point<1>;
@@ -301,5 +314,10 @@ template class transform<2>;
 template class transform<3>;
 template class transform<4>;
 template class transform<5>;
+
+template void to_csv<2>(const std::string &path, const std::vector<point<2>> &points);
+template void to_csv<3>(const std::string &path, const std::vector<point<3>> &points);
+template void to_csv<4>(const std::string &path, const std::vector<point<4>> &points);
+template void to_csv<5>(const std::string &path, const std::vector<point<5>> &points);
 
 } // namespace pivot
