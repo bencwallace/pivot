@@ -1,7 +1,7 @@
 #include <stdexcept>
 #include <vector>
 
-#include "utils.h"
+#include "lattice.h"
 
 namespace pivot {
 

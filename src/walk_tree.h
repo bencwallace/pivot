@@ -5,7 +5,7 @@
 #include <random>
 #include <vector>
 
-#include "utils.h"
+#include "lattice.h"
 #include "walk_base.h"
 #include "walk_node.h"
 

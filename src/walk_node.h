@@ -3,7 +3,7 @@
 #include <gvc.h>
 
 #include "graphviz.h"
-#include "utils.h"
+#include "lattice.h"
 
 namespace pivot {
 

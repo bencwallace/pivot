@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "utils.h"
+#include "lattice.h"
 
 using namespace pivot;
 

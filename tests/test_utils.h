@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "utils.h"
+#include "lattice.h"
 
 using namespace pivot;
 

@@ -9,7 +9,7 @@
 
 #include <boost/unordered/unordered_map.hpp>
 
-#include "utils.h"
+#include "lattice.h"
 #include "walk_base.h"
 
 namespace pivot {
