@@ -45,83 +45,37 @@ template <int Dim> class point {
 public:
   point() = default;
 
-  point(const std::array<int, Dim> &coords) : coords_(coords) {}
+  point(const std::array<int, Dim> &coords);
 
   /**
    * @brief Returns the unit vector e_i.
    *
    * @param i The index of the unit vector. Must be in [0, Dim).
    */
-  static point unit(int i) {
-    point<Dim> result;
-    result.coords_[i] = 1;
-    return result;
-  }
+  static point unit(int i);
 
-  int operator[](int i) const { return coords_[i]; }
+  int operator[](int i) const;
 
-  bool operator==(const point &p) const { return coords_ == p.coords_; }
+  bool operator==(const point &p) const;
 
-  bool operator!=(const point &p) const { return coords_ != p.coords_; }
+  bool operator!=(const point &p) const;
 
   /** @brief Vector addition of points */
-  point operator+(const point &p) const {
-    std::array<int, Dim> sum;
-    for (int i = 0; i < Dim; ++i) {
-      sum[i] = coords_[i] + p.coords_[i];
-    }
-    return point(sum);
-  }
+  point operator+(const point &p) const;
 
   /** @brief Action of a point (understood as a vector) on a box */
-  box<Dim> operator+(const box<Dim> &b) const {
-    std::array<interval, Dim> intervals;
-    for (int i = 0; i < Dim; ++i) {
-      intervals[i] = interval(coords_[i] + b.intervals_[i].left_, coords_[i] + b.intervals_[i].right_);
-    }
-    return box<Dim>(intervals);
-  }
+  box<Dim> operator+(const box<Dim> &b) const;
 
   /** @brief Vector subtraction of points */
-  point operator-(const point &p) const {
-    std::array<int, Dim> diff;
-    for (int i = 0; i < Dim; ++i) {
-      diff[i] = coords_[i] - p.coords_[i];
-    }
-    return point(diff);
-  }
+  point operator-(const point &p) const;
 
   /** @brief Scalar multiplication of a point */
-  friend point operator*(int k, const point &p) {
-    std::array<int, Dim> coords;
-    for (int i = 0; i < Dim; ++i) {
-      coords[i] = k * p.coords_[i];
-    }
-    return point(coords);
-  }
+  template <int D> friend point<D> operator*(int k, const point<D> &p);
 
-  int norm() const {
-    int sum = 0;
-    for (int i = 0; i < Dim; ++i) {
-      sum += coords_[i] * coords_[i];
-    }
-    return sum;
-  }
+  int norm() const;
 
   /** @brief Returns the string of the form "({coords_[0]}, ..., {coords_[Dim - 1]})" */
-  std::string to_string() const {
-    std::string s = "(";
-    for (int i = 0; i < Dim - 1; ++i) {
-      s += std::to_string(coords_[i]) + ", ";
-    }
-    s += std::to_string(coords_[Dim - 1]);
-    if constexpr (Dim == 1) {
-      s += ",)";
-    } else {
-      s += ")";
-    }
-    return s;
-  }
+  std::string to_string() const;
 
 private:
   std::array<int, Dim> coords_{};
@@ -222,13 +176,7 @@ struct point_hash {
 
   // This hashing method, which exploits the known range of values that can be taken by the
   // sequence of points in a walk, ppears to result in better performance than other methods tested.
-  template <int Dim> std::size_t operator()(const point<Dim> &p) const {
-    std::size_t hash = 0;
-    for (int i = 0; i < Dim; ++i) {
-      hash = num_steps_ + p[i] + 2 * num_steps_ * hash;
-    }
-    return hash;
-  }
+  template <int Dim> std::size_t operator()(const point<Dim> &p) const;
 };
 
 /**
