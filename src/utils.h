@@ -265,15 +265,6 @@ private:
   std::array<int, Dim> signs_;
 };
 
-template <int Dim> void to_csv(const std::string &path, const std::vector<point<Dim>> &points) {
-  // TODO: check path exists
-  std::ofstream file(path);
-  for (const auto &p : points) {
-    for (int i = 0; i < Dim - 1; ++i) {
-      file << p[i] << ",";
-    }
-    file << p[Dim - 1] << std::endl;
-  }
-}
+template <int Dim> void to_csv(const std::string &path, const std::vector<point<Dim>> &points);
 
 } // namespace pivot
