@@ -106,6 +106,63 @@ std::string interval::to_string() const {
   return result;
 }
 
+template <int Dim> box<Dim>::box(const std::array<interval, Dim> &intervals) : intervals_(intervals) {}
+
+template <int Dim> box<Dim>::box(std::span<const point<Dim>> points) {
+  std::array<int, Dim> min;
+  std::array<int, Dim> max;
+  min.fill(std::numeric_limits<int>::max());
+  max.fill(std::numeric_limits<int>::min());
+  for (const auto &p : points) {
+    for (int i = 0; i < Dim; ++i) {
+      min[i] = std::min(min[i], p[i]);
+      max[i] = std::max(max[i], p[i]);
+    }
+  }
+  // anchor at (1, 0, ..., 0)
+  intervals_[0] = interval(min[0] - points[0][0] + 1, max[0] - points[0][0] + 1);
+  for (int i = 1; i < Dim; ++i) {
+    intervals_[i] = interval(min[i] - points[0][i], max[i] - points[0][i]);
+  }
+}
+
+template <int Dim> bool box<Dim>::operator==(const box &b) const { return intervals_ == b.intervals_; }
+
+template <int Dim> bool box<Dim>::operator!=(const box &b) const { return intervals_ != b.intervals_; }
+
+template <int Dim> interval box<Dim>::operator[](int i) const { return intervals_[i]; }
+
+template <int Dim> bool box<Dim>::empty() const {
+  return std::any_of(intervals_.begin(), intervals_.end(), [](const interval &i) { return i.empty(); });
+}
+
+template <int Dim> box<Dim> box<Dim>::operator+(const box<Dim> &b) const {
+  std::array<interval, Dim> intervals;
+  for (int i = 0; i < Dim; ++i) {
+    intervals[i] = interval(std::min(intervals_[i].left_, b.intervals_[i].left_),
+                            std::max(intervals_[i].right_, b.intervals_[i].right_));
+  }
+  return box(intervals);
+}
+
+template <int Dim> box<Dim> box<Dim>::operator*(const box<Dim> &b) const {
+  std::array<interval, Dim> intervals;
+  for (int i = 0; i < Dim; ++i) {
+    intervals[i] = interval(std::max(intervals_[i].left_, b.intervals_[i].left_),
+                            std::min(intervals_[i].right_, b.intervals_[i].right_));
+  }
+  return box(intervals);
+}
+
+template <int Dim> std::string box<Dim>::to_string() const {
+  std::string s = "";
+  for (int i = 0; i < Dim - 1; ++i) {
+    s += intervals_[i].to_string() + " x ";
+  }
+  s += intervals_[Dim - 1].to_string();
+  return s;
+}
+
 /* explicit instantiation */
 
 template class point<1>;
@@ -123,5 +180,11 @@ template std::size_t point_hash::operator()<2>(const point<2> &p) const;
 template std::size_t point_hash::operator()<3>(const point<3> &p) const;
 template std::size_t point_hash::operator()<4>(const point<4> &p) const;
 template std::size_t point_hash::operator()<5>(const point<5> &p) const;
+
+template struct box<1>;
+template struct box<2>;
+template struct box<3>;
+template struct box<4>;
+template struct box<5>;
 
 } // namespace pivot
