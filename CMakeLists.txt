@@ -38,7 +38,8 @@ find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories("/usr/include/graphviz")
 
-file(GLOB_RECURSE pivot_lib_SRC "src/graphviz.cpp" "src/utils.cpp" "src/walk.cpp" "src/walk_node.cpp" "src/walk_tree.cpp")
+file(GLOB_RECURSE pivot_lib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+list(REMOVE_ITEM pivot_lib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 add_library(pivot ${pivot_lib_SRC})
 
 add_executable(pivot_exec "src/main.cpp")
