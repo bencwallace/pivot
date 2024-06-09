@@ -89,7 +89,7 @@ template <int Dim> struct box {
 
   box() = delete;
 
-  box(const std::array<interval, Dim> &intervals) : intervals_(intervals) {}
+  box(const std::array<interval, Dim> &intervals);
 
   /**
    * @brief Constructs the smallest box containing a sequence of Dim-dimensional points.
@@ -98,33 +98,15 @@ template <int Dim> struct box {
    * in the sense that the input sequences of points (p0, ...) is effectively translated by e0 - p0
    * prior to the box's construction. In other words, the box will always have a vertex at e0.
    */
-  box(std::span<const point<Dim>> points) {
-    std::array<int, Dim> min;
-    std::array<int, Dim> max;
-    min.fill(std::numeric_limits<int>::max());
-    max.fill(std::numeric_limits<int>::min());
-    for (const auto &p : points) {
-      for (int i = 0; i < Dim; ++i) {
-        min[i] = std::min(min[i], p[i]);
-        max[i] = std::max(max[i], p[i]);
-      }
-    }
-    // anchor at (1, 0, ..., 0)
-    intervals_[0] = interval(min[0] - points[0][0] + 1, max[0] - points[0][0] + 1);
-    for (int i = 1; i < Dim; ++i) {
-      intervals_[i] = interval(min[i] - points[0][i], max[i] - points[0][i]);
-    }
-  }
+  box(std::span<const point<Dim>> points);
 
-  bool operator==(const box &b) const { return intervals_ == b.intervals_; }
+  bool operator==(const box &b) const;
 
-  bool operator!=(const box &b) const { return intervals_ != b.intervals_; }
+  bool operator!=(const box &b) const;
 
-  interval operator[](int i) const { return intervals_[i]; }
+  interval operator[](int i) const;
 
-  bool empty() const {
-    return std::any_of(intervals_.begin(), intervals_.end(), [](const interval &i) { return i.empty(); });
-  }
+  bool empty() const;
 
   /**
    * @brief Returns the "union" of two boxes.
@@ -132,14 +114,7 @@ template <int Dim> struct box {
    * The union here is not to be understood as the set-theoretic union, but rather as the minimal
    * bounding box containing both input boxes.
    */
-  box operator+(const box &b) const {
-    std::array<interval, Dim> intervals;
-    for (int i = 0; i < Dim; ++i) {
-      intervals[i] = interval(std::min(intervals_[i].left_, b.intervals_[i].left_),
-                              std::max(intervals_[i].right_, b.intervals_[i].right_));
-    }
-    return box(intervals);
-  }
+  box operator+(const box &b) const;
 
   /**
    * @brief Returns the intersection of two boxes.
@@ -147,24 +122,10 @@ template <int Dim> struct box {
    * The intersection is the set-theoretic intersection or, equivalently, the maximal box contained
    * in both input boxes.
    */
-  box operator*(const box &b) const {
-    std::array<interval, Dim> intervals;
-    for (int i = 0; i < Dim; ++i) {
-      intervals[i] = interval(std::max(intervals_[i].left_, b.intervals_[i].left_),
-                              std::min(intervals_[i].right_, b.intervals_[i].right_));
-    }
-    return box(intervals);
-  }
+  box operator*(const box &b) const;
 
   /** @brief Returns the string of the form "{intervals_[0]} x ... x {intervals[Dim - 1]}". */
-  std::string to_string() const {
-    std::string s = "";
-    for (int i = 0; i < Dim - 1; ++i) {
-      s += intervals_[i].to_string() + " x ";
-    }
-    s += intervals_[Dim - 1].to_string();
-    return s;
-  }
+  std::string to_string() const;
 };
 
 template <typename S, typename T, S Dim, T N> box(std::array<point<Dim>, N>) -> box<Dim>;
