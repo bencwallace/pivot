@@ -28,21 +28,21 @@ private:
 class cgraph_t {
 
 public:
-  using agopen_t = Agraph_t *(*)(char *, Agdesc_t, Agdisc_t *);
-  using agattr_t = Agsym_t *(*)(Agraph_t *, int, char *, char *);
-  using agclose_t = int (*)(Agraph_t *);
-  using agnode_t = Agnode_t *(*)(Agraph_t *, char *, int);
-  using agset_t = int (*)(void *, char *, char *);
-  using agedge_t = Agedge_t *(*)(Agraph_t *, Agnode_t *, Agnode_t *, char *, int);
+  using agopen_t = decltype(::agopen);
+  using agattr_t = decltype(::agattr);
+  using agclose_t = decltype(::agclose);
+  using agnode_t = decltype(::agnode);
+  using agset_t = decltype(::agset);
+  using agedge_t = decltype(::agedge);
 
   static cgraph_t &load();
 
-  agopen_t agopen;
-  agattr_t agattr;
-  agclose_t agclose;
-  agnode_t agnode;
-  agset_t agset;
-  agedge_t agedge;
+  agopen_t *agopen;
+  agattr_t *agattr;
+  agclose_t *agclose;
+  agnode_t *agnode;
+  agset_t *agset;
+  agedge_t *agedge;
   Agdesc_t Agdirected;
 
 private:
