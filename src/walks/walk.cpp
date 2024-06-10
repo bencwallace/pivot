@@ -1,3 +1,5 @@
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
+
 #include "walk.h"
 
 namespace pivot {
@@ -100,9 +102,7 @@ template <int Dim> point<Dim> walk<Dim>::pivot_point(int step, int i, const tran
   return p + trans * (steps_[i] - p);
 }
 
-template class walk<2>;
-template class walk<3>;
-template class walk<4>;
-template class walk<5>;
+#define WALK_INST(z, n, data) template class walk<n>;
+BOOST_PP_REPEAT_FROM_TO(1, 6, WALK_INST, ~)
 
 } // namespace pivot

@@ -1,3 +1,5 @@
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
+
 #include "walk_node.h"
 
 namespace pivot {
@@ -284,18 +286,12 @@ template <int Dim> void walk_node<Dim>::merge() {
   end_ = left_->end_ + symm_ * right_->end_;
 }
 
-template bool intersect<2>(const walk_node<2> *l_walk, const walk_node<2> *r_walk, const point<2> &l_anchor,
-                           const point<2> &r_anchor, const transform<2> &l_symm, const transform<2> &r_symm);
-template bool intersect<3>(const walk_node<3> *l_walk, const walk_node<3> *r_walk, const point<3> &l_anchor,
-                           const point<3> &r_anchor, const transform<3> &l_symm, const transform<3> &r_symm);
-template bool intersect<4>(const walk_node<4> *l_walk, const walk_node<4> *r_walk, const point<4> &l_anchor,
-                           const point<4> &r_anchor, const transform<4> &l_symm, const transform<4> &r_symm);
-template bool intersect<5>(const walk_node<5> *l_walk, const walk_node<5> *r_walk, const point<5> &l_anchor,
-                           const point<5> &r_anchor, const transform<5> &l_symm, const transform<5> &r_symm);
+#define INTERSECT_INST(z, n, data)                                                                                     \
+  template bool intersect<n>(const walk_node<n> *l_walk, const walk_node<n> *r_walk, const point<n> &l_anchor,         \
+                             const point<n> &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
+#define WALK_NODE_INST(z, n, data) template class walk_node<n>;
 
-template class walk_node<2>;
-template class walk_node<3>;
-template class walk_node<4>;
-template class walk_node<5>;
+BOOST_PP_REPEAT_FROM_TO(1, 6, INTERSECT_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, 6, WALK_NODE_INST, ~)
 
 } // namespace pivot
