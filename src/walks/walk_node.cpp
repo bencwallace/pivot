@@ -1,5 +1,6 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
+#include "defines.h"
 #include "walk_node.h"
 
 namespace pivot {
@@ -291,7 +292,7 @@ template <int Dim> void walk_node<Dim>::merge() {
                              const point<n> &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
 #define WALK_NODE_INST(z, n, data) template class walk_node<n>;
 
-BOOST_PP_REPEAT_FROM_TO(1, 6, INTERSECT_INST, ~)
-BOOST_PP_REPEAT_FROM_TO(1, 6, WALK_NODE_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, INTERSECT_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_NODE_INST, ~)
 
 } // namespace pivot
