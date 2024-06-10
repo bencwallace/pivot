@@ -1,6 +1,8 @@
 #include <stdexcept>
 #include <vector>
 
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
+
 #include "lattice.h"
 
 namespace pivot {
@@ -288,36 +290,18 @@ template <int Dim> void to_csv(const std::string &path, const std::vector<point<
 
 /* explicit instantiation */
 
-template class point<1>;
-template class point<2>;
-template class point<3>;
-template class point<4>;
-template class point<5>;
+#define POINT_INST(z, n, data) template class point<n>;
+#define BOX_INST(z, n, data) template struct box<n>;
+#define TRANSFORM_INST(z, n, data) template class transform<n>;
+#define POINT_SCALAR_MULT_INST(z, n, data) template point<n> operator*(int k, const point<n> &p);
+#define POINT_HASH_CALL_INST(z, n, data) template std::size_t point_hash::operator()<n>(const point<n> &p) const;
+#define TO_CSV_INST(z, n, data) template void to_csv<n>(const std::string &path, const std::vector<point<n>> &points);
 
-template point<2> operator*<2>(int k, const point<2> &p);
-template point<3> operator*<3>(int k, const point<3> &p);
-template point<4> operator*<4>(int k, const point<4> &p);
-template point<5> operator*<5>(int k, const point<5> &p);
-
-template std::size_t point_hash::operator()<2>(const point<2> &p) const;
-template std::size_t point_hash::operator()<3>(const point<3> &p) const;
-template std::size_t point_hash::operator()<4>(const point<4> &p) const;
-template std::size_t point_hash::operator()<5>(const point<5> &p) const;
-
-template struct box<1>;
-template struct box<2>;
-template struct box<3>;
-template struct box<4>;
-template struct box<5>;
-
-template class transform<2>;
-template class transform<3>;
-template class transform<4>;
-template class transform<5>;
-
-template void to_csv<2>(const std::string &path, const std::vector<point<2>> &points);
-template void to_csv<3>(const std::string &path, const std::vector<point<3>> &points);
-template void to_csv<4>(const std::string &path, const std::vector<point<4>> &points);
-template void to_csv<5>(const std::string &path, const std::vector<point<5>> &points);
+BOOST_PP_REPEAT_FROM_TO(1, 6, POINT_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, 6, BOX_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, 6, TRANSFORM_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, 6, POINT_SCALAR_MULT_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, 6, POINT_HASH_CALL_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, 6, TO_CSV_INST, ~)
 
 } // namespace pivot
