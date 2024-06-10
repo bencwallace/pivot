@@ -298,6 +298,7 @@ template <int Dim> void to_csv(const std::string &path, const std::vector<point<
 #define POINT_HASH_CALL_INST(z, n, data) template std::size_t point_hash::operator()<n>(const point<n> &p) const;
 #define TO_CSV_INST(z, n, data) template void to_csv<n>(const std::string &path, const std::vector<point<n>> &points);
 
+// cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, BOX_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TRANSFORM_INST, ~)
