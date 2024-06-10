@@ -7,14 +7,17 @@
 
 #include "lattice.h"
 #include "walk_base.h"
-#include "walk_node.h"
 
 namespace pivot {
+
+template <int Dim> class walk_node;
 
 template <int Dim> class walk_tree : public walk_base<Dim> {
 
 public:
   walk_tree(int num_sites, std::optional<unsigned int> seed = std::nullopt, bool balanced = true);
+
+  ~walk_tree();
 
   point<Dim> endpoint() const override;
 

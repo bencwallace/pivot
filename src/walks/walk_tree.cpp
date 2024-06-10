@@ -1,6 +1,7 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 #include "defines.h"
+#include "walk_node.h"
 #include "walk_tree.h"
 
 namespace pivot {
@@ -19,6 +20,8 @@ template <int Dim> walk_tree<Dim>::walk_tree(int num_sites, std::optional<unsign
   rng_ = std::mt19937(seed.value_or(std::random_device()()));
   dist_ = std::uniform_int_distribution<int>(1, num_sites - 1);
 }
+
+template <int Dim> walk_tree<Dim>::~walk_tree() = default;
 
 template <int Dim> walk_tree<Dim>::walk_tree(walk_node<Dim> *root) : root_(root) {}
 
