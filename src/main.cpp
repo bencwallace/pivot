@@ -5,6 +5,7 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <random>
 
+#include "defines.h"
 #include "walk.h"
 #include "walk_base.h"
 #include "walk_tree.h"
@@ -94,7 +95,7 @@ int main(int argc, char **argv) {
   CLI11_PARSE(app, argc, argv);
 
   switch (dim) {
-    BOOST_PP_REPEAT_FROM_TO(1, 6, CASE_MACRO, ~)
+    BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, CASE_MACRO, ~)
   default:
     std::cerr << "Invalid dimension: " << dim << '\n';
     return 1;

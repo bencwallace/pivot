@@ -3,6 +3,7 @@
 
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
+#include "defines.h"
 #include "lattice.h"
 
 namespace pivot {
@@ -297,11 +298,11 @@ template <int Dim> void to_csv(const std::string &path, const std::vector<point<
 #define POINT_HASH_CALL_INST(z, n, data) template std::size_t point_hash::operator()<n>(const point<n> &p) const;
 #define TO_CSV_INST(z, n, data) template void to_csv<n>(const std::string &path, const std::vector<point<n>> &points);
 
-BOOST_PP_REPEAT_FROM_TO(1, 6, POINT_INST, ~)
-BOOST_PP_REPEAT_FROM_TO(1, 6, BOX_INST, ~)
-BOOST_PP_REPEAT_FROM_TO(1, 6, TRANSFORM_INST, ~)
-BOOST_PP_REPEAT_FROM_TO(1, 6, POINT_SCALAR_MULT_INST, ~)
-BOOST_PP_REPEAT_FROM_TO(1, 6, POINT_HASH_CALL_INST, ~)
-BOOST_PP_REPEAT_FROM_TO(1, 6, TO_CSV_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, BOX_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TRANSFORM_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_SCALAR_MULT_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_HASH_CALL_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TO_CSV_INST, ~)
 
 } // namespace pivot

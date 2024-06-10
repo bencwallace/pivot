@@ -1,5 +1,6 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
+#include "defines.h"
 #include "walk_tree.h"
 
 namespace pivot {
@@ -61,6 +62,6 @@ template <int Dim> bool walk_tree<Dim>::self_avoiding() const {
 template <int Dim> void walk_tree<Dim>::export_csv(const std::string &path) const { return to_csv(path, steps()); }
 
 #define WALK_TREE_INST(z, n, data) template class walk_tree<n>;
-BOOST_PP_REPEAT_FROM_TO(1, 6, WALK_TREE_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_TREE_INST, ~)
 
 } // namespace pivot
