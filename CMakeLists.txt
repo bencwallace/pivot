@@ -38,6 +38,12 @@ find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories("/usr/include/graphviz")
 
+option(DIMS_UB "Upper bound on dimensions handled" OFF)
+if(NOT DIMS_UB)
+  set(DIMS_UB 6 CACHE STRING "Default upper bound on dimensions handled" FORCE)
+endif()
+add_definitions(-DDIMS_UB=${DIMS_UB})
+
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 file(GLOB_RECURSE pivot_lib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 list(REMOVE_ITEM pivot_lib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
