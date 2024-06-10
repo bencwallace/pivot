@@ -2,6 +2,7 @@
 #include <memory>
 
 #include <CLI/CLI.hpp>
+#include <boost/preprocessor/repetition/repeat_from_to.hpp>
 #include <random>
 
 #include "walk.h"
@@ -61,6 +62,11 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
   return 0;
 }
 
+#define CASE_MACRO(z, n, data)                                                                                         \
+  case n:                                                                                                              \
+    return main_loop<n>(num_steps, iters, naive, seed, require_success, verify, out_dir);                              \
+    break;
+
 int main(int argc, char **argv) {
   int dim;
   int num_steps;
@@ -88,18 +94,7 @@ int main(int argc, char **argv) {
   CLI11_PARSE(app, argc, argv);
 
   switch (dim) {
-  case 2:
-    return main_loop<2>(num_steps, iters, naive, seed, require_success, verify, out_dir);
-    break;
-  case 3:
-    return main_loop<3>(num_steps, iters, naive, seed, require_success, verify, out_dir);
-    break;
-  case 4:
-    return main_loop<4>(num_steps, iters, naive, seed, require_success, verify, out_dir);
-    break;
-  case 5:
-    return main_loop<5>(num_steps, iters, naive, seed, require_success, verify, out_dir);
-    break;
+    BOOST_PP_REPEAT_FROM_TO(1, 6, CASE_MACRO, ~)
   default:
     std::cerr << "Invalid dimension: " << dim << '\n';
     return 1;
