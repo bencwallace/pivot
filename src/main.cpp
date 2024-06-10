@@ -95,6 +95,7 @@ int main(int argc, char **argv) {
   CLI11_PARSE(app, argc, argv);
 
   switch (dim) {
+    // cppcheck-suppress syntaxError
     BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, CASE_MACRO, ~)
   default:
     std::cerr << "Invalid dimension: " << dim << '\n';

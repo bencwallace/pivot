@@ -292,6 +292,7 @@ template <int Dim> void walk_node<Dim>::merge() {
                              const point<n> &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
 #define WALK_NODE_INST(z, n, data) template class walk_node<n>;
 
+// cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, INTERSECT_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_NODE_INST, ~)
 
