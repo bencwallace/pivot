@@ -2,7 +2,7 @@
 
 #include <gtest/gtest.h>
 
-#include "walk_tree.h"
+#include "walk_node.h"
 
 #include "test_utils.h"
 
