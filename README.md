@@ -28,26 +28,39 @@ CMake and a suitable C/C++ compiler toolchain are required.
 
 The following third-party dependencies are used:
 
-* [boost](https://www.boost.org/doc/libs/1_85_0/more/getting_started/unix-variants.html)
-  * Header-only (specifically, [boost-unordered](https://www.boost.org/doc/libs/1_84_0/libs/unordered/doc/html/unordered.html))
+* [boost](https://www.boost.org/doc/libs/1_85_0/more/getting_started/unix-variants.html) (headers only)
 * [libgraphviz](https://gitlab.com/graphviz/graphviz)
   * Only needed at build time (optional at runtime)
 * [CLI11](https://github.com/CLIUtils/CLI11)
   * Included via CMake
 
-Only the first two requirements must be explicitly installed prior to building. On Debian/Ubuntu,
+Only the first two requirements must be available prior to building. On Debian/Ubuntu,
 this can be accomplished as follows:
 
 ```bash
-sudo apt-get update && apt-get install libboost-all-dev libgraphviz-dev
+sudo apt-get update && sudo apt-get install libboost-all-dev libgraphviz-dev
 ```
 
 **Build**
 
 ```
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build
+cmake --build build --target pivot_exec -j
 ```
+
+**Maximum number of dimensions**
+
+The maximum number of dimensions supported is a compile-time constant. It can be set by providing the `DIMS_UB` option to CMake,
+which sets the exclusive upper bound on the dimensions supported. For instance, to support all dimensions up to and including 10,
+one would set `DIMS_UB` to 11 as follows:
+
+```
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDIMS_UB=11
+cmake --build build --target pivot_exec -j
+```
+
+At the time of writing, the default value of `DIMS_UB` is 6. The most up-to-date default can be found by looking at
+[CMakeLists.txt](CMakeLists.txt) or [defines.h](src/include/defines.h).
 
 ## Usage
 
@@ -131,8 +144,11 @@ I hope to make the following changes in the future:
 
 * Use Clisby's `fast_pivot` method
 * Improve initialization methods (e.g. Clisby's `pseudo_dimerize` method)
-* Add Python bindings
 * Support multithreaded pivot proposals
+
+Some other interesting directions to explore would be the following:
+
+* Add Python bindings
 * Support non-cubic lattices
 * Allow long-range step distributions
 * Allow soft-core interactions (weak SAW / Domb-Joyce model)
