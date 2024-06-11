@@ -36,7 +36,12 @@ FetchContent_MakeAvailable(cli11_proj)
 
 find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
-include_directories("/usr/include/graphviz")
+
+option(GRAPHVIZ_INCLUDE_PATH "Path to graphviz headers" OFF)
+if(NOT GRAPHVIZ_INCLUDE_PATH)
+  set(GRAPHVIZ_INCLUDE_PATH "/usr/include/graphviz" CACHE STRING "Default path to graphviz headers" FORCE)
+endif()
+include_directories(${GRAPHVIZ_INCLUDE_PATH})
 
 option(DIMS_UB "Upper bound on dimensions handled" OFF)
 if(NOT DIMS_UB)
