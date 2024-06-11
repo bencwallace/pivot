@@ -29,6 +29,8 @@ public:
 
   point operator+(const point &p) const;
 
+  point &operator+=(const point &p);
+
   box operator+(const box &b) const;
 
   point operator-(const point &p) const;
@@ -66,6 +68,10 @@ struct box {
 
   // union
   box operator+(const box &b) const;
+
+  box &operator+=(const point &p);
+
+  box &operator+=(const box &b);
 
   // intersection
   box operator*(const box &b) const;

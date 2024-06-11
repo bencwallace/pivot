@@ -39,6 +39,13 @@ point point::operator+(const point &p) const {
   return point(std::move(sum));
 }
 
+point &point::operator+=(const point &p) {
+  for (int i = 0; i < dim(); ++i) {
+    coords_[i] += p[i];
+  }
+  return *this;
+}
+
 box point::operator+(const box &b) const {
   std::vector<interval> intervals;
   intervals.reserve(dim());
@@ -138,6 +145,22 @@ box box::operator+(const box &b1) const {
                                  std::max(intervals_[i].right_, b1.intervals_[i].right_)));
   }
   return box(std::move(intervals));
+}
+
+box &box::operator+=(const point &p) {
+  for (int i = 0; i < dim(); ++i) {
+    intervals_[i].left_ += p[i];
+    intervals_[i].right_ += p[i];
+  }
+  return *this;
+}
+
+box &box::operator+=(const box &b) {
+  for (int i = 0; i < dim(); ++i) {
+    intervals_[i].left_ = std::min(intervals_[i].left_, b.intervals_[i].left_);
+    intervals_[i].right_ = std::max(intervals_[i].right_, b.intervals_[i].right_);
+  }
+  return *this;
 }
 
 box box::operator*(const box &b1) const {

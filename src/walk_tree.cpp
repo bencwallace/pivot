@@ -169,8 +169,12 @@ void walk_tree::set_right(walk_tree *right) {
 void walk_tree::merge() {
   num_sites_ = left_->num_sites_ + right_->num_sites_;
 
-  bbox_ = left_->bbox_ + (left_->end_ + symm_ * right_->bbox_);
-  end_ = left_->end_ + symm_ * right_->end_;
+  bbox_ = symm_ * right_->bbox_;
+  bbox_ += left_->end_;
+  bbox_ += left_->bbox_;
+
+  end_ = symm_ * right_->end_;
+  end_ += left_->end_;
 }
 
 std::vector<point> walk_tree::steps() const {
