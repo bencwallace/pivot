@@ -80,3 +80,31 @@ jobs:
         run: |
             chmod +x ./test_pivot
             valgrind --leak-check=full --show-leak-kinds=all --errors-for-leak-kinds=all --error-exitcode=1 ./test_pivot
+
+  mac-test:
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: InstallDeps
+        run: brew install bison boost
+
+      - name: InstallGraphviz
+        run: |
+            git clone https://gitlab.com/graphviz/graphviz.git
+            cmake -S ${{github.workspace}}/graphviz -B ${{github.workspace}}/graphviz/build \
+              -DCMAKE_BUILD_TYPE=Release \
+              -DBISON_EXECUTABLE=$(brew --prefix bison)/bin/bison \
+              -DCMAKE_INSTALL_PREFIX=~/.local
+            cmake --build ${{github.workspace}}/graphviz/build --target install -j
+
+      - name: Configure CMake
+        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DGRAPHVIZ_INCLUDE_PATH=~/.local/include/graphviz
+
+      - name: Build
+        run: cmake --build ${{github.workspace}}/build --config Release --target test_pivot -j
+
+      - name: Test
+        working-directory: ${{github.workspace}}/build
+        run: ctest -C Release
