@@ -53,7 +53,7 @@ jobs:
 
       - name: Build
         run: |
-            cmake --build ${{github.workspace}}/build --config Release --target test_pivot -j
+            cmake --build ${{github.workspace}}/build --config Release --target pivot_exec -j
             tar vczf ${{github.workspace}}/build/pivot-macos.tar.gz -C ${{github.workspace}}/build pivot libpivot.a
 
       - name: Release
