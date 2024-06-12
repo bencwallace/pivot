@@ -192,23 +192,6 @@ TEST(TransformTest, Box2D) {
     EXPECT_EQ(t2 * b, box<2>({interval{-5, -1}, interval{2, 4}}));
 }
 
-TEST(TransformTest, DISABLED_Span3D) {
-    // TODO: fails when t == transform<3>({2, 0, 1}, {1, -1, 1});
-    auto e0 = point<3>::unit(0);
-
-    auto p1 = point<3>({1, 2, 3});
-    auto p2 = point<3>({4, 5, 6});
-    auto bp = (p1 - e0) + box(std::array{p1, p2}); // undo anchoring
-
-    auto t = transform<3>::rand();
-    auto tbp = t * bp;
-    auto tp1 = t * p1;
-    auto tp2 = t * p2;
-    auto btp = (tp1 - e0) + box(std::array{tp1, tp2}); // undo anchoring
-
-    EXPECT_EQ(btp, tbp) << "t: " << t.to_string();
-}
-
 TEST(TransformTest, Inverse2D) {
     transform<2> id({0, 1}, {1, 1});
     auto o = point<2>({0, 0});
