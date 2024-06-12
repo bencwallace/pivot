@@ -34,12 +34,12 @@ template <int Dim> point<Dim> point<Dim>::operator+(const point<Dim> &p) const {
   return point(sum);
 }
 
-template <int Dim> box<Dim> point<Dim>::operator+(const box<Dim> &b) const {
-  std::array<interval, Dim> intervals;
+template <int Dim> box<Dim> &box<Dim>::operator+=(const point<Dim> &p) {
   for (int i = 0; i < Dim; ++i) {
-    intervals[i] = interval(coords_[i] + b.intervals_[i].left_, coords_[i] + b.intervals_[i].right_);
+    intervals_[i].left_ += p[i];
+    intervals_[i].right_ += p[i];
   }
-  return box<Dim>(intervals);
+  return *this;
 }
 
 template <int Dim> point<Dim> point<Dim>::operator-(const point &p) const {
@@ -50,12 +50,11 @@ template <int Dim> point<Dim> point<Dim>::operator-(const point &p) const {
   return point(diff);
 }
 
-template <int Dim> point<Dim> operator*(int k, const point<Dim> &p) {
-  std::array<int, Dim> coords;
+template <int Dim> point<Dim> &point<Dim>::operator*=(int k) {
   for (int i = 0; i < Dim; ++i) {
-    coords[i] = k * p.coords_[i];
+    coords_[i] *= k;
   }
-  return point(coords);
+  return *this;
 }
 
 template <int Dim> int point<Dim>::norm() const {
@@ -296,7 +295,6 @@ template <int Dim> void to_csv(const std::string &path, const std::vector<point<
 #define POINT_INST(z, n, data) template class point<n>;
 #define BOX_INST(z, n, data) template struct box<n>;
 #define TRANSFORM_INST(z, n, data) template class transform<n>;
-#define POINT_SCALAR_MULT_INST(z, n, data) template point<n> operator*(int k, const point<n> &p);
 #define POINT_HASH_CALL_INST(z, n, data) template std::size_t point_hash::operator()<n>(const point<n> &p) const;
 #define TO_CSV_INST(z, n, data) template void to_csv<n>(const std::string &path, const std::vector<point<n>> &points);
 
@@ -304,7 +302,6 @@ template <int Dim> void to_csv(const std::string &path, const std::vector<point<
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, BOX_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TRANSFORM_INST, ~)
-BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_SCALAR_MULT_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_HASH_CALL_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TO_CSV_INST, ~)
 

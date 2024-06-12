@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+#include <boost/operators.hpp>
+
 namespace pivot {
 
 template <int Dim> struct box;
@@ -34,7 +36,7 @@ struct interval {
 /**
  * @brief Represents a Dim-dimensional point.
  */
-template <int Dim> class point {
+template <int Dim> class point : boost::multipliable<point<Dim>, int> {
 
 public:
   point() = default;
@@ -57,14 +59,11 @@ public:
   /** @brief Vector addition of points */
   point operator+(const point &p) const;
 
-  /** @brief Action of a point (understood as a vector) on a box */
-  box<Dim> operator+(const box<Dim> &b) const;
-
   /** @brief Vector subtraction of points */
   point operator-(const point &p) const;
 
   /** @brief Scalar multiplication of a point */
-  template <int D> friend point<D> operator*(int k, const point<D> &p);
+  point &operator*=(int k);
 
   int norm() const;
 
@@ -78,7 +77,7 @@ private:
 template <typename S, typename T, T Dim> point(std::array<S, Dim>) -> point<Dim>;
 
 /** @brief Represents a Dim-dimensional box. */
-template <int Dim> struct box {
+template <int Dim> struct box : boost::addable<box<Dim>, point<Dim>> {
   std::array<interval, Dim> intervals_;
 
   box() = delete;
@@ -101,6 +100,9 @@ template <int Dim> struct box {
   interval operator[](int i) const;
 
   bool empty() const;
+
+  /** @brief Action of a point (understood as a vector) on a box */
+  box<Dim> &operator+=(const point<Dim> &b);
 
   /**
    * @brief Returns the "union" of two boxes.
