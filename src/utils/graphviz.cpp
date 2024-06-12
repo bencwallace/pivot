@@ -1,6 +1,5 @@
 #include <dlfcn.h>
 #include <iostream>
-#include <stdexcept>
 
 #include "graphviz.h"
 

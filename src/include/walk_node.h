@@ -1,7 +1,5 @@
 #pragma once
 
-#include <gvc.h>
-
 #include "graphviz.h"
 #include "lattice.h"
 

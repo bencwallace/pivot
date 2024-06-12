@@ -1,16 +1,10 @@
 #pragma once
 
 #include <algorithm>
-#include <array>
-#include <cstdlib>
-#include <fstream>
 #include <limits>
-#include <optional>
-#include <random>
 #include <span>
-#include <vector>
-
 #include <string>
+#include <vector>
 
 namespace pivot {
 

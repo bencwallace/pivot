@@ -1,7 +1,5 @@
 #pragma once
 
-#include <string>
-
 #include "lattice.h"
 
 namespace pivot {
