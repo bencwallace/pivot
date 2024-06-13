@@ -54,14 +54,18 @@ TEST(WalkTreeTest, Seed) {
 
   walk_tree<2> w1(100, seed);
   walk_tree<2> w2(100, seed);
+  walk_tree<2> w3(100);
   std::srand(seed);
   for (int i = 0; i < 10; ++i) {
     w1.rand_pivot();
     w2.rand_pivot();
+    w3.rand_pivot();
   }
   auto steps1 = w1.steps();
   auto steps2 = w2.steps();
+  auto steps3 = w3.steps();
   for (int i = 0; i < 100; ++i) {
     ASSERT_EQ(steps1[i], steps2[i]);
   }
+  ASSERT_NE(steps1, steps3);
 }
