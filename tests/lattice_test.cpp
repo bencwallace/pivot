@@ -75,17 +75,17 @@ TEST(BoxTest, FromSpan2D) {
 TEST(BoxTest, Union1D) {
     box<1> b1({interval{-1, 1}});
     box<1> b2({interval{0, 2}});
-    auto b3 = b1 + b2;
+    auto b3 = b1 | b2;
     EXPECT_EQ(b3.intervals_[0].left_, -1);
     EXPECT_EQ(b3.intervals_[0].right_, 2);
 
     box<1> b4({interval{2, 3}});
-    auto b5 = b1 + b4;
+    auto b5 = b1 | b4;
     EXPECT_EQ(b5.intervals_[0].left_, -1);
     EXPECT_EQ(b5.intervals_[0].right_, 3);
 
     box<1> b6({interval{0, 1}});
-    auto b7 = b1 + b6;
+    auto b7 = b1 | b6;
     EXPECT_EQ(b7.intervals_[0].left_, -1);
     EXPECT_EQ(b7.intervals_[0].right_, 1);
 }
@@ -93,14 +93,14 @@ TEST(BoxTest, Union1D) {
 TEST(BoxTest, Union2D) {
     box<2> b1({interval{-1, 1}, interval{0, 1}});
     box<2> b2({interval{0, 2}, interval{0, 2}});
-    auto b3 = b1 + b2;
+    auto b3 = b1 | b2;
     EXPECT_EQ(b3.intervals_[0].left_, -1);
     EXPECT_EQ(b3.intervals_[0].right_, 2);
     EXPECT_EQ(b3.intervals_[1].left_, 0);
     EXPECT_EQ(b3.intervals_[1].right_, 2);
 
     box<2> b4({interval{2, 3}, interval{1, 2}});
-    auto b5 = b1 + b4;
+    auto b5 = b1 | b4;
     EXPECT_EQ(b5.intervals_[0].left_, -1);
     EXPECT_EQ(b5.intervals_[0].right_, 3);
     EXPECT_EQ(b5.intervals_[1].left_, 0);
@@ -110,16 +110,16 @@ TEST(BoxTest, Union2D) {
 TEST(BoxTest, Intersection1D) {
     box<1> b1({interval{-1, 1}});
     box<1> b2({interval{0, 2}});
-    auto b3 = b1 * b2;
+    auto b3 = b1 & b2;
     EXPECT_EQ(b3.intervals_[0].left_, 0);
     EXPECT_EQ(b3.intervals_[0].right_, 1);
 
     box<1> b4({interval{2, 3}});
-    auto b5 = b1 * b4;
+    auto b5 = b1 & b4;
     EXPECT_TRUE(b5.empty());
 
     box<1> b6({interval{1, 2}});
-    auto b7 = b1 * b6;
+    auto b7 = b1 & b6;
     EXPECT_EQ(b7.intervals_[0].left_, 1);
     EXPECT_EQ(b7.intervals_[0].right_, 1);
 }
@@ -127,14 +127,14 @@ TEST(BoxTest, Intersection1D) {
 TEST(BoxTest, Intersection2D) {
     box<2> b1({interval{-1, 1}, interval{0, 1}});
     box<2> b2({interval{0, 2}, interval{0, 2}});
-    auto b3 = b1 * b2;
+    auto b3 = b1 & b2;
     EXPECT_EQ(b3.intervals_[0].left_, 0);
     EXPECT_EQ(b3.intervals_[0].right_, 1);
     EXPECT_EQ(b3.intervals_[1].left_, 0);
     EXPECT_EQ(b3.intervals_[1].right_, 1);
 
     box<2> b4({interval{2, 3}, interval{1, 2}});
-    auto b5 = b1 * b4;
+    auto b5 = b1 & b4;
     EXPECT_TRUE(b5.empty());
 }
 
