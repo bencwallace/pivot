@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <limits>
+#include <random>
 #include <span>
 #include <string>
 #include <vector>
@@ -174,11 +175,13 @@ public:
 
   /** @brief Produce a uniformly random transfom.*/
   template <typename Gen> static transform rand(Gen &gen) {
+    static std::bernoulli_distribution flip_;
+
     std::array<int, Dim> perm;
     std::array<int, Dim> signs;
     for (int i = 0; i < Dim; ++i) {
       perm[i] = i;
-      signs[i] = 2 * (std::rand() % 2) - 1;
+      signs[i] = 2 * flip_(gen) - 1;
     }
     std::shuffle(perm.begin(), perm.end(), gen);
     return transform(perm, signs);
