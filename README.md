@@ -88,7 +88,7 @@ mkdir out
 Plot the output:
 
 ```
-python plot.py out/walk.csv
+python tools/plot2d.py out/walk.csv
 ```
 
 **Estimating critical exponents**
