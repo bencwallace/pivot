@@ -30,7 +30,8 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
   while (true) {
     if (num_iter % interval == 0) {
       std::cout << "Iterations: " << num_iter << " / Successes: " << num_success
-                << " / Success rate: " << num_success / static_cast<float>(num_iter) << std::endl;
+                << " / Success rate: " << num_success / static_cast<float>(interval) << std::endl;
+      num_success = 0;
     }
     if (require_success) {
       if (num_success == iters) {
