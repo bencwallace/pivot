@@ -7,10 +7,14 @@
 
 template <int Dim>
 int main_loop(int num_steps, int iters, bool naive, int seed, bool require_success, bool verify,
-              const std::string &out_dir) {
+              const std::string &in_path, const std::string &out_dir) {
   std::unique_ptr<pivot::walk_base<Dim>> w;
   if (!naive) {
-    w = std::make_unique<pivot::walk_tree<Dim>>(num_steps, seed);
+    if (in_path.empty()) {
+      w = std::make_unique<pivot::walk_tree<Dim>>(num_steps, seed);
+    } else {
+      w = std::make_unique<pivot::walk_tree<Dim>>(in_path, seed);
+    }
   } else {
     w = std::make_unique<pivot::walk<Dim>>(num_steps, seed);
   }

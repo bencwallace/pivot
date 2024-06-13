@@ -266,6 +266,8 @@ private:
   std::array<int, Dim> signs_;
 };
 
+template <int Dim> std::vector<point<Dim>> from_csv(const std::string &path);
+
 template <int Dim> void to_csv(const std::string &path, const std::vector<point<Dim>> &points);
 
 } // namespace pivot
