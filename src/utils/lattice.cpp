@@ -42,6 +42,14 @@ template <int Dim> box<Dim> &box<Dim>::operator+=(const point<Dim> &p) {
   return *this;
 }
 
+template <int Dim> box<Dim> &box<Dim>::operator-=(const point<Dim> &b) {
+  for (int i = 0; i < Dim; ++i) {
+    intervals_[i].left_ -= b[i];
+    intervals_[i].right_ -= b[i];
+  }
+  return *this;
+}
+
 template <int Dim> point<Dim> point<Dim>::operator-(const point &p) const {
   std::array<int, Dim> diff;
   for (int i = 0; i < Dim; ++i) {
