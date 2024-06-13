@@ -22,6 +22,8 @@ public:
 
   ~walk() = default;
 
+  point<Dim> operator[](int i) const { return steps_[i]; }
+
   int num_steps() const { return steps_.size(); }
 
   point<Dim> endpoint() const override { return steps_.back(); }
