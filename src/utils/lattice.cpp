@@ -148,7 +148,7 @@ template <int Dim> bool box<Dim>::empty() const {
   return std::any_of(intervals_.begin(), intervals_.end(), [](const interval &i) { return i.empty(); });
 }
 
-template <int Dim> box<Dim> box<Dim>::operator+(const box<Dim> &b) const {
+template <int Dim> box<Dim> box<Dim>::operator|(const box<Dim> &b) const {
   std::array<interval, Dim> intervals;
   for (int i = 0; i < Dim; ++i) {
     intervals[i] = interval(std::min(intervals_[i].left_, b.intervals_[i].left_),
@@ -157,7 +157,7 @@ template <int Dim> box<Dim> box<Dim>::operator+(const box<Dim> &b) const {
   return box(intervals);
 }
 
-template <int Dim> box<Dim> box<Dim>::operator*(const box<Dim> &b) const {
+template <int Dim> box<Dim> box<Dim>::operator&(const box<Dim> &b) const {
   std::array<interval, Dim> intervals;
   for (int i = 0; i < Dim; ++i) {
     intervals[i] = interval(std::max(intervals_[i].left_, b.intervals_[i].left_),

@@ -263,7 +263,7 @@ bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const
                const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
   auto l_box = l_anchor + l_symm * l_walk->bbox_;
   auto r_box = r_anchor + r_symm * r_walk->bbox_;
-  if ((l_box * r_box).empty()) {
+  if ((l_box & r_box).empty()) {
     return false;
   }
 
@@ -285,7 +285,7 @@ bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const
 template <int Dim> void walk_node<Dim>::merge() {
   num_sites_ = left_->num_sites_ + right_->num_sites_;
 
-  bbox_ = left_->bbox_ + (left_->end_ + symm_ * right_->bbox_);
+  bbox_ = left_->bbox_ | (left_->end_ + symm_ * right_->bbox_);
   end_ = left_->end_ + symm_ * right_->end_;
 }
 

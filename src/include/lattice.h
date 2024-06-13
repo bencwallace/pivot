@@ -112,7 +112,7 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
    * The union here is not to be understood as the set-theoretic union, but rather as the minimal
    * bounding box containing both input boxes.
    */
-  box operator+(const box &b) const;
+  box operator|(const box &b) const;
 
   /**
    * @brief Returns the intersection of two boxes.
@@ -120,7 +120,7 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
    * The intersection is the set-theoretic intersection or, equivalently, the maximal box contained
    * in both input boxes.
    */
-  box operator*(const box &b) const;
+  box operator&(const box &b) const;
 
   /** @brief Returns the string of the form "{intervals_[0]} x ... x {intervals[Dim - 1]}". */
   std::string to_string() const;
