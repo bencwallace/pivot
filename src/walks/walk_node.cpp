@@ -57,7 +57,7 @@ walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point<Dim>> steps, 
   auto glob_inv = glob_symm.inverse();
   auto rel_symm = glob_inv * abs_symm;
   auto rel_end = glob_inv * (steps.back() - steps.front()) + pivot::point<Dim>::unit(0);
-  auto rel_box = point<Dim>::unit(0) + glob_inv * (point<Dim>() - point<Dim>::unit(0) + box(steps));
+  auto rel_box = point<Dim>::unit(0) + glob_inv * (box(steps) - point<Dim>::unit(0));
   walk_node *root = new walk_node(start + n - 1, num_sites, rel_symm, rel_box, rel_end);
 
   if (n >= 1) {

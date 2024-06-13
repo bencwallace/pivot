@@ -77,7 +77,7 @@ private:
 template <typename S, typename T, T Dim> point(std::array<S, Dim>) -> point<Dim>;
 
 /** @brief Represents a Dim-dimensional box. */
-template <int Dim> struct box : boost::addable<box<Dim>, point<Dim>> {
+template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
   std::array<interval, Dim> intervals_;
 
   box() = delete;
@@ -103,6 +103,8 @@ template <int Dim> struct box : boost::addable<box<Dim>, point<Dim>> {
 
   /** @brief Action of a point (understood as a vector) on a box */
   box<Dim> &operator+=(const point<Dim> &b);
+
+  box<Dim> &operator-=(const point<Dim> &b);
 
   /**
    * @brief Returns the "union" of two boxes.
