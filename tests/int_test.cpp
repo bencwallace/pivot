@@ -2,6 +2,7 @@
 
 #include <gtest/gtest.h>
 
+#include "loop.h"
 #include "walk.h"
 #include "walk_tree.h"
 
@@ -33,6 +34,11 @@ TEST(WalkTest, Seed) {
   for (int i = 0; i < 100; ++i) {
     ASSERT_EQ(w1[i], w2[i]);
   }
+}
+
+TEST(WalkTest, Loop) {
+  auto ret = main_loop<2>(100, 10, true, 42, false, false, "");
+  ASSERT_EQ(ret, 0);
 }
 
 TEST(WalkTreeTest, SelfAvoiding) {
@@ -68,4 +74,9 @@ TEST(WalkTreeTest, Seed) {
     ASSERT_EQ(steps1[i], steps2[i]);
   }
   ASSERT_NE(steps1, steps3);
+}
+
+TEST(WalkTreeTest, Loop) {
+  auto ret = main_loop<2>(100, 10, false, 42, false, false, "");
+  ASSERT_EQ(ret, 0);
 }
