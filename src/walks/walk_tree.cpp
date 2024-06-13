@@ -21,6 +21,15 @@ template <int Dim> walk_tree<Dim>::walk_tree(int num_sites, std::optional<unsign
   dist_ = std::uniform_int_distribution<int>(1, num_sites - 1);
 }
 
+template <int Dim> walk_tree<Dim>::walk_tree(const std::string &path, std::optional<unsigned int> seed, bool balanced) {
+  auto steps = from_csv<Dim>(path);
+  root_ = balanced ? std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::balanced_rep(steps))
+                   : std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::pivot_rep(steps));
+
+  rng_ = std::mt19937(seed.value_or(std::random_device()()));
+  dist_ = std::uniform_int_distribution<int>(1, steps.size() - 1);
+}
+
 template <int Dim> walk_tree<Dim>::~walk_tree() = default;
 
 template <int Dim> walk_tree<Dim>::walk_tree(walk_node<Dim> *root) : root_(root) {}
