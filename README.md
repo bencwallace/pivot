@@ -20,6 +20,10 @@ In a [2010 paper](https://arxiv.org/abs/1005.1444), [Nathan Clisby](https://clis
 
 This repository provides an implementation of the saw-tree pivot algorithm.
 
+## Download
+
+[Releases](https://github.com/bencwallace/pivot/releases) are available for Linux (x64) and macOS (arm64).
+
 ## Build
 
 CMake and a suitable C/C++ compiler toolchain are required.
