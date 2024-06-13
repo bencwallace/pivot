@@ -1,3 +1,5 @@
+#include <random>
+
 #include <gtest/gtest.h>
 
 #include "walk.h"
@@ -17,6 +19,22 @@ TEST(WalkTest, SelfAvoiding) {
   }
 }
 
+TEST(WalkTest, Seed) {
+  std::random_device rd;
+  auto seed = rd();
+  std::mt19937 gen(seed);
+
+  walk<2> w1(100, seed);
+  walk<2> w2(100, seed);
+  for (int i = 0; i < 10; ++i) {
+    w1.rand_pivot();
+    w2.rand_pivot();
+  }
+  for (int i = 0; i < 100; ++i) {
+    ASSERT_EQ(w1[i], w2[i]);
+  }
+}
+
 TEST(WalkTreeTest, SelfAvoiding) {
   for (int num_steps = 2; num_steps < 10; ++num_steps) {
     auto w = walk_tree<2>(2);
@@ -26,5 +44,24 @@ TEST(WalkTreeTest, SelfAvoiding) {
       }
       EXPECT_TRUE(w.self_avoiding());
     }
+  }
+}
+
+TEST(WalkTreeTest, Seed) {
+  std::random_device rd;
+  auto seed = rd();
+  std::mt19937 gen(seed);
+
+  walk_tree<2> w1(100, seed);
+  walk_tree<2> w2(100, seed);
+  std::srand(seed);
+  for (int i = 0; i < 10; ++i) {
+    w1.rand_pivot();
+    w2.rand_pivot();
+  }
+  auto steps1 = w1.steps();
+  auto steps2 = w2.steps();
+  for (int i = 0; i < 100; ++i) {
+    ASSERT_EQ(steps1[i], steps2[i]);
   }
 }
