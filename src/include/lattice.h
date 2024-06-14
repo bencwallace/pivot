@@ -200,10 +200,12 @@ public:
    * @details Given matrix representations (see @ref transform_details) S1 P1 and S2 P2 of *this and t, respectively,
    * the composed transformation acts on a standard unit vector e(i) by producing
    *
-   *    S1 P1 S2 P2 e(i) == S1 P1 S2 e(P2(i))
-   *                     == S2(P2(i)) S1 P1 e(P2(i))
-   *                     == S2(P2(i)) S1 e(P1(P2(i)))
-   *                     == S1(P1(P2(i))) S2(P2(i)) e(P1(P2(i)))
+   * \f{align}{
+   *    S1 P1 S2 P2 e(i) &= S1 P1 S2 e(P2(i)) \\
+   *                     &= S2(P2(i)) S1 P1 e(P2(i)) \\
+   *                     &= S2(P2(i)) S1 e(P1(P2(i))) \\
+   *                     &= S1(P1(P2(i))) S2(P2(i)) e(P1(P2(i))) \\
+   * \f}
    *
    * from which the permutation and signs of the composed transformation can be read off.
    */
@@ -215,12 +217,12 @@ public:
    * @details Using the representation of the inverse of a transform from @ref transform::inverse we
    * see that the pre-image of a point x under such a transform has i-th component given by
    *
-   *    x[i] == S(P(i)) x[P(i)]
+   * \f[ x[i] = S(P(i)) x[P(i)] \f]
    *
    * Given a box B made up of intervals [a[i], b[i]], the image SP(B) of the box consists of points
    * whose pre-images have i-th components between a[i] and b[i] for each i. This is equivalent to saying
    *
-   *    a[i] \le S(P(i)) x[P(i)] \le b[i]
+   * \f[ a[i] \le S(P(i)) x[P(i)] \le b[i] \f]
    *
    * which means the P(i)-th interval from which SP(B) is constructed has bounds S(P(i)) a[i] and
    * S(P(i)) b[i].
@@ -233,10 +235,12 @@ public:
    * @details Writing the transforms as SP (see @ref transform_details) and using the fact that S is its own inverse,
    * the inverse transform acts on a standard unit vector e(P(i)) by producing
    *
-   *    (S P)^{-1} e(P(i)) == P^{-1} S^{-1} e(P(i))
-   *                       == P^{-1} S e(P(i))
-   *                       == S(P(i)) P^{-1} e(P(i))
-   *                       == S(P(i)) e(i)
+   * \f{align}{
+   *    (S P)^{-1} e(P(i)) &= P^{-1} S^{-1} e(P(i)) \\
+   *                       &= P^{-1} S e(P(i)) \\
+   *                       &= S(P(i)) P^{-1} e(P(i)) \\
+   *                       &= S(P(i)) e(i) \\
+   * \f}
    *
    * from which the permutation and signs of the inverse transform can be read off.
    */
@@ -248,7 +252,7 @@ public:
    * @details Writing the transform as SP (see @ref transform_details), the matrix representation
    * can be read off from
    *
-   *    S P e(i) = S e(P(i)) = S(P(i)) e(P(i))
+   * \f[S P e(i) = S e(P(i)) = S(P(i)) e(P(i))\f]
    *
    * which means the i-th column of the matrix has value S(P(i)) in the P(i)-th row and zeros elsewhere.
    */
