@@ -18,11 +18,11 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y libboost-all-dev libgraphviz-dev
       
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release
+        run: cmake --preset release
       
       - name: Build
         run: |
-            cmake --build ${{github.workspace}}/build --config Release --target pivot_exec -j
+            cmake --build --preset release --target pivot_exec -j
             tar vczf ${{github.workspace}}/build/pivot-linux-x86_64.tar.gz -C ${{github.workspace}}/build pivot libpivot.a
 
       - name: Release
@@ -50,11 +50,11 @@ jobs:
           cmake --build ${{github.workspace}}/graphviz/build --target install -j
 
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=Release -DGRAPHVIZ_INCLUDE_PATH=~/.local/include/graphviz
+        run: cmake --preset release -DGRAPHVIZ_INCLUDE_PATH=~/.local/include/graphviz
 
       - name: Build
         run: |
-            cmake --build ${{github.workspace}}/build --config Release --target pivot_exec -j
+            cmake --build --preset release --target pivot_exec -j
             tar vczf ${{github.workspace}}/build/pivot-macos.tar.gz -C ${{github.workspace}}/build pivot libpivot.a
 
       - name: Release
