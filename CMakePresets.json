@@ -1,0 +1,60 @@
+{
+    "version": 3,
+    "configurePresets": [{
+        "name": "debug",
+        "displayName": "Debug",
+        "binaryDir": "build/debug",
+        "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "Debug"
+        }
+    }, {
+        "name": "test",
+        "displayName": "Test",
+        "binaryDir": "build/test",
+        "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "Debug",
+            "CMAKE_CXX_COMPILER": "clang++",
+            "SANITIZE": "ON"
+        }
+    }, {
+        "name": "profile",
+        "displayName": "Profile",
+        "binaryDir": "build/profile",
+        "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+            "CMAKE_CXX_FLAGS": "-fno-omit-frame-pointer"
+        }
+    }, {
+        "name": "release",
+        "displayName": "Release",
+        "binaryDir": "build/release",
+        "cacheVariables": {
+            "CMAKE_BUILD_TYPE": "Release"
+        }
+    }],
+    "buildPresets": [{
+        "name": "debug",
+        "displayName": "Debug",
+        "configurePreset": "debug",
+        "configuration": "Debug",
+        "targets": ["all"]
+    }, {
+        "name": "test",
+        "displayName": "Test",
+        "configurePreset": "test",
+        "configuration": "Debug",
+        "targets": ["test_pivot"]
+    }, {
+        "name": "profile",
+        "displayName": "Profile",
+        "configurePreset": "profile",
+        "configuration": "RelWithDebInfo",
+        "targets": ["pivot_exec"]
+    }, {
+        "name": "release",
+        "displayName": "Release",
+        "configurePreset": "release",
+        "configuration": "Release",
+        "targets": ["all"]
+    }]
+}
