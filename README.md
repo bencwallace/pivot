@@ -48,8 +48,8 @@ sudo apt-get update && sudo apt-get install libboost-all-dev libgraphviz-dev
 **Build**
 
 ```
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --target pivot_exec -j
+cmake --preset release
+cmake --build --preset release -j
 ```
 
 **Maximum number of dimensions**
@@ -59,12 +59,12 @@ which sets the exclusive upper bound on the dimensions supported. For instance, 
 one would set `DIMS_UB` to 11 as follows:
 
 ```
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDIMS_UB=11
-cmake --build build --target pivot_exec -j
+cmake --preset release -DDIMS_UB=11
+cmake --build build --preset release -j
 ```
 
 At the time of writing, the default value of `DIMS_UB` is 6. The most up-to-date default can be found by looking at
-[CMakeLists.txt](CMakeLists.txt) or [defines.h](src/include/defines.h).
+[CMakeLists.txt](CMakeLists.txt).
 
 **Documentation**
 
@@ -76,10 +76,10 @@ doxygen Doxyfile
 
 ## Usage
 
-For usage instructions, run the following command:
+For usage instructions, run the following command from the directory containing the `pivot` executable:
 
 ```
-./build/pivot --help
+./pivot --help
 ```
 
 ## Examples
@@ -90,7 +90,7 @@ Attempt $10^5$ pivots on a $10^6$ step walk:
 
 ```
 mkdir out
-./build/pivot --steps 1000000 --iters 100000 --out out
+./pivot --steps 1000000 --iters 100000 --out out
 ```
 
 Plot the output:
@@ -115,7 +115,7 @@ mkdir data
 for i in $(seq 0 10)
 do
   steps=$((1000 * 2 ** i))
-  ./build/pivot --success -d 2 -s ${steps} -i $((2 * steps)) --out data
+  ./pivot --success -d 2 -s ${steps} -i $((2 * steps)) --out data
   mv data/endpoints.csv data/${steps}.csv
 done
 ```
