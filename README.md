@@ -66,6 +66,14 @@ cmake --build build --target pivot_exec -j
 At the time of writing, the default value of `DIMS_UB` is 6. The most up-to-date default can be found by looking at
 [CMakeLists.txt](CMakeLists.txt) or [defines.h](src/include/defines.h).
 
+**Documentation**
+
+To build documentation with Doxygen, simply run
+
+```
+doxygen Doxyfile
+```
+
 ## Usage
 
 For usage instructions, run the following command:

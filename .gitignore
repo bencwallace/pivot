@@ -1,4 +1,7 @@
 pivot
 *.csv
 *.o
+.cache/
 build/
+html/
+latex/
