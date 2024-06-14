@@ -15,7 +15,7 @@ as computational methods, which are the focus of this project.
 The *pivot algorithm* is a [Monte Carlo](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) approach
 to simulating the SAW. The algorithm consists of a sequence of "pivot moves": random
 rigid transformations applied at random points of a walk, thereby pivoting one end about the other.
-In a [2010 paper](https://arxiv.org/abs/1005.1444), [Nathan Clisby](https://clisby.net) introduced the
+In a [2010 paper](#1), [Nathan Clisby](https://clisby.net) introduced the
 *saw-tree* data structure, enabling a massive performance improvement to this algorithm.
 
 This repository provides an implementation of the saw-tree pivot algorithm.
@@ -152,7 +152,24 @@ I hope to make the following changes in the future:
 
 Some other interesting directions to explore would be the following:
 
+* Allow soft-core interactions (Domb-Joyce model) [[2]](#2)
+* Allow attractive interactions
 * Add Python bindings
 * Support non-cubic lattices
 * Allow long-range step distributions
-* Allow soft-core interactions (weak SAW / Domb-Joyce model)
+
+## References
+
+<a id="1">[1]</a>
+<a href="https://doi.org/10.1007/s10955-010-9994-8">
+N. Clisby.
+Efficient implementation of the pivot algorithm for self-avoidoing walks.
+Journal of Statistical Physics., 140:349-392, (2010).
+</a>
+
+<a id="2">[2]</a>
+<a href="https://dx.doi.org/10.1088/1742-6596/921/1/012012">
+N. Clisby.
+High resolution Monte Carlo study of the Domb-Joyce model.
+Journal of Physics: Conference Series., 921:012012, (2017).
+</a>
