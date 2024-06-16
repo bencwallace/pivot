@@ -9,6 +9,7 @@
 namespace pivot {
 
 struct box;
+class transform;
 
 class point {
 
@@ -16,6 +17,10 @@ public:
   point(int dim);
 
   point(std::vector<int> &&coords);
+
+  point(const point &p);
+
+  point &operator=(const point &p);
 
   static point unit(int dim, int i);
 
@@ -30,6 +35,8 @@ public:
   point operator+(const point &p) const;
 
   point &operator+=(const point &p);
+
+  point &operator*=(const transform &t);
 
   box operator+(const box &b) const;
 
@@ -58,9 +65,15 @@ struct interval {
 struct box {
   std::vector<interval> intervals_;
 
+  box(int dim);
+
   box(std::vector<interval> &&intervals);
 
   box(std::span<const point> points);
+
+  box(const box &b);
+
+  box &operator=(const box &b);
 
   int dim() const;
 
@@ -75,6 +88,10 @@ struct box {
 
   // intersection
   box operator*(const box &b) const;
+
+  box &operator*=(const box &b);
+
+  box &operator*=(const transform &t);
 
   std::string to_string() const;
 };
@@ -117,6 +134,9 @@ public:
 private:
   std::vector<int> perm_;
   std::vector<int> signs_;
+
+  friend struct box;
+  friend class point;
 };
 
 void to_csv(const std::string &path, const std::vector<point> &points);

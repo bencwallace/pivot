@@ -16,6 +16,13 @@ point::point(int dim) : coords_(dim) {}
 
 point::point(std::vector<int> &&coords) : coords_(std::move(coords)) {}
 
+point::point(const point &p) : coords_(p.coords_) {}
+
+point &point::operator=(const point &p) {
+  coords_ = p.coords_;
+  return *this;
+}
+
 point point::unit(int dim, int i) {
   std::vector<int> coords(dim, 0);
   coords[i] = 1;
@@ -105,7 +112,16 @@ bool interval::empty() const { return left_ > right_; }
 
 std::string interval::to_string() const { return "[" + std::to_string(left_) + ", " + std::to_string(right_) + "]"; }
 
+box::box(int dim) : intervals_(dim) {}
+
 box::box(std::vector<interval> &&intervals) : intervals_(std::move(intervals)) {}
+
+box::box(const box &b) : intervals_(b.intervals_) {}
+
+box &box::operator=(const box &b) {
+  intervals_ = b.intervals_;
+  return *this;
+}
 
 int box::dim() const { return intervals_.size(); }
 
@@ -171,6 +187,14 @@ box box::operator*(const box &b1) const {
                                  std::min(intervals_[i].right_, b1.intervals_[i].right_)));
   }
   return box(std::move(intervals));
+}
+
+box &box::operator*=(const box &b) {
+  for (int i = 0; i < dim(); ++i) {
+    intervals_[i].left_ = std::max(intervals_[i].left_, b.intervals_[i].left_);
+    intervals_[i].right_ = std::min(intervals_[i].right_, b.intervals_[i].right_);
+  }
+  return *this;
 }
 
 std::string box::to_string() const {
@@ -239,6 +263,15 @@ point transform::operator*(const point &p) const {
   return point(std::move(coords));
 }
 
+point &point::operator*=(const transform &t) {
+  static std::vector<int> temp(dim());
+  for (int i = 0; i < dim(); ++i) {
+    temp[i] = t.signs_[i] * coords_[t.perm_[i]];
+  }
+  coords_ = temp;
+  return *this;
+}
+
 box transform::operator*(const box &b) const {
   // TODO: test this
   std::vector<interval> intervals(dim());
@@ -248,6 +281,18 @@ box transform::operator*(const box &b) const {
     intervals[perm_[i]] = interval(std::min(x, y), std::max(x, y));
   }
   return box(std::move(intervals));
+}
+
+box &box::operator*=(const transform &t) {
+  static std::vector<interval> temp(dim());
+  for (int i = 0; i < dim(); ++i) {
+    int x = t.signs_[t.perm_[i]] * intervals_[i].left_;
+    int y = t.signs_[t.perm_[i]] * intervals_[i].right_;
+    temp[t.perm_[i]].left_ = std::min(x, y);
+    temp[t.perm_[i]].right_ = std::max(x, y);
+  }
+  intervals_ = temp;
+  return *this;
 }
 
 transform transform::operator*(const transform &t) const {

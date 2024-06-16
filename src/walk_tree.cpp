@@ -169,11 +169,15 @@ void walk_tree::set_right(walk_tree *right) {
 void walk_tree::merge() {
   num_sites_ = left_->num_sites_ + right_->num_sites_;
 
-  bbox_ = symm_ * right_->bbox_;
+  // bbox_ = symm_ * right_->bbox_;
+  bbox_ = right_->bbox_;
+  bbox_ *= symm_;
   bbox_ += left_->end_;
   bbox_ += left_->bbox_;
 
-  end_ = symm_ * right_->end_;
+  // end_ = symm_ * right_->end_;
+  end_ = right_->end_;
+  end_ *= symm_;
   end_ += left_->end_;
 }
 
@@ -270,9 +274,23 @@ bool walk_tree::intersect() const {
 
 bool intersect(const walk_tree *l_walk, const walk_tree *r_walk, const point &l_anchor, const point &r_anchor,
                const transform &l_symm, const transform &r_symm) {
-  auto l_box = l_anchor + l_symm * l_walk->bbox_;
-  auto r_box = r_anchor + r_symm * r_walk->bbox_;
-  if ((l_box * r_box).empty()) {
+  // auto l_box = l_anchor + l_symm * l_walk->bbox_;
+  static box l_box(l_walk->bbox_.dim());
+  l_box = l_walk->bbox_;
+  l_box *= l_symm;
+  l_box += l_anchor;
+  // auto r_box = r_anchor + r_symm * r_walk->bbox_;
+  static box r_box(r_walk->bbox_.dim());
+  r_box = r_walk->bbox_;
+  r_box *= r_symm;
+  r_box += r_anchor;
+  // if ((l_box * r_box).empty()) {
+  //   return false;
+  // }
+  static box lr_box(l_box.dim());
+  lr_box = l_box;
+  lr_box *= r_box;
+  if (lr_box.empty()) {
     return false;
   }
 
