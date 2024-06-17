@@ -27,13 +27,13 @@ jobs:
       run: cmake --preset test
 
     - name: Lint
-      run: ${{github.workspace}}/tools/lint.sh test
+      run: ${{github.workspace}}/tools/lint.sh
 
     - name: Build
       run: cmake --build --preset test -j
 
     - name: Test
-      run: ctest --test-dir ${{github.workspace}}/build/test --output-on-failure
+      run: ctest --test-dir ${{github.workspace}}/build --output-on-failure
 
   release-build:
     runs-on: ubuntu-22.04
@@ -58,7 +58,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test_pivot
-          path: ${{github.workspace}}/build/release/tests/test_pivot
+          path: ${{github.workspace}}/build/tests/test_pivot
 
   release-test:
     runs-on: ubuntu-22.04
@@ -103,4 +103,4 @@ jobs:
         run: cmake --build --preset release --target test_pivot -j
 
       - name: Test
-        run: ctest --test-dir ${{github.workspace}}/build/release --output-on-failure
+        run: ctest --test-dir ${{github.workspace}}/build --output-on-failure
