@@ -28,7 +28,7 @@ walk_tree<Dim>::walk_tree(const std::vector<point<Dim>> &steps, std::optional<un
   populate_nodes(root_.get());
 }
 
-template <int Dim> walk_tree<Dim>::~walk_tree() = default;
+template <int Dim> walk_tree<Dim>::~walk_tree() {} // TODO: fix this
 
 template <int Dim> void walk_tree<Dim>::populate_nodes(walk_node<Dim> *node) {
   if (node->is_leaf()) {
@@ -60,6 +60,28 @@ template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r
     root_->merge();
   }
   root_->shuffle_down();
+  return success;
+}
+
+template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Dim> &t) {
+  auto w = nodes_[n - 1];
+
+  std::optional<bool> is_left_child;
+  if (w->parent_ == nullptr || w->parent_->left_ == nullptr) {
+    is_left_child = std::nullopt;
+  } else if (w->parent_->left_ == w) {
+    is_left_child = true;
+  } else {
+    is_left_child = false;
+  }
+
+  auto success = !w->shuffle_intersect(t, std::nullopt, is_left_child);
+  if (success) {
+    root_->shuffle_up(n);
+    root_->symm_ = root_->symm_ * t;
+    w->merge();
+    root_->shuffle_down();
+  }
   return success;
 }
 

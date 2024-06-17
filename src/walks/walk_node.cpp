@@ -73,13 +73,26 @@ walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point<Dim>> steps, 
 
 template <int Dim>
 walk_node<Dim>::walk_node(const walk_node<Dim> &w) : walk_node(w.id_, w.num_sites_, w.symm_, w.bbox_, w.end_) {
+  is_copy_ = true;
+  if (w.parent_ != nullptr) {
+    // TODO: removing this seems to have no effect but not sure how that can be
+    parent_ = w.parent_;
+  }
   if (w.left_ != nullptr) {
-    left_ = new walk_node(*w.left_);
-    left_->parent_ = this;
+    if (w.left_ == &leaf()) {
+      left_ = &leaf();
+    } else {
+      left_ = new walk_node(*w.left_);
+      left_->parent_ = this;
+    }
   }
   if (w.right_ != nullptr) {
-    right_ = new walk_node(*w.right_);
-    right_->parent_ = this;
+    if (w.right_ == &leaf()) {
+      right_ = &leaf();
+    } else {
+      right_ = new walk_node(*w.right_);
+      right_->parent_ = this;
+    }
   }
 }
 
@@ -93,14 +106,14 @@ template <int Dim> walk_node<Dim> &walk_node<Dim>::leaf() {
   return leaf_;
 }
 
-template <int Dim> walk_node<Dim>::~walk_node() {
-  if (left_ != nullptr && left_ != &leaf()) {
-    delete left_;
-  }
-  if (right_ != nullptr && right_ != &leaf()) {
-    delete right_;
-  }
-}
+template <int Dim> walk_node<Dim>::~walk_node() {} // TODO: fix this
+//   if (left_ != nullptr && left_ != &leaf()) {
+//     delete left_;
+//   }
+//   if (right_ != nullptr && right_ != &leaf()) {
+//     delete right_;
+//   }
+// }
 
 template <int Dim> bool walk_node<Dim>::operator==(const walk_node &other) const {
   if (is_leaf() && other.is_leaf()) {
@@ -222,6 +235,7 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_right() {
   // update pointers
   set_left(temp_tree->left_);
   temp_tree->left_ = temp_tree->right_; // temp_tree->set_left(temp_tree->right_) sets parent unnecessarily
+
   temp_tree->set_right(right_);
   right_ = temp_tree; // set_right(temp_tree) sets parent unnecessarily
 
@@ -304,6 +318,17 @@ bool walk_node<Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bo
   }
 
   walk_node w(*parent_);
+  if (is_copy_) {
+    if (is_left_child.has_value()) {
+      if (is_left_child.value()) {
+        w.left_ = const_cast<walk_node *>(this);
+      } else {
+        w.right_ = const_cast<walk_node *>(this);
+      }
+    } else {
+      // nothing to do, I think
+    }
+  }
   if (is_left_child.has_value()) {
     if (is_left_child.value()) {
       w.rotate_right();

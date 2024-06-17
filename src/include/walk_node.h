@@ -73,6 +73,7 @@ private:
   transform<Dim> symm_;
   box<Dim> bbox_;
   point<Dim> end_;
+  bool is_copy_{false};
 
   friend class walk_tree<Dim>;
 
