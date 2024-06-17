@@ -57,7 +57,7 @@ walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point<Dim>> steps, 
   auto glob_inv = glob_symm.inverse();
   auto rel_symm = glob_inv * abs_symm;
   auto rel_end = glob_inv * (steps.back() - steps.front()) + pivot::point<Dim>::unit(0);
-  auto rel_box = point<Dim>::unit(0) + glob_inv * (box(steps) - point<Dim>::unit(0));
+  auto rel_box = point<Dim>::unit(0) + glob_inv * (box<Dim>(box(steps) - point<Dim>::unit(0)));
   walk_node *root = new walk_node(start + n - 1, num_sites, rel_symm, rel_box, rel_end);
 
   if (n >= 1) {
@@ -254,48 +254,55 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::shuffle_down() {
   return this;
 }
 
+// template <int Dim> bool walk_node<Dim>::intersect() const {
+//   return ::pivot::intersect<Dim>(left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_);
+// }
 template <int Dim> bool walk_node<Dim>::intersect() const {
-  return ::pivot::intersect<Dim>(left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_);
+  return ::pivot::intersect<Dim, point<Dim>, point<Dim>>(left_, right_, point<Dim>(), left_->end_, transform<Dim>(),
+                                                         symm_);
 }
 
-template <int Dim>
-bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point<Dim> &l_anchor,
-               const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
-  auto l_box = l_anchor + l_symm * l_walk->bbox_;
-  auto r_box = r_anchor + r_symm * r_walk->bbox_;
-  if ((l_box & r_box).empty()) {
-    return false;
-  }
+// template <int Dim>
+// bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point<Dim> &l_anchor,
+//                const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
+//   auto l_box = l_anchor + l_symm * l_walk->bbox_;
+//   auto r_box = r_anchor + r_symm * r_walk->bbox_;
+//   if ((l_box & r_box).empty()) {
+//     return false;
+//   }
 
-  if (l_walk->num_sites_ <= 2 && r_walk->num_sites_ <= 2) {
-    return true;
-  }
+//   if (l_walk->num_sites_ <= 2 && r_walk->num_sites_ <= 2) {
+//     return true;
+//   }
 
-  if (l_walk->num_sites_ >= r_walk->num_sites_) {
-    return intersect(l_walk->right_, r_walk, l_anchor + l_symm * l_walk->left_->end_, r_anchor, l_symm * l_walk->symm_,
-                     r_symm) ||
-           intersect(l_walk->left_, r_walk, l_anchor, r_anchor, l_symm, r_symm);
-  } else {
-    return intersect(l_walk, r_walk->left_, l_anchor, r_anchor, l_symm, r_symm) ||
-           intersect(l_walk, r_walk->right_, l_anchor, r_anchor + r_symm * r_walk->left_->end_, l_symm,
-                     r_symm * r_walk->symm_);
-  }
-}
+//   if (l_walk->num_sites_ >= r_walk->num_sites_) {
+//     return intersect(l_walk->right_, r_walk, l_anchor + l_symm * l_walk->left_->end_, r_anchor, l_symm *
+//     l_walk->symm_,
+//                      r_symm) ||
+//            intersect(l_walk->left_, r_walk, l_anchor, r_anchor, l_symm, r_symm);
+//   } else {
+//     return intersect(l_walk, r_walk->left_, l_anchor, r_anchor, l_symm, r_symm) ||
+//            intersect(l_walk, r_walk->right_, l_anchor, r_anchor + r_symm * r_walk->left_->end_, l_symm,
+//                      r_symm * r_walk->symm_);
+//   }
+// }
 
 template <int Dim> void walk_node<Dim>::merge() {
   num_sites_ = left_->num_sites_ + right_->num_sites_;
 
-  bbox_ = left_->bbox_ | (left_->end_ + symm_ * right_->bbox_);
+  bbox_ = left_->bbox_ | (box<Dim>(left_->end_ + symm_ * right_->bbox_));
   end_ = left_->end_ + symm_ * right_->end_;
 }
 
+/*
 #define INTERSECT_INST(z, n, data)                                                                                     \
   template bool intersect<n>(const walk_node<n> *l_walk, const walk_node<n> *r_walk, const point<n> &l_anchor,         \
                              const point<n> &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
+*/
 #define WALK_NODE_INST(z, n, data) template class walk_node<n>;
 
 // cppcheck-suppress syntaxError
-BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, INTERSECT_INST, ~)
+// BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, INTERSECT_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_NODE_INST, ~)
 
 } // namespace pivot

@@ -7,9 +7,9 @@ namespace pivot {
 
 template <int Dim> class walk_node;
 
-template <int Dim>
-bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point<Dim> &l_anchor,
-               const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm);
+template <int Dim, typename D1, typename D2>
+bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const PointExpr<D1> &l_anchor,
+               const PointExpr<D2> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm);
 
 template <int Dim> class walk_tree;
 
@@ -95,9 +95,33 @@ private:
 
   Agnode_t *todot(Agraph_t *g, const cgraph_t &cgraph) const;
 
-  template <int D>
-  friend bool intersect(const walk_node<D> *l_walk, const walk_node<D> *r_walk, const point<D> &l_anchor,
-                        const point<D> &r_anchor, const transform<D> &l_symm, const transform<D> &r_symm);
+  template <int D, typename D1, typename D2>
+  friend bool intersect(const walk_node<D> *l_walk, const walk_node<D> *r_walk, const PointExpr<D1> &l_anchor,
+                        const PointExpr<D2> &r_anchor, const transform<D> &l_symm, const transform<D> &r_symm);
 };
+
+template <int Dim, typename D1, typename D2>
+bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const PointExpr<D1> &l_anchor,
+               const PointExpr<D2> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
+  auto l_box = box<Dim>(l_anchor + l_symm * l_walk->bbox_);
+  auto r_box = box<Dim>(r_anchor + r_symm * r_walk->bbox_);
+  if ((l_box & r_box).empty()) {
+    return false;
+  }
+
+  if (l_walk->num_sites_ <= 2 && r_walk->num_sites_ <= 2) {
+    return true;
+  }
+
+  if (l_walk->num_sites_ >= r_walk->num_sites_) {
+    return intersect(l_walk->right_, r_walk, l_anchor + l_symm * l_walk->left_->end_, r_anchor, l_symm * l_walk->symm_,
+                     r_symm) ||
+           intersect(l_walk->left_, r_walk, l_anchor, r_anchor, l_symm, r_symm);
+  } else {
+    return intersect(l_walk, r_walk->left_, l_anchor, r_anchor, l_symm, r_symm) ||
+           intersect(l_walk, r_walk->right_, l_anchor, r_anchor + r_symm * r_walk->left_->end_, l_symm,
+                     r_symm * r_walk->symm_);
+  }
+}
 
 } // namespace pivot

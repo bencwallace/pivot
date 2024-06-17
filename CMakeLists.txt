@@ -43,6 +43,7 @@ add_definitions(-DDIMS_UB=${DIMS_UB})
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}/src/include")
 file(GLOB_RECURSE pivot_lib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 list(REMOVE_ITEM pivot_lib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+# set(pivot_lib_SRC ${pivot_lib_SRC} "${CMAKE_CURRENT_SOURCE_DIR}/src/include/walk_node.h")
 add_library(pivot ${pivot_lib_SRC})
 
 add_executable(pivot_exec "src/main.cpp")

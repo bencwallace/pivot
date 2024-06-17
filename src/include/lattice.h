@@ -9,6 +9,8 @@
 
 #include <boost/operators.hpp>
 
+#include "expr.h"
+
 namespace pivot {
 
 template <int Dim> struct box;
@@ -37,12 +39,18 @@ struct interval {
 /**
  * @brief Represents a Dim-dimensional point.
  */
-template <int Dim> class point : boost::multipliable<point<Dim>, int> {
+template <int Dim> class point : public PointExpr<point<Dim>>, boost::multipliable<point<Dim>, int> {
 
 public:
   point() = default;
 
   point(const std::array<int, Dim> &coords);
+
+  template <typename D> point(const PointExpr<D> &expr) {
+    for (int i = 0; i < Dim; ++i) {
+      coords_[i] = expr[i];
+    }
+  }
 
   /**
    * @brief Returns the unit vector e_i.
@@ -78,7 +86,7 @@ private:
 template <typename S, typename T, T Dim> point(std::array<S, Dim>) -> point<Dim>;
 
 /** @brief Represents a Dim-dimensional box. */
-template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
+template <int Dim> struct box : public BoxExpr<box<Dim>> {
   std::array<interval, Dim> intervals_;
 
   box() = delete;
@@ -94,6 +102,13 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
    */
   box(std::span<const point<Dim>> points);
 
+  template <typename D> box(const BoxExpr<D> &expr) {
+    for (int i = 0; i < Dim; ++i) {
+      intervals_[i].left_ = expr.left(i);
+      intervals_[i].right_ = expr.right(i);
+    }
+  }
+
   bool operator==(const box &b) const;
 
   bool operator!=(const box &b) const;
@@ -103,7 +118,7 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
   bool empty() const;
 
   /** @brief Action of a point (understood as a vector) on a box */
-  box<Dim> &operator+=(const point<Dim> &b);
+  // box<Dim> &operator+=(const point<Dim> &b);
 
   box<Dim> &operator-=(const point<Dim> &b);
 

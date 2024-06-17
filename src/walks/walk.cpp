@@ -100,7 +100,7 @@ template <int Dim> void walk<Dim>::do_pivot(int step, std::vector<point<Dim>> &n
 
 template <int Dim> point<Dim> walk<Dim>::pivot_point(int step, int i, const transform<Dim> &trans) const {
   auto p = steps_[step];
-  return p + trans * (steps_[i] - p);
+  return point<Dim>(p + trans * (steps_[i] - p));
 }
 
 #define WALK_INST(z, n, data) template class walk<n>;

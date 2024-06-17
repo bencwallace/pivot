@@ -34,13 +34,13 @@ template <int Dim> point<Dim> point<Dim>::operator+(const point<Dim> &p) const {
   return point(sum);
 }
 
-template <int Dim> box<Dim> &box<Dim>::operator+=(const point<Dim> &p) {
-  for (int i = 0; i < Dim; ++i) {
-    intervals_[i].left_ += p[i];
-    intervals_[i].right_ += p[i];
-  }
-  return *this;
-}
+// template <int Dim> box<Dim> &box<Dim>::operator+=(const point<Dim> &p) {
+//   for (int i = 0; i < Dim; ++i) {
+//     intervals_[i].left_ += p[i];
+//     intervals_[i].right_ += p[i];
+//   }
+//   return *this;
+// }
 
 template <int Dim> box<Dim> &box<Dim>::operator-=(const point<Dim> &b) {
   for (int i = 0; i < Dim; ++i) {
