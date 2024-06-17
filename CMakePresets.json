@@ -3,14 +3,14 @@
     "configurePresets": [{
         "name": "debug",
         "displayName": "Debug",
-        "binaryDir": "build/debug",
+        "binaryDir": "build",
         "cacheVariables": {
             "CMAKE_BUILD_TYPE": "Debug"
         }
     }, {
         "name": "test",
         "displayName": "Test",
-        "binaryDir": "build/test",
+        "binaryDir": "build",
         "cacheVariables": {
             "CMAKE_BUILD_TYPE": "Debug",
             "CMAKE_CXX_COMPILER": "clang++",
@@ -19,7 +19,7 @@
     }, {
         "name": "profile",
         "displayName": "Profile",
-        "binaryDir": "build/profile",
+        "binaryDir": "build",
         "cacheVariables": {
             "CMAKE_BUILD_TYPE": "RelWithDebInfo",
             "CMAKE_CXX_FLAGS": "-fno-omit-frame-pointer"
@@ -27,7 +27,7 @@
     }, {
         "name": "release",
         "displayName": "Release",
-        "binaryDir": "build/release",
+        "binaryDir": "build",
         "cacheVariables": {
             "CMAKE_BUILD_TYPE": "Release"
         }
