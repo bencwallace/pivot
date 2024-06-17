@@ -6,7 +6,8 @@
 
 namespace pivot {
 
-template <int Dim> walk_tree<Dim>::walk_tree(int num_sites, std::optional<unsigned int> seed, bool balanced) {
+template <int Dim>
+walk_tree<Dim>::walk_tree(int num_sites, std::optional<unsigned int> seed, bool balanced) : nodes_(num_sites - 1) {
   if (num_sites < 2) {
     throw std::invalid_argument("num_sites must be at least 2");
   }
@@ -19,6 +20,7 @@ template <int Dim> walk_tree<Dim>::walk_tree(int num_sites, std::optional<unsign
 
   rng_ = std::mt19937(seed.value_or(std::random_device()()));
   dist_ = std::uniform_int_distribution<int>(1, num_sites - 1);
+  populate_nodes(root_.get());
 }
 
 template <int Dim> walk_tree<Dim>::walk_tree(const std::string &path, std::optional<unsigned int> seed, bool balanced) {
@@ -28,11 +30,25 @@ template <int Dim> walk_tree<Dim>::walk_tree(const std::string &path, std::optio
 
   rng_ = std::mt19937(seed.value_or(std::random_device()()));
   dist_ = std::uniform_int_distribution<int>(1, steps.size() - 1);
+  nodes_.resize(steps.size() - 1);
+  populate_nodes(root_.get());
 }
 
 template <int Dim> walk_tree<Dim>::~walk_tree() = default;
 
-template <int Dim> walk_tree<Dim>::walk_tree(walk_node<Dim> *root) : root_(root) {}
+template <int Dim> void walk_tree<Dim>::populate_nodes(walk_node<Dim> *node) {
+  if (node->is_leaf()) {
+    return;
+  }
+
+  nodes_[node->id_ - 1] = node;
+  if (node->left_) {
+    populate_nodes(node->left_);
+  }
+  if (node->right_) {
+    populate_nodes(node->right_);
+  }
+}
 
 template <int Dim> point<Dim> walk_tree<Dim>::endpoint() const { return root_->endpoint(); }
 
