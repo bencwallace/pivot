@@ -71,6 +71,18 @@ walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point<Dim>> steps, 
   return root;
 }
 
+template <int Dim>
+walk_node<Dim>::walk_node(const walk_node<Dim> &w) : walk_node(w.id_, w.num_sites_, w.symm_, w.bbox_, w.end_) {
+  if (w.left_ != nullptr) {
+    left_ = new walk_node(*w.left_);
+    left_->parent_ = this;
+  }
+  if (w.right_ != nullptr) {
+    right_ = new walk_node(*w.right_);
+    right_->parent_ = this;
+  }
+}
+
 template <int Dim> walk_node<Dim> &walk_node<Dim>::leaf() {
   std::array<interval, Dim> intervals;
   intervals[0] = interval(1, 1);

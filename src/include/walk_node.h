@@ -25,7 +25,7 @@ public:
    */
   static walk_node *balanced_rep(const std::vector<point<Dim>> &steps);
 
-  walk_node(const walk_node &w) = delete;
+  walk_node(const walk_node &w);
   walk_node(walk_node &&w) = delete;
   walk_node &operator=(const walk_node &w) = delete;
 

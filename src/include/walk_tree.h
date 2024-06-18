@@ -24,6 +24,8 @@ public:
 
   ~walk_tree();
 
+  walk_node<Dim> *root() { return root_.get(); }
+
   point<Dim> endpoint() const override;
 
   bool is_leaf() const;
