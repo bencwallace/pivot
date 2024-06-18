@@ -90,7 +90,7 @@ template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Di
 template <int Dim> bool walk_tree<Dim>::rand_pivot() {
   auto site = dist_(rng_);
   auto r = transform<Dim>::rand(rng_);
-  return try_pivot(site, r);
+  return try_pivot_fast(site, r);
 }
 
 template <int Dim> bool walk_tree<Dim>::self_avoiding() const {

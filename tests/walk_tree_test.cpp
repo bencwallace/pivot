@@ -36,3 +36,15 @@ TEST(WalkTreePivot, PivotLineFail) {
     EXPECT_EQ(steps[1], pivot::point<2>({2, 0}));
     EXPECT_EQ(steps[2], pivot::point<2>({3, 0}));
 }
+
+TEST(WalkTreePivot, PivotFastLine) {
+    auto w = walk_tree<2>(4);
+    pivot::transform<2> trans = transform<2>({1, 0}, {-1, 1});
+    EXPECT_TRUE(w.try_pivot_fast(1, trans));
+    auto steps = w.steps();
+    EXPECT_EQ(steps.size(), 4);
+    EXPECT_EQ(steps[0], pivot::point<2>({1, 0}));
+    EXPECT_EQ(steps[1], pivot::point<2>({1, 1}));
+    EXPECT_EQ(steps[2], pivot::point<2>({1, 2}));
+    EXPECT_EQ(steps[3], pivot::point<2>({1, 3}));
+}
