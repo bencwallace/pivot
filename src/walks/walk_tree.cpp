@@ -6,23 +6,19 @@
 
 namespace pivot {
 
-template <int Dim> walk_tree<Dim>::walk_tree(int num_sites, std::optional<unsigned int> seed, bool balanced) {
-  if (num_sites < 2) {
-    throw std::invalid_argument("num_sites must be at least 2");
-  }
-  std::vector<point<Dim>> steps(num_sites);
-  for (int i = 0; i < num_sites; ++i) {
-    steps[i] = (i + 1) * point<Dim>::unit(0);
-  }
-  root_ = balanced ? std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::balanced_rep(steps))
-                   : std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::pivot_rep(steps));
+template <int Dim>
+walk_tree<Dim>::walk_tree(int num_sites, std::optional<unsigned int> seed, bool balanced)
+    : walk_tree(line<Dim>(num_sites), seed, balanced) {}
 
-  rng_ = std::mt19937(seed.value_or(std::random_device()()));
-  dist_ = std::uniform_int_distribution<int>(1, num_sites - 1);
-}
+template <int Dim>
+walk_tree<Dim>::walk_tree(const std::string &path, std::optional<unsigned int> seed, bool balanced)
+    : walk_tree(from_csv<Dim>(path), seed, balanced) {}
 
-template <int Dim> walk_tree<Dim>::walk_tree(const std::string &path, std::optional<unsigned int> seed, bool balanced) {
-  auto steps = from_csv<Dim>(path);
+template <int Dim>
+walk_tree<Dim>::walk_tree(const std::vector<point<Dim>> &steps, std::optional<unsigned int> seed, bool balanced) {
+  if (steps.size() < 2) {
+    throw std::invalid_argument("walk must have at least 2 sites (1 step)");
+  }
   root_ = balanced ? std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::balanced_rep(steps))
                    : std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::pivot_rep(steps));
 

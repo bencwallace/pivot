@@ -318,6 +318,14 @@ template <int Dim> void to_csv(const std::string &path, const std::vector<point<
   }
 }
 
+template <int Dim> std::vector<point<Dim>> line(int num_steps) {
+  std::vector<point<Dim>> steps(num_steps);
+  for (int i = 0; i < num_steps; ++i) {
+    steps[i] = (i + 1) * point<Dim>::unit(0);
+  }
+  return steps;
+}
+
 /* explicit instantiation */
 
 #define POINT_INST(z, n, data) template class point<n>;
@@ -326,6 +334,7 @@ template <int Dim> void to_csv(const std::string &path, const std::vector<point<
 #define POINT_HASH_CALL_INST(z, n, data) template std::size_t point_hash::operator()<n>(const point<n> &p) const;
 #define FROM_CSV_INST(z, n, data) template std::vector<point<n>> from_csv<n>(const std::string &path);
 #define TO_CSV_INST(z, n, data) template void to_csv<n>(const std::string &path, const std::vector<point<n>> &points);
+#define LINE_INST(z, n, data) template std::vector<point<n>> line(int num_steps);
 
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_INST, ~)
@@ -334,5 +343,6 @@ BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TRANSFORM_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_HASH_CALL_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TO_CSV_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, FROM_CSV_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, LINE_INST, ~)
 
 } // namespace pivot
