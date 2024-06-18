@@ -19,6 +19,9 @@ public:
 
   walk_tree(const std::string &path, std::optional<unsigned int> seed = std::nullopt, bool balanced = true);
 
+  walk_tree(const std::vector<point<Dim>> &steps, std::optional<unsigned int> seed = std::nullopt,
+            bool balanced = true);
+
   ~walk_tree();
 
   point<Dim> endpoint() const override;
