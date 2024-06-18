@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "graphviz.h"
 #include "lattice.h"
 
@@ -58,6 +60,9 @@ public:
   walk_node *shuffle_down();
 
   bool intersect() const;
+
+  bool shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
+                         std::optional<bool> is_left_child) const;
 
 private:
   int id_;
