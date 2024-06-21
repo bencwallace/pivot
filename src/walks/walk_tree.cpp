@@ -64,24 +64,26 @@ template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r
 }
 
 template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Dim> &t) {
-  auto w = nodes_[n - 1];
-
+  auto &w = *nodes_[n - 1];
   std::optional<bool> is_left_child;
-  if (w->parent_ == nullptr || w->parent_->left_ == nullptr) {
+  if (w.parent_ == nullptr || w.parent_->left_ == nullptr) {
     is_left_child = std::nullopt;
-  } else if (w->parent_->left_ == w) {
+  } else if (w.parent_->left_ == &w) {
     is_left_child = true;
   } else {
     is_left_child = false;
   }
 
-  auto success = !w->shuffle_intersect(t, std::nullopt, is_left_child);
+  auto w_copy = new walk_node<Dim>(w, true);
+  auto [root, intersection] = w_copy->shuffle_intersect(t, std::nullopt, is_left_child);
+  auto success = !intersection;
   if (success) {
     root_->shuffle_up(n);
     root_->symm_ = root_->symm_ * t;
-    w->merge();
+    w.merge();
     root_->shuffle_down();
   }
+  delete root;
   return success;
 }
 

@@ -72,26 +72,27 @@ walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point<Dim>> steps, 
 }
 
 template <int Dim>
-walk_node<Dim>::walk_node(const walk_node<Dim> &w) : walk_node(w.id_, w.num_sites_, w.symm_, w.bbox_, w.end_) {
+walk_node<Dim>::walk_node(const walk_node<Dim> &w, bool tree)
+    : walk_node(w.id_, w.num_sites_, w.symm_, w.bbox_, w.end_) {
   is_copy_ = true;
   if (w.parent_ != nullptr) {
     // TODO: removing this seems to have no effect but not sure how that can be
     parent_ = w.parent_;
   }
-  if (w.left_ != nullptr) {
-    if (w.left_ == &leaf()) {
-      left_ = &leaf();
-    } else {
-      left_ = new walk_node(*w.left_);
-      left_->parent_ = this;
+  if (tree) {
+    if (w.left_ != nullptr) {
+      if (w.left_ == &leaf()) {
+        left_ = &leaf();
+      } else {
+        set_left(new walk_node(*w.left_, true));
+      }
     }
-  }
-  if (w.right_ != nullptr) {
-    if (w.right_ == &leaf()) {
-      right_ = &leaf();
-    } else {
-      right_ = new walk_node(*w.right_);
-      right_->parent_ = this;
+    if (w.right_ != nullptr) {
+      if (w.right_ == &leaf()) {
+        right_ = &leaf();
+      } else {
+        set_right(new walk_node(*w.right_, true));
+      }
     }
   }
 }
@@ -106,14 +107,14 @@ template <int Dim> walk_node<Dim> &walk_node<Dim>::leaf() {
   return leaf_;
 }
 
-template <int Dim> walk_node<Dim>::~walk_node() {} // TODO: fix this
-//   if (left_ != nullptr && left_ != &leaf()) {
-//     delete left_;
-//   }
-//   if (right_ != nullptr && right_ != &leaf()) {
-//     delete right_;
-//   }
-// }
+template <int Dim> walk_node<Dim>::~walk_node() {
+  if (left_ != nullptr && left_ != &leaf()) {
+    delete left_;
+  }
+  if (right_ != nullptr && right_ != &leaf()) {
+    delete right_;
+  }
+}
 
 template <int Dim> bool walk_node<Dim>::operator==(const walk_node &other) const {
   if (is_leaf() && other.is_leaf()) {
@@ -285,27 +286,28 @@ template <int Dim> bool walk_node<Dim>::intersect() const {
 }
 
 template <int Dim>
-bool walk_node<Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
-                                       std::optional<bool> is_left_child) const {
+std::pair<walk_node<Dim> *, bool> walk_node<Dim>::shuffle_intersect(const transform<Dim> &t,
+                                                                    std::optional<bool> was_left_child,
+                                                                    std::optional<bool> is_left_child) {
   if (was_left_child.has_value()) {
     if (was_left_child.value()) {
       if (::pivot::intersect(left_, right_->right_, point<Dim>(), left_->end_ + symm_ * t * right_->left_->end_,
                              transform<Dim>(), symm_ * t * right_->symm_)) {
-        return true;
+        return {this, true};
       }
     } else {
       if (::pivot::intersect(left_->left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_ * t)) {
-        return true;
+        return {this, true};
       }
     }
   } else {
     if (::pivot::intersect(left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_ * t)) {
-      return true;
+      return {this, true};
     }
   }
 
   if (parent_ == nullptr) {
-    return false;
+    return {this, false};
   }
 
   std::optional<bool> is_left_child_new;
@@ -317,26 +319,34 @@ bool walk_node<Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bo
     is_left_child_new = false;
   }
 
-  walk_node w(*parent_);
-  if (is_copy_) {
-    if (is_left_child.has_value()) {
-      if (is_left_child.value()) {
-        w.left_ = const_cast<walk_node *>(this);
+  walk_node *w = new walk_node(*parent_, false);
+  if (is_left_child.has_value()) {
+    if (is_left_child.value()) {
+      if (parent_->right_ != &leaf()) {
+        w->set_right(new walk_node(*parent_->right_, true));
       } else {
-        w.right_ = const_cast<walk_node *>(this);
+        w->set_right(&leaf());
       }
+      w->set_left(this);
     } else {
-      // nothing to do, I think
+      if (parent_->left_ != &leaf()) {
+        w->set_left(new walk_node(*parent_->left_, true));
+      } else {
+        w->set_left(&leaf());
+      }
+      w->set_right(this);
     }
+  } else {
+    // nothing to do, I think
   }
   if (is_left_child.has_value()) {
     if (is_left_child.value()) {
-      w.rotate_right();
+      w->rotate_right();
     } else {
-      w.rotate_left();
+      w->rotate_left();
     }
   }
-  return w.shuffle_intersect(t, is_left_child, is_left_child_new);
+  return w->shuffle_intersect(t, is_left_child, is_left_child_new);
 }
 
 template <int Dim>

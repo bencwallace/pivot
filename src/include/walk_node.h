@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <tuple>
 
 #include "graphviz.h"
 #include "lattice.h"
@@ -27,7 +28,8 @@ public:
    */
   static walk_node *balanced_rep(const std::vector<point<Dim>> &steps);
 
-  walk_node(const walk_node &w);
+  walk_node(const walk_node &w, bool tree);
+
   walk_node(walk_node &&w) = delete;
   walk_node &operator=(const walk_node &w) = delete;
 
@@ -61,8 +63,8 @@ public:
 
   bool intersect() const;
 
-  bool shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
-                         std::optional<bool> is_left_child) const;
+  std::pair<walk_node<Dim> *, bool> shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
+                                                      std::optional<bool> is_left_child);
 
 private:
   int id_;
