@@ -71,14 +71,18 @@ walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point<Dim>> steps, 
   return root;
 }
 
-template <int Dim> walk_node<Dim> &walk_node<Dim>::leaf() {
+template <int Dim> walk_node<Dim> walk_node<Dim>::create_leaf() {
   std::array<interval, Dim> intervals;
   intervals[0] = interval(1, 1);
   for (int i = 1; i < Dim; ++i) {
     intervals[i] = interval(0, 0);
   }
-  static auto leaf_ = walk_node(0, 1, transform<Dim>(), box<Dim>(intervals), point<Dim>::unit(0));
-  return leaf_;
+  return walk_node(0, 1, transform<Dim>(), box<Dim>(intervals), point<Dim>::unit(0));
+}
+
+template <int Dim> walk_node<Dim> &walk_node<Dim>::leaf() {
+  static walk_node<Dim> leaf = create_leaf();
+  return leaf;
 }
 
 template <int Dim> walk_node<Dim>::~walk_node() {

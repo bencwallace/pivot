@@ -91,6 +91,7 @@ private:
 
   void merge();
 
+  static walk_node create_leaf();
   static walk_node &leaf();
 
   Agnode_t *todot(Agraph_t *g, const cgraph_t &cgraph) const;
