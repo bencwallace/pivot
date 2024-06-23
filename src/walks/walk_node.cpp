@@ -231,9 +231,9 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_left() {
   // update IDs
   int temp_id = id_;
   id_ = left_->id_;
-  scratch()[id_ - 1] = this;
+  // scratch()[id_ - 1] = this;
   left_->id_ = temp_id;
-  scratch()[temp_id - 1] = left_;
+  // scratch()[temp_id - 1] = left_;
 
   return this;
 }
@@ -262,9 +262,9 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_right() {
   // update IDs
   int temp_id = id_;
   id_ = right_->id_;
-  scratch()[id_ - 1] = this;
+  // scratch()[id_ - 1] = this;
   right_->id_ = temp_id;
-  scratch()[temp_id - 1] = right_;
+  // scratch()[temp_id - 1] = right_;
 
   return this;
 }
@@ -313,14 +313,16 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::copy_into_scratch(const walk_
     if (w.left_ == &leaf()) {
       w_copy->left_ = &leaf();
     } else {
-      w_copy->set_left(copy_into_scratch(*w.left_));
+      // w_copy->set_left(copy_into_scratch(*w.left_));
+      w_copy->left_ = copy_into_scratch(*w.left_);
     }
   }
   if (w.right_ != nullptr) {
     if (w.right_ == &leaf()) {
       w_copy->right_ = &leaf();
     } else {
-      w_copy->set_right(copy_into_scratch(*w.right_));
+      // w_copy->set_right(copy_into_scratch(*w.right_));
+      w_copy->right_ = copy_into_scratch(*w.right_);
     }
   }
   return w_copy;
@@ -384,9 +386,13 @@ std::pair<walk_node<Dim> *, bool> walk_node<Dim>::shuffle_intersect(const transf
   if (is_left_child.has_value()) {
     if (is_left_child.value()) {
       w->rotate_right();
+      scratch()[w->right_->id_ - 1] = w->right_;
     } else {
       w->rotate_left();
+      scratch()[w->left_->id_ - 1] = w->left_;
     }
+    // TODO: update scratch
+    scratch()[w->id_ - 1] = w;
   }
   return w->shuffle_intersect(t, is_left_child, is_left_child_new);
 }

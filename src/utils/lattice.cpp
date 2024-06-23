@@ -145,7 +145,13 @@ template <int Dim> bool box<Dim>::operator!=(const box &b) const { return interv
 template <int Dim> interval box<Dim>::operator[](int i) const { return intervals_[i]; }
 
 template <int Dim> bool box<Dim>::empty() const {
-  return std::any_of(intervals_.begin(), intervals_.end(), [](const interval &i) { return i.empty(); });
+  // return std::any_of(intervals_.begin(), intervals_.end(), [](const interval &i) { return i.empty(); });
+  for (const auto &i : intervals_) {
+    if (i.empty()) {
+      return true;
+    }
+  }
+  return false;
 }
 
 template <int Dim> box<Dim> box<Dim>::operator|(const box<Dim> &b) const {

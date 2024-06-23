@@ -44,6 +44,16 @@ public:
 
   point(const std::array<int, Dim> &coords);
 
+  point(const point &p) = default;
+
+  point &operator=(const point &p) {
+    // std::copy(p.coords_.begin(), p.coords_.end(), coords_.begin());
+    for (int i = 0; i < Dim; ++i) {
+      coords_[i] = p.coords_[i];
+    }
+    return *this;
+  }
+
   /**
    * @brief Returns the unit vector e_i.
    *
@@ -84,6 +94,16 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
   box() = default;
 
   box(const std::array<interval, Dim> &intervals);
+
+  box(const box &b) = default;
+
+  box &operator=(const box &b) {
+    // std::copy(b.intervals_.begin(), b.intervals_.end(), intervals_.begin());
+    for (int i = 0; i < Dim; ++i) {
+      intervals_[i] = b.intervals_[i];
+    }
+    return *this;
+  }
 
   /**
    * @brief Constructs the smallest box containing a sequence of Dim-dimensional points.
@@ -161,6 +181,18 @@ public:
 
   // TODO: this should be private
   transform(const std::array<int, Dim> &perm, const std::array<int, Dim> &signs);
+
+  transform(const transform &t) = default;
+
+  transform &operator=(const transform &t) {
+    // std::copy(t.perm_.begin(), t.perm_.end(), perm_.begin());
+    // std::copy(t.signs_.begin(), t.signs_.end(), signs_.begin());
+    for (int i = 0; i < Dim; ++i) {
+      perm_[i] = t.perm_[i];
+      signs_[i] = t.signs_[i];
+    }
+    return *this;
+  }
 
   /**
    * @brief Constructs a "pivot" transformation from two input points.
