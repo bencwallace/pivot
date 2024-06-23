@@ -26,6 +26,13 @@ walk_tree<Dim>::walk_tree(const std::vector<point<Dim>> &steps, std::optional<un
   dist_ = std::uniform_int_distribution<int>(1, steps.size() - 1);
   nodes_.resize(steps.size() - 1);
   populate_nodes(root_.get());
+
+  auto &scratch = walk_node<Dim>::scratch();
+  scratch.clear();
+  scratch.resize(nodes_.size());
+  for (size_t i = 0; i < nodes_.size(); ++i) {
+    scratch[i] = new walk_node<Dim>();
+  }
 }
 
 template <int Dim> walk_tree<Dim>::~walk_tree() {} // TODO: fix this
@@ -74,7 +81,8 @@ template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Di
     is_left_child = false;
   }
 
-  auto w_copy = new walk_node<Dim>(w, true);
+  // auto w_copy = new walk_node<Dim>(w, true);
+  auto w_copy = walk_node<Dim>::copy_into_scratch(w);
   auto [root, intersection] = w_copy->shuffle_intersect(t, std::nullopt, is_left_child);
   auto success = !intersection;
   if (success) {
@@ -83,7 +91,7 @@ template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Di
     w.merge();
     root_->shuffle_down();
   }
-  delete root;
+  // delete root;
   return success;
 }
 

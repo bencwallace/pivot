@@ -111,6 +111,11 @@ template <int Dim> walk_node<Dim> &walk_node<Dim>::leaf() {
   return leaf;
 }
 
+template <int Dim> std::vector<walk_node<Dim> *> &walk_node<Dim>::scratch() {
+  static std::vector<walk_node<Dim> *> nodes;
+  return nodes;
+}
+
 template <int Dim> walk_node<Dim>::~walk_node() {
   if (left_ != nullptr && left_ != &leaf()) {
     delete left_;
@@ -226,7 +231,9 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_left() {
   // update IDs
   int temp_id = id_;
   id_ = left_->id_;
+  scratch()[id_ - 1] = this;
   left_->id_ = temp_id;
+  scratch()[temp_id - 1] = left_;
 
   return this;
 }
@@ -255,7 +262,9 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_right() {
   // update IDs
   int temp_id = id_;
   id_ = right_->id_;
+  scratch()[id_ - 1] = this;
   right_->id_ = temp_id;
+  scratch()[temp_id - 1] = right_;
 
   return this;
 }
@@ -287,6 +296,34 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::shuffle_down() {
 
 template <int Dim> bool walk_node<Dim>::intersect() const {
   return ::pivot::intersect<Dim>(left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_);
+}
+
+template <int Dim> walk_node<Dim> *walk_node<Dim>::copy_into_scratch(const walk_node<Dim> &w) {
+  walk_node *w_copy = scratch()[w.id_ - 1];
+  w_copy->id_ = w.id_;
+  w_copy->num_sites_ = w.num_sites_;
+  w_copy->symm_ = w.symm_;
+  w_copy->bbox_ = w.bbox_;
+  w_copy->end_ = w.end_;
+  w_copy->is_copy_ = true;
+  if (w.parent_ != nullptr) {
+    w_copy->parent_ = w.parent_;
+  }
+  if (w.left_ != nullptr) {
+    if (w.left_ == &leaf()) {
+      w_copy->left_ = &leaf();
+    } else {
+      w_copy->set_left(copy_into_scratch(*w.left_));
+    }
+  }
+  if (w.right_ != nullptr) {
+    if (w.right_ == &leaf()) {
+      w_copy->right_ = &leaf();
+    } else {
+      w_copy->set_right(copy_into_scratch(*w.right_));
+    }
+  }
+  return w_copy;
 }
 
 template <int Dim>
@@ -323,26 +360,27 @@ std::pair<walk_node<Dim> *, bool> walk_node<Dim>::shuffle_intersect(const transf
     is_left_child_new = false;
   }
 
-  walk_node *w = new walk_node(*parent_, false);
-  if (is_left_child.has_value()) {
-    if (is_left_child.value()) {
-      if (parent_->right_ != &leaf()) {
-        w->set_right(new walk_node(*parent_->right_, true));
-      } else {
-        w->set_right(&leaf());
-      }
-      w->set_left(this);
-    } else {
-      if (parent_->left_ != &leaf()) {
-        w->set_left(new walk_node(*parent_->left_, true));
-      } else {
-        w->set_left(&leaf());
-      }
-      w->set_right(this);
-    }
-  } else {
-    // nothing to do, I think
-  }
+  // walk_node *w = new walk_node(*parent_, false);
+  walk_node *w = copy_into_scratch(*parent_);
+  // if (is_left_child.has_value()) {
+  //   if (is_left_child.value()) {
+  //     if (parent_->right_ != &leaf()) {
+  //       w->set_right(new walk_node(*parent_->right_, true));
+  //     } else {
+  //       w->set_right(&leaf());
+  //     }
+  //     w->set_left(this);
+  //   } else {
+  //     if (parent_->left_ != &leaf()) {
+  //       w->set_left(new walk_node(*parent_->left_, true));
+  //     } else {
+  //       w->set_left(&leaf());
+  //     }
+  //     w->set_right(this);
+  //   }
+  // } else {
+  //   // nothing to do, I think
+  // }
   if (is_left_child.has_value()) {
     if (is_left_child.value()) {
       w->rotate_right();

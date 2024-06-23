@@ -28,6 +28,7 @@ public:
    */
   static walk_node *balanced_rep(const std::vector<point<Dim>> &steps);
 
+  walk_node() = default;
   walk_node(const walk_node &w, bool tree);
 
   walk_node(walk_node &&w) = delete;
@@ -66,6 +67,8 @@ public:
   std::pair<walk_node<Dim> *, bool> shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
                                                       std::optional<bool> is_left_child);
 
+  static std::vector<walk_node *> &scratch();
+
 private:
   int id_;
   int num_sites_;
@@ -82,6 +85,8 @@ private:
   walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end);
 
   static walk_node *balanced_rep(std::span<const point<Dim>> steps, int start, const transform<Dim> &glob_symm);
+
+  static walk_node *copy_into_scratch(const walk_node &w);
 
   void set_left(walk_node *left) {
     left_ = left;

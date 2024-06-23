@@ -81,7 +81,7 @@ template <typename S, typename T, T Dim> point(std::array<S, Dim>) -> point<Dim>
 template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
   std::array<interval, Dim> intervals_;
 
-  box() = delete;
+  box() = default;
 
   box(const std::array<interval, Dim> &intervals);
 
