@@ -1,6 +1,7 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 #include "defines.h"
+#include "utils.h"
 #include "walk.h"
 
 namespace pivot {

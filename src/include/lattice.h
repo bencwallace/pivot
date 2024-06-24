@@ -9,6 +9,8 @@
 
 #include <boost/operators.hpp>
 
+#include "defines.h"
+
 namespace pivot {
 
 template <int Dim> struct box;
@@ -269,11 +271,5 @@ private:
   std::array<int, Dim> perm_;
   std::array<int, Dim> signs_;
 };
-
-template <int Dim> std::vector<point<Dim>> from_csv(const std::string &path);
-
-template <int Dim> void to_csv(const std::string &path, const std::vector<point<Dim>> &points);
-
-template <int Dim> std::vector<point<Dim>> line(int num_steps);
 
 } // namespace pivot

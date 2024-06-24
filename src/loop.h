@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 
+#include "utils.h"
 #include "walk.h"
 #include "walk_tree.h"
 
