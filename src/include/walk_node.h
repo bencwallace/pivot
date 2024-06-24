@@ -1,5 +1,6 @@
 #pragma once
 
+#include "defines.h"
 #include "graphviz.h"
 #include "lattice.h"
 
