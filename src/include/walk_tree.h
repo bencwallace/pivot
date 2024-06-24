@@ -30,6 +30,16 @@ public:
 
   bool is_leaf() const;
 
+  /**
+   * @brief Find a node by its id
+   * @param n node id
+   * @note Runs in constant time.
+   * @warning This function can only be used on trees initialized with balanced=true. Moreover,
+   * it cannot be used on trees currently being transformed (e.g. via rotation).
+   * @return reference to the node
+   */
+  walk_node<Dim> &find_node(int n);
+
   bool try_pivot(int n, const transform<Dim> &r);
 
   bool rand_pivot() override;

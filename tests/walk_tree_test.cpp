@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 
+#include "walk_node.h"
 #include "walk_tree.h"
 
 using namespace pivot;
@@ -14,6 +15,10 @@ TEST(WalkTreeInit, Line) {
     }
     EXPECT_FALSE(w.is_leaf());
     EXPECT_EQ(w.endpoint(), pivot::point<2>({5, 0}));
+    for (int i = 1; i <= 4; i++) {
+        auto &node = w.find_node(i);
+        EXPECT_EQ(node.id(), i);
+    }
 }
 
 TEST(WalkTreePivot, PivotLine) {

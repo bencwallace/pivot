@@ -4,6 +4,7 @@
 
 #include "loop.h"
 #include "walk.h"
+#include "walk_node.h"
 #include "walk_tree.h"
 
 using namespace pivot;
@@ -50,6 +51,17 @@ TEST(WalkTreeTest, SelfAvoiding) {
       }
       EXPECT_TRUE(w.self_avoiding());
     }
+  }
+}
+
+TEST(WalkTreeTest, FindNode) {
+  auto w = walk_tree<2>(100);
+  for (int i = 1; i <= 100; ++i) {
+    w.rand_pivot();
+  }
+  for (int i = 1; i < 100; ++i) {
+    auto &node = w.find_node(i);
+    ASSERT_EQ(node.id(), i);
   }
 }
 
