@@ -32,6 +32,8 @@ public:
 
   ~walk_node();
 
+  int id() const { return id_; }
+
   const box<Dim> &bbox() const { return bbox_; }
 
   const point<Dim> &endpoint() const { return end_; }

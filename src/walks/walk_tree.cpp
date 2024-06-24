@@ -66,6 +66,15 @@ template <int Dim> bool walk_tree<Dim>::is_leaf() const { return root_->is_leaf(
 
 template <int Dim> std::vector<point<Dim>> walk_tree<Dim>::steps() const { return root_->steps(); }
 
+template <int Dim> walk_node<Dim> &walk_tree<Dim>::find_node(int n) {
+  if (!buf_) {
+    throw std::runtime_error("find_node can only be used on trees initialized with balanced=true");
+  }
+  walk_node<Dim> &result = buf_[n - 1];
+  assert(result.id_ == n);
+  return result;
+}
+
 template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r) {
   root_->shuffle_up(n);
   root_->symm_ = root_->symm_ * r; // modify in-place
