@@ -37,7 +37,7 @@
         "displayName": "Debug",
         "configurePreset": "debug",
         "configuration": "Debug",
-        "targets": ["all"]
+        "targets": ["all", "test_pivot", "pivot_exec"]
     }, {
         "name": "test",
         "displayName": "Test",
@@ -55,6 +55,6 @@
         "displayName": "Release",
         "configurePreset": "release",
         "configuration": "Release",
-        "targets": ["all"]
+        "targets": ["all", "test_pivot", "pivot_exec"]
     }]
 }
