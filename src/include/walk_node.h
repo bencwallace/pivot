@@ -16,14 +16,15 @@ template <int Dim> class walk_tree;
 template <int Dim> class walk_node {
 
 public:
-  static walk_node *pivot_rep(const std::vector<point<Dim>> &steps);
+  static walk_node *pivot_rep(const std::vector<point<Dim>> &steps, walk_node *buf = nullptr);
 
   /** @brief Create a balanced tree representation of a walk given by a sequence of points.
    *
    * @param steps The steps of the walk.
+   * @param buf An optional buffer to use for the tree nodes.
    * @return The root of the walk tree.
    */
-  static walk_node *balanced_rep(const std::vector<point<Dim>> &steps);
+  static walk_node *balanced_rep(const std::vector<point<Dim>> &steps, walk_node *buf = nullptr);
 
   walk_node(const walk_node &w) = delete;
   walk_node(walk_node &&w) = delete;
@@ -73,7 +74,8 @@ private:
 
   walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end);
 
-  static walk_node *balanced_rep(std::span<const point<Dim>> steps, int start, const transform<Dim> &glob_symm);
+  static walk_node *balanced_rep(std::span<const point<Dim>> steps, int start, const transform<Dim> &glob_symm,
+                                 walk_node *buf);
 
   void set_left(walk_node *left) {
     left_ = left;
