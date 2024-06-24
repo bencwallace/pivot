@@ -1,3 +1,7 @@
+#include <cstdlib>
+#include <new>
+#include <stack>
+
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 #include "defines.h"
@@ -19,16 +23,42 @@ walk_tree<Dim>::walk_tree(const std::vector<point<Dim>> &steps, std::optional<un
   if (steps.size() < 2) {
     throw std::invalid_argument("walk must have at least 2 sites (1 step)");
   }
-  root_ = balanced ? std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::balanced_rep(steps))
-                   : std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::pivot_rep(steps));
+  buf_ = nullptr;
+  if (balanced) {
+    size_t buf_size = sizeof(walk_node<Dim>) * (steps.size() - 1);
+    constexpr auto alignment = std::align_val_t(alignof(walk_node<Dim>));
+    buf_ = static_cast<walk_node<Dim> *>(::operator new[](buf_size, alignment));
+  }
+  root_ = balanced ? std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::balanced_rep(steps, buf_))
+                   : std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::pivot_rep(steps, buf_));
 
   rng_ = std::mt19937(seed.value_or(std::random_device()()));
   dist_ = std::uniform_int_distribution<int>(1, steps.size() - 1);
 }
 
-template <int Dim> walk_tree<Dim>::~walk_tree() = default;
+template <int Dim> walk_tree<Dim>::~walk_tree() {
+  std::stack<walk_node<Dim> *> nodes;
+  nodes.push(root_.release());
+  while (!nodes.empty()) {
+    auto curr = nodes.top();
+    nodes.pop();
+    if (curr->left_ && !curr->left_->is_leaf()) {
+      nodes.push(curr->left_);
+    }
+    if (curr->right_ && !curr->right_->is_leaf()) {
+      nodes.push(curr->right_);
+    }
+    curr->~walk_node();
+  }
+
+  if (buf_) {
+    ::operator delete[](buf_, std::align_val_t(alignof(walk_node<Dim>)));
+  }
+}
 
 template <int Dim> walk_tree<Dim>::walk_tree(walk_node<Dim> *root) : root_(root) {}
+
+template <int Dim> walk_node<Dim> *walk_tree<Dim>::root() const { return root_.get(); }
 
 template <int Dim> point<Dim> walk_tree<Dim>::endpoint() const { return root_->endpoint(); }
 

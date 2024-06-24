@@ -24,6 +24,8 @@ public:
 
   ~walk_tree();
 
+  walk_node<Dim> *root() const;
+
   point<Dim> endpoint() const override;
 
   bool is_leaf() const;
@@ -42,6 +44,7 @@ private:
   std::unique_ptr<walk_node<Dim>> root_;
   std::mt19937 rng_;
   std::uniform_int_distribution<int> dist_;
+  walk_node<Dim> *buf_;
 
   walk_tree(walk_node<Dim> *root);
 };

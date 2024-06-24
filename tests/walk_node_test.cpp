@@ -3,6 +3,7 @@
 #include <gtest/gtest.h>
 
 #include "walk_node.h"
+#include "walk_tree.h"
 
 #include "test_utils.h"
 
@@ -10,7 +11,8 @@ using namespace pivot;
 
 TEST(WalkNode, Balanced1) {
     auto steps = {pivot::point<2>({1, 0}), pivot::point<2>({2, 0}), pivot::point<2>({2, 1}), pivot::point<2>({3, 1})};
-    auto root = walk_node<2>::balanced_rep(steps);
+    auto tree = walk_tree<2>(steps);
+    auto root = tree.root();
 
     auto symm = root->symm();
     auto end = root->endpoint();
@@ -42,15 +44,14 @@ TEST(WalkNode, Balanced1) {
     EXPECT_TRUE(left->right()->is_leaf());
     EXPECT_TRUE(right->left()->is_leaf());
     EXPECT_TRUE(right->right()->is_leaf());
-
-    delete root;
 }
 
 TEST(WalkNode, Balanced2) {
     // steps and tree from Clisby (2010), Figs. 1, 23
     auto steps = {pivot::point<2>({1, 0}), pivot::point<2>({1, 1}), pivot::point<2>({2, 1}), pivot::point<2>({3, 1}),
                   pivot::point<2>({3, 0})};
-    auto root = walk_node<2>::balanced_rep(steps);
+    auto tree = walk_tree<2>(steps);
+    auto root = tree.root();
 
     auto symm = root->symm();
     auto end = root->endpoint();
@@ -92,12 +93,12 @@ TEST(WalkNode, Balanced2) {
     EXPECT_TRUE(left->left()->left()->is_leaf());
     EXPECT_TRUE(left->left()->right()->is_leaf());
 
-    delete root;
 }
 
 TEST(WalkNode, Balanced3) {
     std::vector steps = {pivot::point<2>({1, 0}), pivot::point<2>({2, 0}), pivot::point<2>({2, 1}), pivot::point<2>({2, 2})};
-    auto root = walk_node<2>::balanced_rep(steps);
+    auto tree = walk_tree<2>(steps);
+    auto root = tree.root();
 
     auto symm = root->symm();
     auto end = root->endpoint();
@@ -130,7 +131,6 @@ TEST(WalkNode, Balanced3) {
     EXPECT_TRUE(right->left()->is_leaf());
     EXPECT_TRUE(right->right()->is_leaf());
 
-    delete root;
 }
 
 TEST(RandomWalk, IsNearestNeighbor) {
@@ -143,15 +143,16 @@ TEST(RandomWalk, IsNearestNeighbor) {
 
 TEST(WalkNode, BalancedSteps) {
     auto steps = random_walk<2>(100);
-    auto root = walk_node<2>::balanced_rep(steps);
+    auto tree = walk_tree<2>(steps);
+    auto root = tree.root();
     auto result = root->steps();
     EXPECT_EQ(steps, result);
-    delete root;
 }
 
 TEST(WalkNode, RotateRight2D1) {
     std::vector steps = {pivot::point<2>({1, 0}), pivot::point<2>({2, 0}), pivot::point<2>({3, 0})};
-    auto root = walk_node<2>::balanced_rep(steps);
+    auto tree = walk_tree<2>(steps);
+    auto root = tree.root();
 
     root->rotate_right();
     auto symm = root->symm();
@@ -176,12 +177,12 @@ TEST(WalkNode, RotateRight2D1) {
     EXPECT_TRUE(right->left()->is_leaf());
     EXPECT_TRUE(right->right()->is_leaf());
 
-    delete root;
 }
 
 TEST(WalkNode, RotateRight2D2) {
     std::vector steps = {pivot::point<2>({1, 0}), pivot::point<2>({1, 1}), pivot::point<2>({1, 2})};
-    auto root = walk_node<2>::balanced_rep(steps);
+    auto tree = walk_tree<2>(steps);
+    auto root = tree.root();
 
     root->rotate_right();
     auto symm = root->symm();
@@ -206,47 +207,46 @@ TEST(WalkNode, RotateRight2D2) {
     EXPECT_TRUE(right->left()->is_leaf());
     EXPECT_TRUE(right->right()->is_leaf());
 
-    delete root;
 }
 
 TEST(WalkNode, RotateRightStepsRand2D) {
     int num_sites = 100;
     auto steps = random_walk<2>(num_sites);
 
-    auto root = walk_node<2>::balanced_rep(steps);
+    auto tree = walk_tree<2>(steps);
+    auto root = tree.root();
     ASSERT_EQ(root->steps(), steps);
     EXPECT_EQ(root->rotate_right()->steps(), steps);
-    delete root;
 }
 
 TEST(WalkNode, RotateLeftStepsRand2D) {
     int num_sites = 100;
     auto steps = random_walk<2>(num_sites);
 
-    auto root = walk_node<2>::balanced_rep(steps);
+    auto tree = walk_tree<2>(steps);
+    auto root = tree.root();
     ASSERT_EQ(root->steps(), steps);
     EXPECT_EQ(root->rotate_left()->steps(), steps);
-    delete root;
 }
 
 TEST(WalkNode, RotateLeftRightRand2D) {
     int num_sites = 100;
     auto steps = random_walk<2>(num_sites);
 
-    auto root1 = walk_node<2>::balanced_rep(steps);
-    auto root2 = walk_node<2>::balanced_rep(steps);
+    auto tree1 = walk_tree<2>(steps);
+    auto root1 = tree1.root();
+    auto tree2 = walk_tree<2>(steps);
+    auto root2 = tree2.root();
     EXPECT_EQ(*root1->rotate_left()->rotate_right(), *root2);
-    delete root1;
-    delete root2;
 }
 
 TEST(WalkNode, RotateRightLeftRand2D) {
     int num_sites = 100;
     auto steps = random_walk<2>(num_sites);
 
-    auto root1 = walk_node<2>::balanced_rep(steps);
-    auto root2 = walk_node<2>::balanced_rep(steps);
+    auto tree1 = walk_tree<2>(steps);
+    auto root1 = tree1.root();
+    auto tree2 = walk_tree<2>(steps);
+    auto root2 = tree2.root();
     EXPECT_EQ(*root1->rotate_right()->rotate_left(), *root2);
-    delete root1;
-    delete root2;
 }
