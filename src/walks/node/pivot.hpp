@@ -90,9 +90,7 @@ template <int Dim> bool walk_node<Dim>::intersect() const {
 template <int Dim>
 bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point<Dim> &l_anchor,
                const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
-  auto l_box = l_anchor + l_symm * l_walk->bbox_;
-  auto r_box = r_anchor + r_symm * r_walk->bbox_;
-  if ((l_box & r_box).empty()) {
+  if (empty_intersection(l_walk->bbox_, r_walk->bbox_, l_anchor, r_anchor, l_symm, r_symm)) {
     return false;
   }
 
@@ -116,6 +114,12 @@ template <int Dim> void walk_node<Dim>::merge() {
 
   bbox_ = left_->bbox_ | (left_->end_ + symm_ * right_->bbox_);
   end_ = left_->end_ + symm_ * right_->end_;
+}
+
+template <int Dim>
+bool empty_intersection(const box<Dim> &l_box, const box<Dim> &r_box, const point<Dim> &l_anchor,
+                        const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
+  return ((l_anchor + l_symm * l_box) & (r_anchor + r_symm * r_box)).empty();
 }
 
 } // namespace pivot

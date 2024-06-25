@@ -38,12 +38,17 @@ template <int Dim> std::vector<point<Dim>> walk_node<Dim>::steps() const {
   return result;
 }
 
+#define EMPTY_INTERSECT_INST(z, n, data)                                                                               \
+  template bool empty_intersection<n>(const box<n> &l_box, const box<n> &r_box, const point<n> &l_anchor,              \
+                                      const point<n> &r_anchor, const transform<n> &l_symm,                            \
+                                      const transform<n> &r_symm);
 #define INTERSECT_INST(z, n, data)                                                                                     \
   template bool intersect<n>(const walk_node<n> *l_walk, const walk_node<n> *r_walk, const point<n> &l_anchor,         \
                              const point<n> &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
 #define WALK_NODE_INST(z, n, data) template class walk_node<n>;
 
 // cppcheck-suppress syntaxError
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, EMPTY_INTERSECT_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, INTERSECT_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_NODE_INST, ~)
 
