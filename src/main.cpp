@@ -4,11 +4,6 @@
 
 #include "loop.h"
 
-#define CASE_MACRO(z, n, data)                                                                                         \
-  case n:                                                                                                              \
-    return main_loop<n>(num_steps, iters, naive, seed, require_success, verify, in_path, out_dir);                     \
-    break;
-
 int main(int argc, char **argv) {
   int dim;
   int num_steps;
@@ -36,12 +31,5 @@ int main(int argc, char **argv) {
   app.add_option("--seed", seed, "seed")->default_val(std::random_device()());
 
   CLI11_PARSE(app, argc, argv);
-
-  switch (dim) {
-    // cppcheck-suppress syntaxError
-    BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, CASE_MACRO, ~)
-  default:
-    std::cerr << "Invalid dimension: " << dim << '\n';
-    return 1;
-  }
+  return main_loop(dim, num_steps, iters, naive, seed, require_success, verify, in_path, out_dir);
 }
