@@ -134,7 +134,7 @@ TEST(WalkNode, Balanced3) {
 }
 
 TEST(RandomWalk, IsNearestNeighbor) {
-    auto steps = random_walk<2>(100);
+    auto steps = random_walk(2, 100);
     ASSERT_EQ(steps.size(), 100);
     for (int i = 1; i < 100; ++i) {
         EXPECT_EQ((steps[i] - steps[i - 1]).norm(), 1);
@@ -142,7 +142,7 @@ TEST(RandomWalk, IsNearestNeighbor) {
 }
 
 TEST(WalkNode, BalancedSteps) {
-    auto steps = random_walk<2>(100);
+    auto steps = random_walk(2, 100);
     auto tree = walk_tree(steps);
     auto root = tree.root();
     auto result = root->steps();
@@ -211,7 +211,7 @@ TEST(WalkNode, RotateRight2D2) {
 
 TEST(WalkNode, RotateRightStepsRand2D) {
     int num_sites = 100;
-    auto steps = random_walk<2>(num_sites);
+    auto steps = random_walk(2, num_sites);
 
     auto tree = walk_tree(steps);
     auto root = tree.root();
@@ -221,7 +221,7 @@ TEST(WalkNode, RotateRightStepsRand2D) {
 
 TEST(WalkNode, RotateLeftStepsRand2D) {
     int num_sites = 100;
-    auto steps = random_walk<2>(num_sites);
+    auto steps = random_walk(2, num_sites);
 
     auto tree = walk_tree(steps);
     auto root = tree.root();
@@ -231,7 +231,7 @@ TEST(WalkNode, RotateLeftStepsRand2D) {
 
 TEST(WalkNode, RotateLeftRightRand2D) {
     int num_sites = 100;
-    auto steps = random_walk<2>(num_sites);
+    auto steps = random_walk(2, num_sites);
 
     auto tree1 = walk_tree(steps);
     auto root1 = tree1.root();
@@ -242,7 +242,7 @@ TEST(WalkNode, RotateLeftRightRand2D) {
 
 TEST(WalkNode, RotateRightLeftRand2D) {
     int num_sites = 100;
-    auto steps = random_walk<2>(num_sites);
+    auto steps = random_walk(2, num_sites);
 
     auto tree1 = walk_tree(steps);
     auto root1 = tree1.root();
@@ -252,7 +252,7 @@ TEST(WalkNode, RotateRightLeftRand2D) {
 }
 
 TEST(WalkNode, Steps2D) {
-    auto steps = random_walk<2>(100);
+    auto steps = random_walk(2, 100);
     auto tree = walk_tree(steps);
     auto root = tree.root();
     auto result = root->steps();
