@@ -4,7 +4,7 @@
 
 namespace pivot {
 
-template <int Dim> std::vector<point> from_csv(const std::string &path);
+std::vector<point> from_csv(int dim, const std::string &path);
 
 void to_csv(const std::string &path, const std::vector<point> &points);
 

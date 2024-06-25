@@ -4,13 +4,9 @@
 
 #include "walk_node.h"
 
-#include "ctors.hpp"
-#include "graphviz.hpp"
-#include "pivot.hpp"
-
 namespace pivot {
 
-template <int Dim> bool walk_node<Dim>::operator==(const walk_node &other) const {
+bool walk_node::operator==(const walk_node &other) const {
   if (is_leaf() && other.is_leaf()) {
     return true;
   }
@@ -18,9 +14,9 @@ template <int Dim> bool walk_node<Dim>::operator==(const walk_node &other) const
          end_ == other.end_ && *left_ == *other.left_ && *right_ == *other.right_;
 }
 
-template <int Dim> bool walk_node<Dim>::is_leaf() const { return left_ == nullptr && right_ == nullptr; }
+bool walk_node::is_leaf() const { return left_ == nullptr && right_ == nullptr; }
 
-template <int Dim> std::vector<point> walk_node<Dim>::steps() const {
+std::vector<point> walk_node::steps() const {
   std::vector<point> result;
   if (is_leaf()) {
     result.push_back(end_);
@@ -37,14 +33,5 @@ template <int Dim> std::vector<point> walk_node<Dim>::steps() const {
 
   return result;
 }
-
-#define INTERSECT_INST(z, n, data)                                                                                     \
-  template bool intersect<n>(const walk_node<n> *l_walk, const walk_node<n> *r_walk, const point &l_anchor,            \
-                             const point &r_anchor, const transform &l_symm, const transform &r_symm);
-#define WALK_NODE_INST(z, n, data) template class walk_node<n>;
-
-// cppcheck-suppress syntaxError
-BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, INTERSECT_INST, ~)
-BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_NODE_INST, ~)
 
 } // namespace pivot

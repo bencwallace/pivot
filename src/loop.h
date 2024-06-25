@@ -12,12 +12,12 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
   std::unique_ptr<pivot::walk_base> w;
   if (!naive) {
     if (in_path.empty()) {
-      w = std::make_unique<pivot::walk_tree<Dim>>(num_steps, seed);
+      w = std::make_unique<pivot::walk_tree>(Dim, num_steps, seed);
     } else {
-      w = std::make_unique<pivot::walk_tree<Dim>>(in_path, seed);
+      w = std::make_unique<pivot::walk_tree>(Dim, in_path, seed);
     }
   } else {
-    w = std::make_unique<pivot::walk>(num_steps, seed);
+    w = std::make_unique<pivot::walk>(Dim, num_steps, seed);
   }
 
   std::vector<pivot::point> endpoints;
