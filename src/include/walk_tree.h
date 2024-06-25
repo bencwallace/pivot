@@ -12,7 +12,7 @@ namespace pivot {
 
 template <int Dim> class walk_node;
 
-template <int Dim> class walk_tree : public walk_base<Dim> {
+template <int Dim> class walk_tree : public walk_base {
 
 public:
   walk_tree(int num_sites, std::optional<unsigned int> seed = std::nullopt, bool balanced = true);

@@ -4,7 +4,7 @@
 
 namespace pivot {
 
-template <int Dim> class walk_base {
+class walk_base {
 
 public:
   virtual ~walk_base() = default;

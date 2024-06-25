@@ -11,7 +11,7 @@
 
 namespace pivot {
 
-template <int Dim> class walk : public walk_base<Dim> {
+template <int Dim> class walk : public walk_base {
 
 public:
   walk(int num_steps, std::optional<unsigned int> seed = std::nullopt);
