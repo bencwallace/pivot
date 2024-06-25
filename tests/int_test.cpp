@@ -56,7 +56,7 @@ TEST(WalkTest, Loop) {
 
 TEST(WalkTreeTest, SelfAvoiding) {
   for (int num_steps = 2; num_steps < 10; ++num_steps) {
-    auto w = walk_tree<2>(num_steps);
+    auto w = walk_tree(2, num_steps);
     for (int i = 0; i < 10; ++i) {
       for (int j = 0; j < 100; j++) {
         w.rand_pivot();
@@ -67,7 +67,7 @@ TEST(WalkTreeTest, SelfAvoiding) {
 }
 
 TEST(WalkTreeTest, FindNode) {
-  auto w = walk_tree<2>(100);
+  auto w = walk_tree(2, 100);
   for (int i = 1; i <= 100; ++i) {
     w.rand_pivot();
   }
@@ -82,9 +82,9 @@ TEST(WalkTreeTest, Seed) {
   auto seed = rd();
   std::mt19937 gen(seed);
 
-  walk_tree<2> w1(100, seed);
-  walk_tree<2> w2(100, seed);
-  walk_tree<2> w3(100);
+  walk_tree w1(2, 100, seed);
+  walk_tree w2(2, 100, seed);
+  walk_tree w3(2, 100);
   std::srand(seed);
   for (int i = 0; i < 10; ++i) {
     w1.rand_pivot();

@@ -6,15 +6,14 @@
 
 namespace pivot {
 
-template <int Dim> class walk_node;
+class walk_node;
 
-template <int Dim>
-bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point &l_anchor, const point &r_anchor,
+bool intersect(const walk_node *l_walk, const walk_node *r_walk, const point &l_anchor, const point &r_anchor,
                const transform &l_symm, const transform &r_symm);
 
-template <int Dim> class walk_tree;
+class walk_tree;
 
-template <int Dim> class walk_node {
+class walk_node {
 
 public:
   static walk_node *pivot_rep(const std::vector<point> &steps, walk_node *buf = nullptr);
@@ -61,8 +60,6 @@ public:
 
   walk_node *shuffle_down();
 
-  bool intersect() const;
-
 private:
   int id_;
   int num_sites_;
@@ -73,7 +70,7 @@ private:
   box bbox_;
   point end_;
 
-  friend class walk_tree<Dim>;
+  friend class walk_tree;
 
   walk_node(int id, int num_sites, const transform &symm, const box &bbox, const point &end);
 
@@ -95,14 +92,13 @@ private:
 
   void merge();
 
-  static walk_node create_leaf();
-  static walk_node &leaf();
+  static walk_node create_leaf(int dim);
+  static walk_node &leaf(int dim);
 
   Agnode_t *todot(Agraph_t *g, const cgraph_t &cgraph) const;
 
-  template <int D>
-  friend bool intersect(const walk_node<D> *l_walk, const walk_node<D> *r_walk, const point &l_anchor,
-                        const point &r_anchor, const transform &l_symm, const transform &r_symm);
+  friend bool intersect(const walk_node *l_walk, const walk_node *r_walk, const point &l_anchor, const point &r_anchor,
+                        const transform &l_symm, const transform &r_symm);
 };
 
 } // namespace pivot

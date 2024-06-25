@@ -8,16 +8,16 @@
 
 namespace pivot {
 
-template <int Dim> std::vector<point> from_csv(const std::string &path) {
+std::vector<point> from_csv(int dim, const std::string &path) {
   std::ifstream file(path);
   std::vector<point> points;
   std::string line;
   while (std::getline(file, line)) {
     std::vector<int> coords;
     size_t start = 0;
-    for (int i = 0; i < Dim; ++i) {
+    for (int i = 0; i < dim; ++i) {
       size_t end = line.find(',', start);
-      if (end == std::string::npos && i < Dim - 1) {
+      if (end == std::string::npos && i < dim - 1) {
         throw std::invalid_argument("Invalid CSV format at line " + std::to_string(points.size()));
       }
       coords[i] = std::stoi(line.substr(start, end - start));
@@ -48,10 +48,5 @@ std::vector<point> line(int dim, int num_steps) {
   }
   return steps;
 }
-
-#define FROM_CSV_INST(z, n, data) template std::vector<point> from_csv<n>(const std::string &path);
-
-// cppcheck-suppress syntaxError
-BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, FROM_CSV_INST, ~)
 
 } // namespace pivot

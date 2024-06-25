@@ -10,20 +10,20 @@
 
 namespace pivot {
 
-template <int Dim> class walk_node;
+class walk_node;
 
-template <int Dim> class walk_tree : public walk_base {
+class walk_tree : public walk_base {
 
 public:
-  walk_tree(int num_sites, std::optional<unsigned int> seed = std::nullopt, bool balanced = true);
+  walk_tree(int dim, int num_sites, std::optional<unsigned int> seed = std::nullopt, bool balanced = true);
 
-  walk_tree(const std::string &path, std::optional<unsigned int> seed = std::nullopt, bool balanced = true);
+  walk_tree(int dim, const std::string &path, std::optional<unsigned int> seed = std::nullopt, bool balanced = true);
 
   walk_tree(const std::vector<point> &steps, std::optional<unsigned int> seed = std::nullopt, bool balanced = true);
 
   ~walk_tree();
 
-  walk_node<Dim> *root() const;
+  walk_node *root() const;
 
   point endpoint() const override;
 
@@ -37,7 +37,7 @@ public:
    * it cannot be used on trees currently being transformed (e.g. via rotation).
    * @return reference to the node
    */
-  walk_node<Dim> &find_node(int n);
+  walk_node &find_node(int n);
 
   bool try_pivot(int n, const transform &r);
 
@@ -50,12 +50,15 @@ public:
   void export_csv(const std::string &path) const override;
 
 private:
-  std::unique_ptr<walk_node<Dim>> root_;
+  int dim_;
+  std::unique_ptr<walk_node> root_;
   std::mt19937 rng_;
   std::uniform_int_distribution<int> dist_;
-  walk_node<Dim> *buf_;
+  walk_node *buf_;
 
-  walk_tree(walk_node<Dim> *root);
+  walk_tree(walk_node *root);
+
+  bool intersect() const;
 };
 
 } // namespace pivot

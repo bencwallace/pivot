@@ -2,19 +2,17 @@
 
 namespace pivot {
 
-template <int Dim>
-walk_node<Dim>::walk_node(int id, int num_sites, const transform &symm, const box &bbox,
-                          const point &end)
+walk_node::walk_node(int id, int num_sites, const transform &symm, const box &bbox, const point &end)
     : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
 
-template <int Dim> walk_node<Dim> *walk_node<Dim>::pivot_rep(const std::vector<point> &steps, walk_node *buf) {
+walk_node *walk_node::pivot_rep(const std::vector<point> &steps, walk_node *buf) {
   int num_sites = steps.size();
   if (num_sites < 2) {
     throw std::invalid_argument("num_sites must be at least 2");
   }
-  walk_node<Dim> *root =
-      buf ? new (buf) walk_node(1, num_sites, transform(steps[0], steps[1]), box(steps), steps[num_sites - 1])
-          : new walk_node(1, num_sites, transform(steps[0], steps[1]), box(steps), steps[num_sites - 1]);
+  walk_node *root = buf ? new (buf)
+                              walk_node(1, num_sites, transform(steps[0], steps[1]), box(steps), steps[num_sites - 1])
+                        : new walk_node(1, num_sites, transform(steps[0], steps[1]), box(steps), steps[num_sites - 1]);
   auto node = root;
   for (int i = 0; i < num_sites - 2; ++i) {
     auto id = i + 2;
@@ -30,20 +28,18 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::pivot_rep(const std::vector<p
   return root;
 }
 
-template <int Dim>
-walk_node<Dim> *walk_node<Dim>::balanced_rep(const std::vector<point> &steps, walk_node<Dim> *buf) {
-  return balanced_rep(steps, 1, transform(Dim), buf);
+walk_node *walk_node::balanced_rep(const std::vector<point> &steps, walk_node *buf) {
+  return balanced_rep(steps, 1, transform(steps[0].dim()), buf);
 }
 
-template <int Dim>
-walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point> steps, int start,
-                                             const transform &glob_symm, walk_node<Dim> *buf) {
+walk_node *walk_node::balanced_rep(std::span<const point> steps, int start, const transform &glob_symm,
+                                   walk_node *buf) {
   int num_sites = steps.size();
   if (num_sites < 1) {
     throw std::invalid_argument("num_sites must be at least 1");
   }
   if (num_sites == 1) {
-    return &leaf();
+    return &leaf(steps.front().dim());
   }
 
   /* The steps span gives an "absolute" view of the walk, but a "relative" view is required, since each sub-tree,
@@ -51,11 +47,12 @@ walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point> steps, int s
   glob_symm represents the transformation "accumulated" since the root of the tree under construction. Its effect
   must be reversed in order to obtain the relative properties of the current node. */
   int n = std::floor((1 + num_sites) / 2.0);
+  int dim = steps.front().dim();
   auto abs_symm = transform(steps[n - 1], steps[n]);
   auto glob_inv = glob_symm.inverse();
   auto rel_symm = glob_inv * abs_symm;
-  auto rel_end = glob_inv * (steps.back() - steps.front()) + pivot::point::unit(Dim, 0);
-  auto rel_box = point::unit(Dim, 0) + glob_inv * (box(steps) - point::unit(Dim, 0));
+  auto rel_end = glob_inv * (steps.back() - steps.front()) + pivot::point::unit(dim, 0);
+  auto rel_box = point::unit(dim, 0) + glob_inv * (box(steps) - point::unit(dim, 0));
   int id = start + n - 1;
   walk_node *root = buf ? new (buf + id - 1) walk_node(id, num_sites, rel_symm, rel_box, rel_end)
                         : new walk_node(id, num_sites, rel_symm, rel_box, rel_end);
@@ -71,21 +68,21 @@ walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point> steps, int s
   return root;
 }
 
-template <int Dim> walk_node<Dim> walk_node<Dim>::create_leaf() {
+walk_node walk_node::create_leaf(int dim) {
   std::vector<interval> intervals;
-  intervals.reserve(Dim);
+  intervals.reserve(dim);
   intervals.push_back(interval(1, 1));
-  for (int i = 1; i < Dim; ++i) {
+  for (int i = 1; i < dim; ++i) {
     intervals.push_back(interval(0, 0));
   }
-  return walk_node(0, 1, transform(Dim), box(intervals), point::unit(Dim, 0));
+  return walk_node(0, 1, transform(dim), box(intervals), point::unit(dim, 0));
 }
 
-template <int Dim> walk_node<Dim> &walk_node<Dim>::leaf() {
-  static walk_node<Dim> leaf = create_leaf();
+walk_node &walk_node::leaf(int dim) {
+  static walk_node leaf = create_leaf(dim);
   return leaf;
 }
 
-template <int Dim> walk_node<Dim>::~walk_node() = default;
+walk_node::~walk_node() = default;
 
 } // namespace pivot

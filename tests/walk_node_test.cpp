@@ -11,7 +11,7 @@ using namespace pivot;
 
 TEST(WalkNode, Balanced1) {
     auto steps = {pivot::point({1, 0}), pivot::point({2, 0}), pivot::point({2, 1}), pivot::point({3, 1})};
-    auto tree = walk_tree<2>(steps);
+    auto tree = walk_tree(steps);
     auto root = tree.root();
 
     auto symm = root->symm();
@@ -50,7 +50,7 @@ TEST(WalkNode, Balanced2) {
     // steps and tree from Clisby (2010), Figs. 1, 23
     auto steps = {pivot::point({1, 0}), pivot::point({1, 1}), pivot::point({2, 1}), pivot::point({3, 1}),
                   pivot::point({3, 0})};
-    auto tree = walk_tree<2>(steps);
+    auto tree = walk_tree(steps);
     auto root = tree.root();
 
     auto symm = root->symm();
@@ -97,7 +97,7 @@ TEST(WalkNode, Balanced2) {
 
 TEST(WalkNode, Balanced3) {
     std::vector steps = {pivot::point({1, 0}), pivot::point({2, 0}), pivot::point({2, 1}), pivot::point({2, 2})};
-    auto tree = walk_tree<2>(steps);
+    auto tree = walk_tree(steps);
     auto root = tree.root();
 
     auto symm = root->symm();
@@ -143,7 +143,7 @@ TEST(RandomWalk, IsNearestNeighbor) {
 
 TEST(WalkNode, BalancedSteps) {
     auto steps = random_walk<2>(100);
-    auto tree = walk_tree<2>(steps);
+    auto tree = walk_tree(steps);
     auto root = tree.root();
     auto result = root->steps();
     EXPECT_EQ(steps, result);
@@ -151,7 +151,7 @@ TEST(WalkNode, BalancedSteps) {
 
 TEST(WalkNode, RotateRight2D1) {
     std::vector steps = {pivot::point({1, 0}), pivot::point({2, 0}), pivot::point({3, 0})};
-    auto tree = walk_tree<2>(steps);
+    auto tree = walk_tree(steps);
     auto root = tree.root();
 
     root->rotate_right();
@@ -181,7 +181,7 @@ TEST(WalkNode, RotateRight2D1) {
 
 TEST(WalkNode, RotateRight2D2) {
     std::vector steps = {pivot::point({1, 0}), pivot::point({1, 1}), pivot::point({1, 2})};
-    auto tree = walk_tree<2>(steps);
+    auto tree = walk_tree(steps);
     auto root = tree.root();
 
     root->rotate_right();
@@ -213,7 +213,7 @@ TEST(WalkNode, RotateRightStepsRand2D) {
     int num_sites = 100;
     auto steps = random_walk<2>(num_sites);
 
-    auto tree = walk_tree<2>(steps);
+    auto tree = walk_tree(steps);
     auto root = tree.root();
     ASSERT_EQ(root->steps(), steps);
     EXPECT_EQ(root->rotate_right()->steps(), steps);
@@ -223,7 +223,7 @@ TEST(WalkNode, RotateLeftStepsRand2D) {
     int num_sites = 100;
     auto steps = random_walk<2>(num_sites);
 
-    auto tree = walk_tree<2>(steps);
+    auto tree = walk_tree(steps);
     auto root = tree.root();
     ASSERT_EQ(root->steps(), steps);
     EXPECT_EQ(root->rotate_left()->steps(), steps);
@@ -233,9 +233,9 @@ TEST(WalkNode, RotateLeftRightRand2D) {
     int num_sites = 100;
     auto steps = random_walk<2>(num_sites);
 
-    auto tree1 = walk_tree<2>(steps);
+    auto tree1 = walk_tree(steps);
     auto root1 = tree1.root();
-    auto tree2 = walk_tree<2>(steps);
+    auto tree2 = walk_tree(steps);
     auto root2 = tree2.root();
     EXPECT_EQ(*root1->rotate_left()->rotate_right(), *root2);
 }
@@ -244,16 +244,16 @@ TEST(WalkNode, RotateRightLeftRand2D) {
     int num_sites = 100;
     auto steps = random_walk<2>(num_sites);
 
-    auto tree1 = walk_tree<2>(steps);
+    auto tree1 = walk_tree(steps);
     auto root1 = tree1.root();
-    auto tree2 = walk_tree<2>(steps);
+    auto tree2 = walk_tree(steps);
     auto root2 = tree2.root();
     EXPECT_EQ(*root1->rotate_right()->rotate_left(), *root2);
 }
 
 TEST(WalkNode, Steps2D) {
     auto steps = random_walk<2>(100);
-    auto tree = walk_tree<2>(steps);
+    auto tree = walk_tree(steps);
     auto root = tree.root();
     auto result = root->steps();
     EXPECT_EQ(steps, result);
