@@ -8,12 +8,12 @@
 
 namespace pivot {
 
-template <int Dim> std::vector<point<Dim>> from_csv(const std::string &path) {
+template <int Dim> std::vector<point> from_csv(const std::string &path) {
   std::ifstream file(path);
-  std::vector<point<Dim>> points;
+  std::vector<point> points;
   std::string line;
   while (std::getline(file, line)) {
-    std::array<int, Dim> coords;
+    std::vector<int> coords;
     size_t start = 0;
     for (int i = 0; i < Dim; ++i) {
       size_t end = line.find(',', start);
@@ -23,12 +23,12 @@ template <int Dim> std::vector<point<Dim>> from_csv(const std::string &path) {
       coords[i] = std::stoi(line.substr(start, end - start));
       start = end + 1;
     }
-    points.push_back(point<Dim>(coords));
+    points.push_back(point(coords));
   }
   return points;
 }
 
-template <int Dim> void to_csv(const std::string &path, const std::vector<point<Dim>> &points) {
+template <int Dim> void to_csv(const std::string &path, const std::vector<point> &points) {
   // TODO: check path exists
   std::ofstream file(path);
   for (const auto &p : points) {
@@ -39,21 +39,20 @@ template <int Dim> void to_csv(const std::string &path, const std::vector<point<
   }
 }
 
-template <int Dim> std::vector<point<Dim>> line(int num_steps) {
-  std::vector<point<Dim>> steps(num_steps);
+std::vector<point> line(int dim, int num_steps) {
+  std::vector<point> steps;
+  steps.reserve(num_steps);
   for (int i = 0; i < num_steps; ++i) {
-    steps[i] = (i + 1) * point<Dim>::unit(0);
+    steps.push_back((i + 1) * point::unit(dim, 0));
   }
   return steps;
 }
 
-#define FROM_CSV_INST(z, n, data) template std::vector<point<n>> from_csv<n>(const std::string &path);
-#define TO_CSV_INST(z, n, data) template void to_csv<n>(const std::string &path, const std::vector<point<n>> &points);
-#define LINE_INST(z, n, data) template std::vector<point<n>> line(int num_steps);
+#define FROM_CSV_INST(z, n, data) template std::vector<point> from_csv<n>(const std::string &path);
+#define TO_CSV_INST(z, n, data) template void to_csv<n>(const std::string &path, const std::vector<point> &points);
 
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TO_CSV_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, FROM_CSV_INST, ~)
-BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, LINE_INST, ~)
 
 } // namespace pivot

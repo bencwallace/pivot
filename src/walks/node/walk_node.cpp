@@ -20,8 +20,8 @@ template <int Dim> bool walk_node<Dim>::operator==(const walk_node &other) const
 
 template <int Dim> bool walk_node<Dim>::is_leaf() const { return left_ == nullptr && right_ == nullptr; }
 
-template <int Dim> std::vector<point<Dim>> walk_node<Dim>::steps() const {
-  std::vector<point<Dim>> result;
+template <int Dim> std::vector<point> walk_node<Dim>::steps() const {
+  std::vector<point> result;
   if (is_leaf()) {
     result.push_back(end_);
     return result;
@@ -39,8 +39,8 @@ template <int Dim> std::vector<point<Dim>> walk_node<Dim>::steps() const {
 }
 
 #define INTERSECT_INST(z, n, data)                                                                                     \
-  template bool intersect<n>(const walk_node<n> *l_walk, const walk_node<n> *r_walk, const point<n> &l_anchor,         \
-                             const point<n> &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
+  template bool intersect<n>(const walk_node<n> *l_walk, const walk_node<n> *r_walk, const point &l_anchor,            \
+                             const point &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
 #define WALK_NODE_INST(z, n, data) template class walk_node<n>;
 
 // cppcheck-suppress syntaxError

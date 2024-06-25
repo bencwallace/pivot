@@ -13,14 +13,14 @@ namespace pivot {
 
 template <int Dim>
 walk_tree<Dim>::walk_tree(int num_sites, std::optional<unsigned int> seed, bool balanced)
-    : walk_tree(line<Dim>(num_sites), seed, balanced) {}
+    : walk_tree(line(Dim, num_sites), seed, balanced) {}
 
 template <int Dim>
 walk_tree<Dim>::walk_tree(const std::string &path, std::optional<unsigned int> seed, bool balanced)
     : walk_tree(from_csv<Dim>(path), seed, balanced) {}
 
 template <int Dim>
-walk_tree<Dim>::walk_tree(const std::vector<point<Dim>> &steps, std::optional<unsigned int> seed, bool balanced) {
+walk_tree<Dim>::walk_tree(const std::vector<point> &steps, std::optional<unsigned int> seed, bool balanced) {
   if (steps.size() < 2) {
     throw std::invalid_argument("walk must have at least 2 sites (1 step)");
   }
@@ -61,11 +61,11 @@ template <int Dim> walk_tree<Dim>::walk_tree(walk_node<Dim> *root) : root_(root)
 
 template <int Dim> walk_node<Dim> *walk_tree<Dim>::root() const { return root_.get(); }
 
-template <int Dim> point<Dim> walk_tree<Dim>::endpoint() const { return root_->endpoint(); }
+template <int Dim> point walk_tree<Dim>::endpoint() const { return root_->endpoint(); }
 
 template <int Dim> bool walk_tree<Dim>::is_leaf() const { return root_->is_leaf(); }
 
-template <int Dim> std::vector<point<Dim>> walk_tree<Dim>::steps() const { return root_->steps(); }
+template <int Dim> std::vector<point> walk_tree<Dim>::steps() const { return root_->steps(); }
 
 template <int Dim> walk_node<Dim> &walk_tree<Dim>::find_node(int n) {
   if (!buf_) {
@@ -107,7 +107,7 @@ template <int Dim> bool walk_tree<Dim>::self_avoiding() const {
   return true;
 }
 
-template <int Dim> void walk_tree<Dim>::export_csv(const std::string &path) const { return to_csv(path, steps()); }
+template <int Dim> void walk_tree<Dim>::export_csv(const std::string &path) const { return to_csv<Dim>(path, steps()); }
 
 #define WALK_TREE_INST(z, n, data) template class walk_tree<n>;
 
