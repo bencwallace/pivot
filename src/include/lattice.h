@@ -163,6 +163,7 @@ public:
   transform();
 
   // TODO: this should be private
+  transform(const std::array<int, Dim> &perm, const std::array<int, Dim> &signs, const std::array<int, Dim> &iperm);
   transform(const std::array<int, Dim> &perm, const std::array<int, Dim> &signs);
 
   /**
@@ -182,12 +183,16 @@ public:
 
     std::array<int, Dim> perm;
     std::array<int, Dim> signs;
+    std::array<int, Dim> iperm;
     for (int i = 0; i < Dim; ++i) {
       perm[i] = i;
       signs[i] = 2 * flip_(gen) - 1;
     }
     std::shuffle(perm.begin(), perm.end(), gen);
-    return transform(perm, signs);
+    for (int i = 0; i < Dim; ++i) {
+      iperm[perm[i]] = i;
+    }
+    return transform(perm, signs, iperm);
   }
 
   static transform rand();
@@ -279,6 +284,7 @@ public:
 private:
   std::array<int, Dim> perm_;
   std::array<int, Dim> signs_;
+  std::array<int, Dim> iperm_;
 };
 
 } // namespace pivot
