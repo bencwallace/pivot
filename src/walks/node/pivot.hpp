@@ -119,7 +119,24 @@ template <int Dim> void walk_node<Dim>::merge() {
 template <int Dim>
 bool empty_intersection(const box<Dim> &l_box, const box<Dim> &r_box, const point<Dim> &l_anchor,
                         const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
-  return ((l_anchor + l_symm * l_box) & (r_anchor + r_symm * r_box)).empty();
+  for (int i = 0; i < Dim; ++i) {
+    auto l_x = l_anchor[i] + l_symm.signs_[i] * l_box.intervals_[l_symm.iperm_[i]].left_;
+    auto l_y = l_anchor[i] + l_symm.signs_[i] * l_box.intervals_[l_symm.iperm_[i]].right_;
+    auto l_left = std::min(l_x, l_y);
+    auto l_right = std::max(l_x, l_y);
+
+    auto r_x = r_anchor[i] + r_symm.signs_[i] * r_box.intervals_[r_symm.iperm_[i]].left_;
+    auto r_y = r_anchor[i] + r_symm.signs_[i] * r_box.intervals_[r_symm.iperm_[i]].right_;
+    auto r_left = std::min(r_x, r_y);
+    auto r_right = std::max(r_x, r_y);
+
+    auto left = std::max(l_left, r_left);
+    auto right = std::min(l_right, r_right);
+    if (left > right) {
+      return true;
+    }
+  }
+  return false;
 }
 
 } // namespace pivot

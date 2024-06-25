@@ -285,6 +285,10 @@ private:
   std::array<int, Dim> perm_;
   std::array<int, Dim> signs_;
   std::array<int, Dim> iperm_;
+
+  template <int D>
+  friend bool empty_intersection(const box<D> &l_box, const box<D> &r_box, const point<D> &l_anchor,
+                                 const point<D> &r_anchor, const transform<D> &l_symm, const transform<D> &r_symm);
 };
 
 } // namespace pivot
