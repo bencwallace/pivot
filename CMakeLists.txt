@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.0.0)
 project(pivot VERSION 0.1.0 LANGUAGES C CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -30,6 +30,9 @@ FetchContent_MakeAvailable(cli11_proj)
 find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
 include_directories("/usr/include/graphviz")
+
+include_directories("etl/include")
+include_directories("etl/lib/include")
 
 file(GLOB_RECURSE pivot_lib_SRC "src/graphviz.cpp" "src/utils.cpp" "src/walk.cpp" "src/walk_tree.cpp")
 add_library(pivot ${pivot_lib_SRC})

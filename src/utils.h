@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cstdlib>
+#include <etl/etl_light.hpp>
 #include <span>
 #include <vector>
 
@@ -47,7 +48,7 @@ public:
   std::string to_string() const;
 
 private:
-  std::vector<int> coords_;
+  etl::dyn_vector<int> coords_;
 };
 
 struct interval {
