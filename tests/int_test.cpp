@@ -11,7 +11,7 @@ using namespace pivot;
 
 TEST(WalkTest, SelfAvoiding) {
   for (int num_steps = 2; num_steps < 10; ++num_steps) {
-    walk<2> w(num_steps);
+    walk w(2, num_steps);
     for (int i = 0; i < 10; ++i) {
       for (int j = 0; j < 100; j++) {
         w.rand_pivot();
@@ -23,7 +23,7 @@ TEST(WalkTest, SelfAvoiding) {
 
 TEST(WalkTest, SelfAvoiding3D) {
   for (int num_steps = 2; num_steps < 10; ++num_steps) {
-    walk<3> w(100);
+    walk w(3, 100);
     for (int i = 0; i < 10; ++i) {
       for (int j = 0; j < 100; j++) {
         w.rand_pivot();
@@ -38,8 +38,8 @@ TEST(WalkTest, Seed) {
   auto seed = rd();
   std::mt19937 gen(seed);
 
-  walk<2> w1(100, seed);
-  walk<2> w2(100, seed);
+  walk w1(2, 100, seed);
+  walk w2(2, 100, seed);
   for (int i = 0; i < 10; ++i) {
     w1.rand_pivot();
     w2.rand_pivot();

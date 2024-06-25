@@ -1,16 +1,13 @@
-#include <boost/preprocessor/repetition/repeat_from_to.hpp>
-
+#include "walk.h"
 #include "defines.h"
 #include "utils.h"
-#include "walk.h"
 
 namespace pivot {
 
-template <int Dim>
-walk<Dim>::walk(int num_steps, std::optional<unsigned int> seed)
-    : steps_(), occupied_(num_steps, point_hash(num_steps)) {
+walk::walk(int dim, int num_steps, std::optional<unsigned int> seed)
+    : dim_(dim), steps_(), occupied_(num_steps, point_hash(num_steps)) {
   for (int i = 0; i < num_steps; ++i) {
-    steps_.push_back(i * point::unit(Dim, 0));
+    steps_.push_back(i * point::unit(dim_, 0));
     occupied_[steps_[i]] = i;
   }
 
@@ -18,7 +15,7 @@ walk<Dim>::walk(int num_steps, std::optional<unsigned int> seed)
   dist_ = std::uniform_int_distribution<int>(0, num_steps - 1);
 }
 
-template <int Dim> std::optional<std::vector<point>> walk<Dim>::try_pivot(int step, const transform &trans) const {
+std::optional<std::vector<point>> walk::try_pivot(int step, const transform &trans) const {
   std::vector<point> new_points;
   new_points.reserve(num_steps() - step - 1);
   for (int i = step + 1; i < num_steps(); ++i) {
@@ -32,13 +29,13 @@ template <int Dim> std::optional<std::vector<point>> walk<Dim>::try_pivot(int st
   return new_points;
 }
 
-template <int Dim> std::pair<int, std::optional<std::vector<point>>> walk<Dim>::try_rand_pivot() const {
+std::pair<int, std::optional<std::vector<point>>> walk::try_rand_pivot() const {
   auto step = dist_(rng_);
-  auto r = transform::rand(Dim, rng_);
+  auto r = transform::rand(dim_, rng_);
   return {step, try_pivot(step, r)};
 }
 
-template <int Dim> bool walk<Dim>::rand_pivot() {
+bool walk::rand_pivot() {
   auto [step, new_points] = try_rand_pivot();
   if (!new_points) {
     return false;
@@ -47,7 +44,7 @@ template <int Dim> bool walk<Dim>::rand_pivot() {
   return true;
 }
 
-template <int Dim> bool walk<Dim>::rand_pivot(int num_workers) {
+bool walk::rand_pivot(int num_workers) {
   if (num_workers == 0) {
     return rand_pivot();
   }
@@ -76,7 +73,7 @@ template <int Dim> bool walk<Dim>::rand_pivot(int num_workers) {
   return success;
 }
 
-template <int Dim> bool walk<Dim>::self_avoiding() const {
+bool walk::self_avoiding() const {
   for (int i = 0; i < num_steps(); ++i) {
     for (int j = i + 1; j < num_steps(); ++j) {
       if (steps_[i] == steps_[j]) {
@@ -87,9 +84,9 @@ template <int Dim> bool walk<Dim>::self_avoiding() const {
   return true;
 }
 
-template <int Dim> void walk<Dim>::export_csv(const std::string &path) const { return to_csv<Dim>(path, steps_); }
+void walk::export_csv(const std::string &path) const { return to_csv(path, steps_); }
 
-template <int Dim> void walk<Dim>::do_pivot(int step, std::vector<point> &new_points) {
+void walk::do_pivot(int step, std::vector<point> &new_points) {
   for (auto it = steps_.begin() + step + 1; it != steps_.end(); ++it) {
     occupied_.erase(*it);
   }
@@ -99,14 +96,9 @@ template <int Dim> void walk<Dim>::do_pivot(int step, std::vector<point> &new_po
   }
 }
 
-template <int Dim> point walk<Dim>::pivot_point(int step, int i, const transform &trans) const {
+point walk::pivot_point(int step, int i, const transform &trans) const {
   auto p = steps_[step];
   return p + trans * (steps_[i] - p);
 }
-
-#define WALK_INST(z, n, data) template class walk<n>;
-
-// cppcheck-suppress syntaxError
-BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_INST, ~)
 
 } // namespace pivot
