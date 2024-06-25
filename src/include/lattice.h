@@ -44,7 +44,7 @@ template <int Dim> class point : boost::multipliable<point<Dim>, int> {
 public:
   point() = default;
 
-  point(const std::array<int, Dim> &coords);
+  explicit point(const std::array<int, Dim> &coords);
 
   /**
    * @brief Returns the unit vector e_i.
