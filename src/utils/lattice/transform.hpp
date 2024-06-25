@@ -82,9 +82,9 @@ template <int Dim> transform<Dim> transform<Dim>::operator*(const transform<Dim>
 template <int Dim> box<Dim> transform<Dim>::operator*(const box<Dim> &b) const {
   std::array<interval, Dim> intervals;
   for (int i = 0; i < Dim; ++i) {
-    int x = signs_[perm_[i]] * b.intervals_[i].left_;
-    int y = signs_[perm_[i]] * b.intervals_[i].right_;
-    intervals[perm_[i]] = interval(std::min(x, y), std::max(x, y));
+    int x = signs_[i] * b.intervals_[iperm_[i]].left_;
+    int y = signs_[i] * b.intervals_[iperm_[i]].right_;
+    intervals[i] = interval(std::min(x, y), std::max(x, y));
   }
   return box<Dim>(intervals);
 }
