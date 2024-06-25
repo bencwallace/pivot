@@ -8,12 +8,20 @@ template <int Dim> transform<Dim>::transform() {
   for (int i = 0; i < Dim; ++i) {
     perm_[i] = i;  // trivial permutation
     signs_[i] = 1; // standard orientations (no flips)
+    iperm_[i] = i;
   }
 }
 
 template <int Dim>
-transform<Dim>::transform(const std::array<int, Dim> &perm, const std::array<int, Dim> &signs)
-    : perm_(perm), signs_(signs) {}
+transform<Dim>::transform(const std::array<int, Dim> &perm, const std::array<int, Dim> &signs, const std::array<int, Dim> &iperm)
+    : perm_(perm), signs_(signs), iperm_(iperm) {}
+
+template <int Dim>
+transform<Dim>::transform(const std::array<int, Dim> &perm, const std::array<int, Dim> &signs) : transform(perm, signs, {}) {
+  for (int i = 0; i < Dim; ++i) {
+    iperm_[perm[i]] = i;
+  }
+}
 
 template <int Dim> transform<Dim>::transform(const point<Dim> &p, const point<Dim> &q) : transform() {
   // The input points should differ by 1 in a single coordinate. Start by finding this coordinate or fail.
@@ -37,6 +45,8 @@ template <int Dim> transform<Dim>::transform(const point<Dim> &p, const point<Di
   perm_[idx] = 0;
   signs_[0] = -diff[idx]; // not strictly necessary
   signs_[idx] = diff[idx];
+  iperm_[0] = idx;
+  iperm_[idx] = 0;
 }
 
 template <int Dim> transform<Dim> transform<Dim>::rand() {
@@ -60,11 +70,13 @@ template <int Dim> point<Dim> transform<Dim>::operator*(const point<Dim> &p) con
 template <int Dim> transform<Dim> transform<Dim>::operator*(const transform<Dim> &t) const {
   std::array<int, Dim> perm;
   std::array<int, Dim> signs;
+  std::array<int, Dim> iperm;
   for (int i = 0; i < Dim; ++i) {
     perm[i] = perm_[t.perm_[i]];
     signs[perm[i]] = signs_[perm[i]] * t.signs_[t.perm_[i]];
+    iperm[perm[i]] = i;
   }
-  return transform(perm, signs);
+  return transform(perm, signs, iperm);
 }
 
 template <int Dim> box<Dim> transform<Dim>::operator*(const box<Dim> &b) const {
@@ -80,11 +92,13 @@ template <int Dim> box<Dim> transform<Dim>::operator*(const box<Dim> &b) const {
 template <int Dim> transform<Dim> transform<Dim>::inverse() const {
   std::array<int, Dim> perm;
   std::array<int, Dim> signs;
+  std::array<int, Dim> iperm;
   for (int i = 0; i < Dim; ++i) {
     perm[perm_[i]] = i;
     signs[i] = signs_[perm_[i]];
+    iperm[perm_[i]] = i;
   }
-  return transform(perm, signs);
+  return transform(perm, signs, iperm);
 }
 
 template <int Dim> std::array<std::array<int, Dim>, Dim> transform<Dim>::to_matrix() const {
