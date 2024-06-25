@@ -22,15 +22,15 @@ public:
 
   ~walk() = default;
 
-  point<Dim> operator[](int i) const { return steps_[i]; }
+  point operator[](int i) const { return steps_[i]; }
 
   int num_steps() const { return steps_.size(); }
 
-  point<Dim> endpoint() const override { return steps_.back(); }
+  point endpoint() const override { return steps_.back(); }
 
-  std::optional<std::vector<point<Dim>>> try_pivot(int step, const transform<Dim> &trans) const;
+  std::optional<std::vector<point>> try_pivot(int step, const transform<Dim> &trans) const;
 
-  std::pair<int, std::optional<std::vector<point<Dim>>>> try_rand_pivot() const;
+  std::pair<int, std::optional<std::vector<point>>> try_rand_pivot() const;
 
   bool rand_pivot() override;
 
@@ -41,15 +41,15 @@ public:
   void export_csv(const std::string &path) const override;
 
 protected:
-  std::vector<point<Dim>> steps_;
-  boost::unordered_map<point<Dim>, int, point_hash> occupied_;
+  std::vector<point> steps_;
+  boost::unordered_map<point, int, point_hash> occupied_;
 
   mutable std::mt19937 rng_;
   mutable std::uniform_int_distribution<int> dist_;
 
-  void do_pivot(int step, std::vector<point<Dim>> &new_points);
+  void do_pivot(int step, std::vector<point> &new_points);
 
-  point<Dim> pivot_point(int step, int i, const transform<Dim> &trans) const;
+  point pivot_point(int step, int i, const transform<Dim> &trans) const;
 };
 
 } // namespace pivot

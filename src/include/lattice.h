@@ -39,19 +39,20 @@ struct interval {
 /**
  * @brief Represents a Dim-dimensional point.
  */
-template <int Dim> class point : boost::multipliable<point<Dim>, int> {
+class point : boost::multipliable<point, int> {
 
 public:
-  point() = default;
+  point(int dim);
 
-  point(const std::array<int, Dim> &coords);
+  point(const std::vector<int> &coords);
+  point(std::initializer_list<int> coords);
 
   /**
    * @brief Returns the unit vector e_i.
    *
    * @param i The index of the unit vector. Must be in [0, Dim).
    */
-  static point unit(int i);
+  static point unit(int dim, int i);
 
   int operator[](int i) const;
 
@@ -68,19 +69,20 @@ public:
   /** @brief Scalar multiplication of a point */
   point &operator*=(int k);
 
+  int dim() const;
+
   int norm() const;
 
   /** @brief Returns the string of the form "({coords_[0]}, ..., {coords_[Dim - 1]})" */
   std::string to_string() const;
 
 private:
-  std::array<int, Dim> coords_{};
+  int dim_;
+  std::vector<int> coords_{};
 };
 
-template <typename S, typename T, T Dim> point(std::array<S, Dim>) -> point<Dim>;
-
 /** @brief Represents a Dim-dimensional box. */
-template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
+template <int Dim> struct box : boost::additive<box<Dim>, point> {
   std::array<interval, Dim> intervals_;
 
   box() = delete;
@@ -94,7 +96,7 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
    * in the sense that the input sequences of points (p0, ...) is effectively translated by e0 - p0
    * prior to the box's construction. In other words, the box will always have a vertex at e0.
    */
-  box(std::span<const point<Dim>> points);
+  box(std::span<const point> points);
 
   bool operator==(const box &b) const;
 
@@ -105,9 +107,9 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
   bool empty() const;
 
   /** @brief Action of a point (understood as a vector) on a box */
-  box<Dim> &operator+=(const point<Dim> &b);
+  box<Dim> &operator+=(const point &b);
 
-  box<Dim> &operator-=(const point<Dim> &b);
+  box<Dim> &operator-=(const point &b);
 
   /**
    * @brief Returns the "union" of two boxes.
@@ -129,8 +131,6 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
   std::string to_string() const;
 };
 
-template <typename S, typename T, S Dim, T N> box(std::array<point<Dim>, N>) -> box<Dim>;
-
 struct point_hash {
   int num_steps_;
 
@@ -138,7 +138,7 @@ struct point_hash {
 
   // This hashing method, which exploits the known range of values that can be taken by the
   // sequence of points in a walk, ppears to result in better performance than other methods tested.
-  template <int Dim> std::size_t operator()(const point<Dim> &p) const;
+  std::size_t operator()(const point &p) const;
 };
 
 /**
@@ -174,7 +174,7 @@ public:
    *
    * Note that the resulting pivot transformation is not uniquely defined by the inputs.
    */
-  transform(const point<Dim> &p, const point<Dim> &q);
+  transform(const point &p, const point &q);
 
   /** @brief Produce a uniformly random transfom.*/
   template <typename Gen> static transform rand(Gen &gen) {
@@ -203,7 +203,7 @@ public:
    *
    * which means the P(i)-th component of the result is S(P(i)) p[i].
    */
-  point<Dim> operator*(const point<Dim> &p) const;
+  point operator*(const point &p) const;
 
   /**
    * @brief Composes two transforms.

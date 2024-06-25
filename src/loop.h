@@ -20,7 +20,7 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
     w = std::make_unique<pivot::walk<Dim>>(num_steps, seed);
   }
 
-  std::vector<pivot::point<Dim>> endpoints;
+  std::vector<pivot::point> endpoints;
   if (require_success) {
     endpoints.reserve(iters);
   }
@@ -54,7 +54,7 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
   if (!out_dir.empty()) {
     std::cout << "Saving to: " << out_dir << '\n';
     w->export_csv(out_dir + "/walk.csv");
-    pivot::to_csv(out_dir + "/endpoints.csv", endpoints);
+    pivot::to_csv<Dim>(out_dir + "/endpoints.csv", endpoints);
   }
   if (verify) {
     std::cout << "Verifying self-avoiding\n";

@@ -19,14 +19,13 @@ public:
 
   walk_tree(const std::string &path, std::optional<unsigned int> seed = std::nullopt, bool balanced = true);
 
-  walk_tree(const std::vector<point<Dim>> &steps, std::optional<unsigned int> seed = std::nullopt,
-            bool balanced = true);
+  walk_tree(const std::vector<point> &steps, std::optional<unsigned int> seed = std::nullopt, bool balanced = true);
 
   ~walk_tree();
 
   walk_node<Dim> *root() const;
 
-  point<Dim> endpoint() const override;
+  point endpoint() const override;
 
   bool is_leaf() const;
 
@@ -44,7 +43,7 @@ public:
 
   bool rand_pivot() override;
 
-  std::vector<point<Dim>> steps() const;
+  std::vector<point> steps() const;
 
   bool self_avoiding() const override;
 

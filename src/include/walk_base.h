@@ -15,7 +15,7 @@ public:
 
   virtual void export_csv(const std::string &path) const = 0;
 
-  virtual point<Dim> endpoint() const = 0;
+  virtual point endpoint() const = 0;
 };
 
 } // namespace pivot

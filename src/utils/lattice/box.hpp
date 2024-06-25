@@ -23,7 +23,7 @@ std::string interval::to_string() const {
   return result;
 }
 
-template <int Dim> box<Dim> &box<Dim>::operator+=(const point<Dim> &p) {
+template <int Dim> box<Dim> &box<Dim>::operator+=(const point &p) {
   for (int i = 0; i < Dim; ++i) {
     intervals_[i].left_ += p[i];
     intervals_[i].right_ += p[i];
@@ -31,7 +31,7 @@ template <int Dim> box<Dim> &box<Dim>::operator+=(const point<Dim> &p) {
   return *this;
 }
 
-template <int Dim> box<Dim> &box<Dim>::operator-=(const point<Dim> &b) {
+template <int Dim> box<Dim> &box<Dim>::operator-=(const point &b) {
   for (int i = 0; i < Dim; ++i) {
     intervals_[i].left_ -= b[i];
     intervals_[i].right_ -= b[i];
@@ -41,7 +41,7 @@ template <int Dim> box<Dim> &box<Dim>::operator-=(const point<Dim> &b) {
 
 template <int Dim> box<Dim>::box(const std::array<interval, Dim> &intervals) : intervals_(intervals) {}
 
-template <int Dim> box<Dim>::box(std::span<const point<Dim>> points) {
+template <int Dim> box<Dim>::box(std::span<const point> points) {
   std::array<int, Dim> min;
   std::array<int, Dim> max;
   min.fill(std::numeric_limits<int>::max());
