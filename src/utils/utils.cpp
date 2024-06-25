@@ -28,14 +28,15 @@ template <int Dim> std::vector<point> from_csv(const std::string &path) {
   return points;
 }
 
-template <int Dim> void to_csv(const std::string &path, const std::vector<point> &points) {
+void to_csv(const std::string &path, const std::vector<point> &points) {
   // TODO: check path exists
+  int dim = points[0].dim();
   std::ofstream file(path);
   for (const auto &p : points) {
-    for (int i = 0; i < Dim - 1; ++i) {
+    for (int i = 0; i < dim - 1; ++i) {
       file << p[i] << ",";
     }
-    file << p[Dim - 1] << std::endl;
+    file << p[dim - 1] << std::endl;
   }
 }
 
@@ -49,10 +50,8 @@ std::vector<point> line(int dim, int num_steps) {
 }
 
 #define FROM_CSV_INST(z, n, data) template std::vector<point> from_csv<n>(const std::string &path);
-#define TO_CSV_INST(z, n, data) template void to_csv<n>(const std::string &path, const std::vector<point> &points);
 
 // cppcheck-suppress syntaxError
-BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TO_CSV_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, FROM_CSV_INST, ~)
 
 } // namespace pivot

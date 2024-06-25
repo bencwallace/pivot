@@ -107,7 +107,7 @@ template <int Dim> bool walk_tree<Dim>::self_avoiding() const {
   return true;
 }
 
-template <int Dim> void walk_tree<Dim>::export_csv(const std::string &path) const { return to_csv<Dim>(path, steps()); }
+template <int Dim> void walk_tree<Dim>::export_csv(const std::string &path) const { return to_csv(path, steps()); }
 
 #define WALK_TREE_INST(z, n, data) template class walk_tree<n>;
 

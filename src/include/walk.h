@@ -11,10 +11,10 @@
 
 namespace pivot {
 
-template <int Dim> class walk : public walk_base {
+class walk : public walk_base {
 
 public:
-  walk(int num_steps, std::optional<unsigned int> seed = std::nullopt);
+  walk(int dim, int num_steps, std::optional<unsigned int> seed = std::nullopt);
 
   walk(const walk &w) = delete;
   walk(walk &&w) = delete;
@@ -41,6 +41,7 @@ public:
   void export_csv(const std::string &path) const override;
 
 protected:
+  int dim_;
   std::vector<point> steps_;
   boost::unordered_map<point, int, point_hash> occupied_;
 
