@@ -3,7 +3,7 @@
 namespace pivot {
 
 template <int Dim>
-walk_node<Dim>::walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox,
+walk_node<Dim>::walk_node(int id, int num_sites, const transform<Dim> &symm, const box &bbox,
                           const point &end)
     : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
 
@@ -13,16 +13,16 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::pivot_rep(const std::vector<p
     throw std::invalid_argument("num_sites must be at least 2");
   }
   walk_node<Dim> *root =
-      buf ? new (buf) walk_node(1, num_sites, transform<Dim>(steps[0], steps[1]), box<Dim>(steps), steps[num_sites - 1])
-          : new walk_node(1, num_sites, transform<Dim>(steps[0], steps[1]), box<Dim>(steps), steps[num_sites - 1]);
+      buf ? new (buf) walk_node(1, num_sites, transform<Dim>(steps[0], steps[1]), box(steps), steps[num_sites - 1])
+          : new walk_node(1, num_sites, transform<Dim>(steps[0], steps[1]), box(steps), steps[num_sites - 1]);
   auto node = root;
   for (int i = 0; i < num_sites - 2; ++i) {
     auto id = i + 2;
     node->right_ = buf ? new (buf + id - 1)
                              walk_node(id, num_sites - i - 1, transform<Dim>(steps[i + 1], steps[i + 2]),
-                                       box<Dim>(std::span<const point>(steps).subspan(i + 1)), steps[num_sites - 1])
+                                       box(std::span<const point>(steps).subspan(i + 1)), steps[num_sites - 1])
                        : new walk_node(i + 2, num_sites - i - 1, transform<Dim>(steps[i + 1], steps[i + 2]),
-                                       box<Dim>(std::span<const point>(steps).subspan(i + 1)),
+                                       box(std::span<const point>(steps).subspan(i + 1)),
                                        steps[num_sites - 1]); // TODO: double-check this
     node->right_->parent_ = node;
     node = node->right_;
@@ -55,7 +55,7 @@ walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point> steps, int s
   auto glob_inv = glob_symm.inverse();
   auto rel_symm = glob_inv * abs_symm;
   auto rel_end = glob_inv * (steps.back() - steps.front()) + pivot::point::unit(Dim, 0);
-  auto rel_box = point::unit(Dim, 0) + glob_inv * (box<Dim>(steps) - point::unit(Dim, 0));
+  auto rel_box = point::unit(Dim, 0) + glob_inv * (box(steps) - point::unit(Dim, 0));
   int id = start + n - 1;
   walk_node *root = buf ? new (buf + id - 1) walk_node(id, num_sites, rel_symm, rel_box, rel_end)
                         : new walk_node(id, num_sites, rel_symm, rel_box, rel_end);
@@ -72,12 +72,13 @@ walk_node<Dim> *walk_node<Dim>::balanced_rep(std::span<const point> steps, int s
 }
 
 template <int Dim> walk_node<Dim> walk_node<Dim>::create_leaf() {
-  std::array<interval, Dim> intervals;
-  intervals[0] = interval(1, 1);
+  std::vector<interval> intervals;
+  intervals.reserve(Dim);
+  intervals.push_back(interval(1, 1));
   for (int i = 1; i < Dim; ++i) {
-    intervals[i] = interval(0, 0);
+    intervals.push_back(interval(0, 0));
   }
-  return walk_node(0, 1, transform<Dim>(), box<Dim>(intervals), point::unit(Dim, 0));
+  return walk_node(0, 1, transform<Dim>(), box(intervals), point::unit(Dim, 0));
 }
 
 template <int Dim> walk_node<Dim> &walk_node<Dim>::leaf() {

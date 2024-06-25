@@ -17,7 +17,7 @@ TEST(WalkNode, Balanced1) {
     auto symm = root->symm();
     auto end = root->endpoint();
     auto b = root->bbox();
-    auto expect_box = pivot::box<2>(std::array{interval{1, 3}, interval{0, 1}});
+    auto expect_box = pivot::box({interval{1, 3}, interval{0, 1}});
     EXPECT_EQ(symm, transform<2>(std::array{1, 0}, std::array{-1, 1}));
     EXPECT_EQ(end, pivot::point({3, 1}));
     EXPECT_EQ(b, expect_box);
@@ -26,7 +26,7 @@ TEST(WalkNode, Balanced1) {
     symm = left->symm();
     end = left->endpoint();
     b = left->bbox();
-    expect_box = pivot::box<2>(std::array{interval{1, 2}, interval{0, 0}});
+    expect_box = pivot::box({interval{1, 2}, interval{0, 0}});
     EXPECT_EQ(symm, transform<2>());
     EXPECT_EQ(end, pivot::point({2, 0}));
     EXPECT_EQ(b, expect_box);
@@ -35,7 +35,7 @@ TEST(WalkNode, Balanced1) {
     symm = right->symm();
     end = right->endpoint();
     b = right->bbox();
-    expect_box = pivot::box<2>(std::array{interval{1, 1}, interval{-1, 0}});
+    expect_box = pivot::box({interval{1, 1}, interval{-1, 0}});
     EXPECT_EQ(symm, transform<2>(std::array{1, 0}, std::array{1, -1}));
     EXPECT_EQ(end, pivot::point({1, -1}));
     EXPECT_EQ(b, expect_box) << "b: " << b.to_string() << " expect_box: " << expect_box.to_string();
@@ -56,7 +56,7 @@ TEST(WalkNode, Balanced2) {
     auto symm = root->symm();
     auto end = root->endpoint();
     auto b = root->bbox();
-    auto expect_box = pivot::box<2>(std::array{interval{1, 3}, interval{0, 1}});
+    auto expect_box = pivot::box({interval{1, 3}, interval{0, 1}});
     EXPECT_EQ(symm, transform<2>(std::array{0, 1}, std::array{1, 1}));
     EXPECT_EQ(end, pivot::point({3, 0}));
     EXPECT_EQ(b, expect_box);
@@ -65,7 +65,7 @@ TEST(WalkNode, Balanced2) {
     symm = left->symm();
     end = left->endpoint();
     b = left->bbox();
-    expect_box = pivot::box<2>(std::array{interval{1, 2}, interval{0, 1}});
+    expect_box = pivot::box({interval{1, 2}, interval{0, 1}});
     EXPECT_EQ(symm, transform<2>(std::array{0, 1}, std::array{1, 1}));
     EXPECT_EQ(end, pivot::point({2, 1}));
     EXPECT_EQ(b, expect_box);
@@ -74,7 +74,7 @@ TEST(WalkNode, Balanced2) {
     symm = right->symm();
     end = right->endpoint();
     b = right->bbox();
-    expect_box = pivot::box<2>(std::array{interval{1, 1}, interval{-1, 0}});
+    expect_box = pivot::box({interval{1, 1}, interval{-1, 0}});
     EXPECT_EQ(symm, transform<2>(std::array{1, 0}, std::array{1, -1}));
     EXPECT_EQ(end, pivot::point({1, -1}));
     EXPECT_EQ(b, expect_box);
@@ -82,7 +82,7 @@ TEST(WalkNode, Balanced2) {
     symm = left->left()->symm();
     end = left->left()->endpoint();
     b = left->left()->bbox();
-    expect_box = pivot::box<2>(std::array{interval{1, 1}, interval{0, 1}});
+    expect_box = pivot::box({interval{1, 1}, interval{0, 1}});
     EXPECT_EQ(symm, transform<2>(std::array{1, 0}, std::array{-1, 1}));
     EXPECT_EQ(end, pivot::point({1, 1}));
     EXPECT_EQ(b, expect_box);
@@ -103,7 +103,7 @@ TEST(WalkNode, Balanced3) {
     auto symm = root->symm();
     auto end = root->endpoint();
     auto b = root->bbox();
-    auto expect_box = pivot::box<2>(std::array{interval{1, 2}, interval{0, 2}});
+    auto expect_box = pivot::box({interval{1, 2}, interval{0, 2}});
     EXPECT_EQ(symm, transform<2>(std::array{1, 0}, std::array{-1, 1}));
     EXPECT_EQ(end, pivot::point({2, 2}));
     EXPECT_EQ(b, expect_box);
@@ -112,7 +112,7 @@ TEST(WalkNode, Balanced3) {
     symm = left->symm();
     end = left->endpoint();
     b = left->bbox();
-    expect_box = pivot::box<2>(std::array{interval{1, 2}, interval{0, 0}});
+    expect_box = pivot::box({interval{1, 2}, interval{0, 0}});
     EXPECT_EQ(symm, transform<2>());
     EXPECT_EQ(end, pivot::point({2, 0}));
     EXPECT_EQ(b, expect_box);
@@ -121,7 +121,7 @@ TEST(WalkNode, Balanced3) {
     symm = right->symm();
     end = right->endpoint();
     b = right->bbox();
-    expect_box = pivot::box<2>(std::array{interval{1, 2}, interval{0, 0}});
+    expect_box = pivot::box({interval{1, 2}, interval{0, 0}});
     EXPECT_EQ(symm, transform<2>());
     EXPECT_EQ(end, pivot::point({2, 0}));
     EXPECT_EQ(b, expect_box);
@@ -158,7 +158,7 @@ TEST(WalkNode, RotateRight2D1) {
     auto symm = root->symm();
     auto end = root->endpoint();
     auto b = root->bbox();
-    auto expect_box = pivot::box<2>(std::array{interval{1, 3}, interval{0, 0}});
+    auto expect_box = pivot::box({interval{1, 3}, interval{0, 0}});
     EXPECT_EQ(symm, transform<2>());
     EXPECT_EQ(end, pivot::point({3, 0}));
     EXPECT_EQ(b, expect_box);
@@ -167,7 +167,7 @@ TEST(WalkNode, RotateRight2D1) {
     symm = right->symm();
     end = right->endpoint();
     b = right->bbox();
-    expect_box = pivot::box<2>(std::array{interval{1, 2}, interval{0, 0}});
+    expect_box = pivot::box({interval{1, 2}, interval{0, 0}});
     EXPECT_EQ(symm, transform<2>());
     EXPECT_EQ(end, pivot::point({2, 0}));
     EXPECT_EQ(b, expect_box);
@@ -188,7 +188,7 @@ TEST(WalkNode, RotateRight2D2) {
     auto symm = root->symm();
     auto end = root->endpoint();
     auto b = root->bbox();
-    auto expect_box = pivot::box<2>(std::array{interval{1, 1}, interval{0, 2}});
+    auto expect_box = pivot::box({interval{1, 1}, interval{0, 2}});
     EXPECT_EQ(symm, transform<2>(std::array{1, 0}, std::array{-1, 1}));
     EXPECT_EQ(end, pivot::point({1, 2}));
     EXPECT_EQ(b, expect_box);
@@ -197,7 +197,7 @@ TEST(WalkNode, RotateRight2D2) {
     symm = right->symm();
     end = right->endpoint();
     b = right->bbox();
-    expect_box = pivot::box<2>(std::array{interval{1, 2}, interval{0, 0}});
+    expect_box = pivot::box({interval{1, 2}, interval{0, 0}});
     EXPECT_EQ(symm, transform<2>());
     EXPECT_EQ(end, pivot::point({2, 0}));
     EXPECT_EQ(b, expect_box);
