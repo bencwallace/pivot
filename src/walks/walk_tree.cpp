@@ -55,8 +55,6 @@ walk_tree::~walk_tree() {
   }
 }
 
-walk_tree::walk_tree(walk_node *root) : root_(root) {}
-
 walk_node *walk_tree::root() const { return root_.get(); }
 
 point walk_tree::endpoint() const { return root_->endpoint(); }

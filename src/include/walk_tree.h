@@ -56,8 +56,6 @@ private:
   std::uniform_int_distribution<int> dist_;
   walk_node *buf_;
 
-  walk_tree(walk_node *root);
-
   bool intersect() const;
 };
 
