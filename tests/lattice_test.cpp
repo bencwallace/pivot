@@ -151,11 +151,11 @@ TEST(TransformTest, Pivot2D) {
 
     point p1({3, 4});
     point p2({4, 4});
-    transform<2> t1(p1, p2);
+    transform t1(p1, p2);
     EXPECT_EQ(p1 + t1 * e0, p2);
 
     point p3({3, 5});
-    transform<2> t2(p1, p3);
+    transform t2(p1, p3);
     EXPECT_EQ(p1 + t2 * e0, p3);
 }
 
@@ -164,25 +164,25 @@ TEST(TransformTest, Pivot3D) {
 
     point p1({3, 4, 5});
     point p2({4, 4, 5});
-    transform<3> t1(p1, p2);
+    transform t1(p1, p2);
     EXPECT_EQ(p1 + t1 * e0, p2);
 
     point p3({3, 5, 5});
-    transform<3> t2(p1, p3);
+    transform t2(p1, p3);
     EXPECT_EQ(p1 + t2 * e0, p3);
 }
 
 TEST(TransformTest, Compose2D) {
-    auto t1 = transform<2>::rand();
-    auto t2 = transform<2>::rand();
+    auto t1 = transform::rand(2);
+    auto t2 = transform::rand(2);
     auto t3 = t1 * t2;
     auto p = point({1, 2});
     EXPECT_EQ(t3 * p, t1 * (t2 * p)) << "t1: " << t1.to_string() << ", t2: " << t2.to_string();
 }
 
 TEST(TransformTest, Compose3D) {
-    auto t1 = transform<3>::rand();
-    auto t2 = transform<3>::rand();
+    auto t1 = transform::rand(3);
+    auto t2 = transform::rand(3);
     auto t3 = t1 * t2;
     auto p = point({1, 2, 3});
     EXPECT_EQ(t3 * p, t1 * (t2 * p)) << "t1: " << t1.to_string() << ", t2: " << t2.to_string();
@@ -193,12 +193,12 @@ TEST(TransformTest, Box2D) {
 
     point p1({0, 0});
     point p2({0, 1});
-    transform<2> t1(p1, p2);
+    transform t1(p1, p2);
     EXPECT_EQ(t1 * b, box({interval{-4, -2}, interval{1, 5}}));
 
-    std::array perm = {0, 1};
-    std::array signs = {-1, 1};
-    transform<2> t2(perm, signs);
+    std::vector<int> perm = {0, 1};
+    std::vector<int> signs = {-1, 1};
+    transform t2(perm, signs);
     EXPECT_EQ(t2 * b, box({interval{-5, -1}, interval{2, 4}}));
 }
 
@@ -207,28 +207,28 @@ TEST(TransformTest, Box3D) {
 
     point p1({0, 0, 0});
     point p2({0, 1, 0});
-    transform<3> t1(p1, p2);
+    transform t1(p1, p2);
     EXPECT_EQ(t1 * b, box({interval{-4, -2}, interval{1, 5}, interval{3, 6}}));
 
-    transform<3> t2(std::array{0, 1, 2}, std::array{-1, 1, 1});
+    transform t2(std::vector{0, 1, 2}, std::vector{-1, 1, 1});
     EXPECT_EQ(t2 * b, box({interval{-5, -1}, interval{2, 4}, interval{3, 6}}));
 
-    transform<3> t3(std::array{2, 0, 1}, std::array{1, 1, 1});
+    transform t3(std::vector{2, 0, 1}, std::vector{1, 1, 1});
     EXPECT_EQ(t3 * b, box({interval{2, 4}, interval{3, 6}, interval{1, 5}}));
 }
 
 TEST(TransformTest, Inverse2D) {
-    transform<2> id{};
+    transform id(2);
     auto o = point({0, 0});
     auto e1 = point({1, 0});
     auto e2 = point({0, 1});
     ASSERT_EQ(e1, id * e1);
     ASSERT_EQ(e2, id * e2);
 
-    std::array perm = {1, 0};
-    std::array signs = {-1, 1};
-    transform<2> t(perm, signs);
-    transform<2> t_inv = t.inverse();
+    std::vector<int> perm = {1, 0};
+    std::vector<int> signs = {-1, 1};
+    transform t(perm, signs);
+    transform t_inv = t.inverse();
     auto f1 = t * e1;
     auto f2 = t * e2;
     ASSERT_EQ(f1, e2);
@@ -243,7 +243,7 @@ TEST(TransformTest, Inverse2D) {
 }
 
 TEST(TransformTest, Inverse3D) {
-    transform<3> id{};
+    transform id(3);
     auto e1 = point({1, 0, 0});
     auto e2 = point({0, 1, 0});
     auto e3 = point({0, 0, 1});
@@ -251,8 +251,8 @@ TEST(TransformTest, Inverse3D) {
     ASSERT_EQ(e2, id * e2);
     ASSERT_EQ(e3, id * e3);
 
-    transform<3> t(std::array{2, 0, 1}, std::array{-1, 1, -1});
-    transform<3> t_inv = t.inverse();
+    transform t(std::vector{2, 0, 1}, std::vector{-1, 1, -1});
+    transform t_inv = t.inverse();
     auto f1 = t * e1;
     auto f2 = t * e2;
     auto f3 = t * e3;

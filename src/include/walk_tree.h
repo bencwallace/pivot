@@ -39,7 +39,7 @@ public:
    */
   walk_node<Dim> &find_node(int n);
 
-  bool try_pivot(int n, const transform<Dim> &r);
+  bool try_pivot(int n, const transform &r);
 
   bool rand_pivot() override;
 

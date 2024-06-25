@@ -76,7 +76,7 @@ template <int Dim> walk_node<Dim> &walk_tree<Dim>::find_node(int n) {
   return result;
 }
 
-template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r) {
+template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform &r) {
   root_->shuffle_up(n);
   root_->symm_ = root_->symm_ * r; // modify in-place
   auto success = !root_->intersect();
@@ -91,7 +91,7 @@ template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r
 
 template <int Dim> bool walk_tree<Dim>::rand_pivot() {
   auto site = dist_(rng_);
-  auto r = transform<Dim>::rand(rng_);
+  auto r = transform::rand(Dim, rng_);
   return try_pivot(site, r);
 }
 

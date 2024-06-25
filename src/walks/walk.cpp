@@ -18,7 +18,7 @@ walk<Dim>::walk(int num_steps, std::optional<unsigned int> seed)
   dist_ = std::uniform_int_distribution<int>(0, num_steps - 1);
 }
 
-template <int Dim> std::optional<std::vector<point>> walk<Dim>::try_pivot(int step, const transform<Dim> &trans) const {
+template <int Dim> std::optional<std::vector<point>> walk<Dim>::try_pivot(int step, const transform &trans) const {
   std::vector<point> new_points;
   new_points.reserve(num_steps() - step - 1);
   for (int i = step + 1; i < num_steps(); ++i) {
@@ -34,7 +34,7 @@ template <int Dim> std::optional<std::vector<point>> walk<Dim>::try_pivot(int st
 
 template <int Dim> std::pair<int, std::optional<std::vector<point>>> walk<Dim>::try_rand_pivot() const {
   auto step = dist_(rng_);
-  auto r = transform<Dim>::rand(rng_);
+  auto r = transform::rand(Dim, rng_);
   return {step, try_pivot(step, r)};
 }
 
@@ -99,7 +99,7 @@ template <int Dim> void walk<Dim>::do_pivot(int step, std::vector<point> &new_po
   }
 }
 
-template <int Dim> point walk<Dim>::pivot_point(int step, int i, const transform<Dim> &trans) const {
+template <int Dim> point walk<Dim>::pivot_point(int step, int i, const transform &trans) const {
   auto p = steps_[step];
   return p + trans * (steps_[i] - p);
 }

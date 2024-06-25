@@ -40,7 +40,7 @@ template <int Dim> std::vector<point> walk_node<Dim>::steps() const {
 
 #define INTERSECT_INST(z, n, data)                                                                                     \
   template bool intersect<n>(const walk_node<n> *l_walk, const walk_node<n> *r_walk, const point &l_anchor,            \
-                             const point &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
+                             const point &r_anchor, const transform &l_symm, const transform &r_symm);
 #define WALK_NODE_INST(z, n, data) template class walk_node<n>;
 
 // cppcheck-suppress syntaxError

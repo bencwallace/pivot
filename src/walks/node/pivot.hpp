@@ -84,12 +84,12 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::shuffle_down() {
 }
 
 template <int Dim> bool walk_node<Dim>::intersect() const {
-  return ::pivot::intersect<Dim>(left_, right_, point(Dim), left_->end_, transform<Dim>(), symm_);
+  return ::pivot::intersect<Dim>(left_, right_, point(Dim), left_->end_, transform(Dim), symm_);
 }
 
 template <int Dim>
 bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point &l_anchor,
-               const point &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
+               const point &r_anchor, const transform &l_symm, const transform &r_symm) {
   auto l_box = l_anchor + l_symm * l_walk->bbox_;
   auto r_box = r_anchor + r_symm * r_walk->bbox_;
   if ((l_box & r_box).empty()) {
