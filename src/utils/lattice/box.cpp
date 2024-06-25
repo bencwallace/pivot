@@ -39,7 +39,7 @@ box &box::operator-=(const point &b) {
   return *this;
 }
 
-box::box(int dim) : intervals_(dim) {}
+box::box(int dim) : dim_(dim), intervals_(dim) {}
 
 box::box(const std::vector<interval> &intervals) : dim_(intervals.size()), intervals_(intervals) {}
 
