@@ -13,7 +13,7 @@
 
 namespace pivot {
 
-template <int Dim> struct box;
+struct box;
 
 /**
  * @brief Represents a closed interval [left_, right_].
@@ -82,12 +82,13 @@ private:
 };
 
 /** @brief Represents a Dim-dimensional box. */
-template <int Dim> struct box : boost::additive<box<Dim>, point> {
-  std::array<interval, Dim> intervals_;
+struct box : boost::additive<box, point> {
+  int dim_;
+  std::vector<interval> intervals_;
 
-  box() = delete;
+  box(int dim);
 
-  box(const std::array<interval, Dim> &intervals);
+  box(const std::vector<interval> &intervals);
 
   /**
    * @brief Constructs the smallest box containing a sequence of Dim-dimensional points.
@@ -107,9 +108,9 @@ template <int Dim> struct box : boost::additive<box<Dim>, point> {
   bool empty() const;
 
   /** @brief Action of a point (understood as a vector) on a box */
-  box<Dim> &operator+=(const point &b);
+  box &operator+=(const point &b);
 
-  box<Dim> &operator-=(const point &b);
+  box &operator-=(const point &b);
 
   /**
    * @brief Returns the "union" of two boxes.
@@ -238,7 +239,7 @@ public:
    * which means the P(i)-th interval from which SP(B) is constructed has bounds S(P(i)) a[i] and
    * S(P(i)) b[i].
    */
-  box<Dim> operator*(const box<Dim> &b) const;
+  box operator*(const box &b) const;
 
   /**
    * @brief Returns the inverse transform.

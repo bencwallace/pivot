@@ -67,14 +67,14 @@ template <int Dim> transform<Dim> transform<Dim>::operator*(const transform<Dim>
   return transform(perm, signs);
 }
 
-template <int Dim> box<Dim> transform<Dim>::operator*(const box<Dim> &b) const {
-  std::array<interval, Dim> intervals;
+template <int Dim> box transform<Dim>::operator*(const box &b) const {
+  std::vector<interval> intervals(Dim);
   for (int i = 0; i < Dim; ++i) {
     int x = signs_[perm_[i]] * b.intervals_[i].left_;
     int y = signs_[perm_[i]] * b.intervals_[i].right_;
     intervals[perm_[i]] = interval(std::min(x, y), std::max(x, y));
   }
-  return box<Dim>(intervals);
+  return box(intervals);
 }
 
 template <int Dim> transform<Dim> transform<Dim>::inverse() const {

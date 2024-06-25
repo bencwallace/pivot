@@ -35,7 +35,7 @@ public:
 
   int id() const { return id_; }
 
-  const box<Dim> &bbox() const { return bbox_; }
+  const box &bbox() const { return bbox_; }
 
   const point &endpoint() const { return end_; }
 
@@ -70,12 +70,12 @@ private:
   walk_node *left_{};
   walk_node *right_{};
   transform<Dim> symm_;
-  box<Dim> bbox_;
+  box bbox_;
   point end_;
 
   friend class walk_tree<Dim>;
 
-  walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point &end);
+  walk_node(int id, int num_sites, const transform<Dim> &symm, const box &bbox, const point &end);
 
   static walk_node *balanced_rep(std::span<const point> steps, int start, const transform<Dim> &glob_symm,
                                  walk_node *buf);
