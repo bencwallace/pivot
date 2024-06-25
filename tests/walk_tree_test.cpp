@@ -23,7 +23,7 @@ TEST(WalkTreeInit, Line) {
 
 TEST(WalkTreePivot, PivotLine) {
     auto w = walk_tree<2>(2);
-    pivot::transform<2> trans = transform<2>(std::array{1, 0}, std::array{-1, 1});
+    pivot::transform trans = transform(std::vector{1, 0}, std::vector{-1, 1});
     EXPECT_TRUE(w.try_pivot(1, trans));
     auto steps = w.steps();
     EXPECT_EQ(steps.size(), 2);
@@ -33,7 +33,7 @@ TEST(WalkTreePivot, PivotLine) {
 
 TEST(WalkTreePivot, PivotLineFail) {
     auto w = walk_tree<2>(3);
-    pivot::transform<2> trans = transform<2>(std::array{0, 1}, std::array{-1, 1});
+    pivot::transform trans = transform(std::vector{0, 1}, std::vector{-1, 1});
     EXPECT_FALSE(w.try_pivot(2, trans));
     auto steps = w.steps();
     EXPECT_EQ(steps.size(), 3);

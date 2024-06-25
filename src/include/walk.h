@@ -28,7 +28,7 @@ public:
 
   point endpoint() const override { return steps_.back(); }
 
-  std::optional<std::vector<point>> try_pivot(int step, const transform<Dim> &trans) const;
+  std::optional<std::vector<point>> try_pivot(int step, const transform &trans) const;
 
   std::pair<int, std::optional<std::vector<point>>> try_rand_pivot() const;
 
@@ -49,7 +49,7 @@ protected:
 
   void do_pivot(int step, std::vector<point> &new_points);
 
-  point pivot_point(int step, int i, const transform<Dim> &trans) const;
+  point pivot_point(int step, int i, const transform &trans) const;
 };
 
 } // namespace pivot

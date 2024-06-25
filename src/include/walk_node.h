@@ -10,7 +10,7 @@ template <int Dim> class walk_node;
 
 template <int Dim>
 bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point &l_anchor, const point &r_anchor,
-               const transform<Dim> &l_symm, const transform<Dim> &r_symm);
+               const transform &l_symm, const transform &r_symm);
 
 template <int Dim> class walk_tree;
 
@@ -39,7 +39,7 @@ public:
 
   const point &endpoint() const { return end_; }
 
-  const transform<Dim> &symm() const { return symm_; }
+  const transform &symm() const { return symm_; }
 
   walk_node *left() const { return left_; }
 
@@ -69,16 +69,15 @@ private:
   walk_node *parent_{};
   walk_node *left_{};
   walk_node *right_{};
-  transform<Dim> symm_;
+  transform symm_;
   box bbox_;
   point end_;
 
   friend class walk_tree<Dim>;
 
-  walk_node(int id, int num_sites, const transform<Dim> &symm, const box &bbox, const point &end);
+  walk_node(int id, int num_sites, const transform &symm, const box &bbox, const point &end);
 
-  static walk_node *balanced_rep(std::span<const point> steps, int start, const transform<Dim> &glob_symm,
-                                 walk_node *buf);
+  static walk_node *balanced_rep(std::span<const point> steps, int start, const transform &glob_symm, walk_node *buf);
 
   void set_left(walk_node *left) {
     left_ = left;
@@ -103,7 +102,7 @@ private:
 
   template <int D>
   friend bool intersect(const walk_node<D> *l_walk, const walk_node<D> *r_walk, const point &l_anchor,
-                        const point &r_anchor, const transform<D> &l_symm, const transform<D> &r_symm);
+                        const point &r_anchor, const transform &l_symm, const transform &r_symm);
 };
 
 } // namespace pivot
