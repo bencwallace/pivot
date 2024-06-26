@@ -250,3 +250,11 @@ TEST(WalkNode, RotateRightLeftRand2D) {
     auto root2 = tree2.root();
     EXPECT_EQ(*root1->rotate_right()->rotate_left(), *root2);
 }
+
+TEST(WalkNode, Steps2D) {
+    auto steps = random_walk<2>(100);
+    auto tree = walk_tree<2>(steps);
+    auto root = tree.root();
+    auto result = root->steps();
+    EXPECT_EQ(steps, result);
+}
