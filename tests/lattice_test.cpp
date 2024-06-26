@@ -192,6 +192,21 @@ TEST(TransformTest, Box2D) {
     EXPECT_EQ(t2 * b, box<2>({interval{-5, -1}, interval{2, 4}}));
 }
 
+TEST(TransformTest, Box3D) {
+    box<3> b({interval{1, 5}, interval{2, 4}, interval{3, 6}});
+
+    point<3> p1({0, 0, 0});
+    point<3> p2({0, 1, 0});
+    transform<3> t1(p1, p2);
+    EXPECT_EQ(t1 * b, box<3>({interval{-4, -2}, interval{1, 5}, interval{3, 6}}));
+
+    transform<3> t2({0, 1, 2}, {-1, 1, 1});
+    EXPECT_EQ(t2 * b, box<3>({interval{-5, -1}, interval{2, 4}, interval{3, 6}}));
+
+    transform<3> t3({2, 0, 1}, {1, 1, 1});
+    EXPECT_EQ(t3 * b, box<3>({interval{3, 6}, interval{1, 5}, interval{2, 4}}));
+}
+
 TEST(TransformTest, Inverse2D) {
     transform<2> id({0, 1}, {1, 1});
     auto o = point<2>({0, 0});
