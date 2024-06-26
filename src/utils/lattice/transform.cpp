@@ -13,8 +13,8 @@ transform::transform(int dim) : dim_(dim) {
   }
 }
 
-transform::transform(const std::vector<int> &perm, const std::vector<int> &signs)
-    : dim_(perm.size()), perm_(perm), signs_(signs) {}
+transform::transform(std::vector<int> &&perm, std::vector<int> &&signs)
+    : dim_(perm.size()), perm_(std::move(perm)), signs_(std::move(signs)) {}
 
 transform::transform(const point &p, const point &q) : transform(p.dim()) {
   // The input points should differ by 1 in a single coordinate. Start by finding this coordinate or fail.
@@ -54,7 +54,7 @@ point transform::operator*(const point &p) const {
   for (int i = 0; i < dim_; ++i) {
     coords.push_back(signs_[i] * p[perm_[i]]);
   }
-  return point(coords);
+  return point(std::move(coords));
 }
 
 transform transform::operator*(const transform &t) const {
@@ -65,7 +65,7 @@ transform transform::operator*(const transform &t) const {
     perm.push_back(perm_[t.perm_[i]]);
     signs[perm[i]] = signs_[perm[i]] * t.signs_[t.perm_[i]];
   }
-  return transform(perm, signs);
+  return transform(std::move(perm), std::move(signs));
 }
 
 box transform::operator*(const box &b) const {
@@ -75,7 +75,7 @@ box transform::operator*(const box &b) const {
     int y = signs_[perm_[i]] * b.intervals_[i].right_;
     intervals[perm_[i]] = interval(std::min(x, y), std::max(x, y));
   }
-  return box(intervals);
+  return box(std::move(intervals));
 }
 
 transform transform::inverse() const {
@@ -86,7 +86,7 @@ transform transform::inverse() const {
     perm[perm_[i]] = i;
     signs.push_back(signs_[perm_[i]]);
   }
-  return transform(perm, signs);
+  return transform(std::move(perm), std::move(signs));
 }
 
 std::vector<std::vector<int>> transform::to_matrix() const {
