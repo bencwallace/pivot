@@ -21,6 +21,18 @@ TEST(WalkTest, SelfAvoiding) {
   }
 }
 
+TEST(WalkTest, SelfAvoiding3D) {
+  for (int num_steps = 2; num_steps < 10; ++num_steps) {
+    walk<3> w(100);
+    for (int i = 0; i < 10; ++i) {
+      for (int j = 0; j < 100; j++) {
+        w.rand_pivot();
+      }
+      EXPECT_TRUE(w.self_avoiding());
+    }
+  }
+}
+
 TEST(WalkTest, Seed) {
   std::random_device rd;
   auto seed = rd();
