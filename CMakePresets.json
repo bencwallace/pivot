@@ -5,7 +5,8 @@
         "displayName": "Debug",
         "binaryDir": "build",
         "cacheVariables": {
-            "CMAKE_BUILD_TYPE": "Debug"
+            "CMAKE_BUILD_TYPE": "Debug",
+            "GLIBC_DEBUG": "OFF"
         }
     }, {
         "name": "test",
@@ -14,15 +15,18 @@
         "cacheVariables": {
             "CMAKE_BUILD_TYPE": "Debug",
             "CMAKE_CXX_COMPILER": "clang++",
-            "SANITIZE": "ON"
+            "SANITIZE": "ON",
+            "GLIBC_DEBUG": "ON"
         }
     }, {
         "name": "profile",
         "displayName": "Profile",
         "binaryDir": "build",
         "cacheVariables": {
-            "CMAKE_BUILD_TYPE": "RelWithDebInfo",
-            "CMAKE_CXX_FLAGS": "-fno-omit-frame-pointer"
+            "CMAKE_BUILD_TYPE": "Debug",
+            "CMAKE_CXX_FLAGS": "-fno-omit-frame-pointer",
+            "GLIBC_DEBUG": "OFF",
+            "SANITIZE": "OFF"
         }
     }, {
         "name": "release",
