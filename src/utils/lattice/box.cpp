@@ -85,8 +85,8 @@ box box::operator&(const box &b) const {
   std::vector<interval> intervals;
   intervals.reserve(dim_);
   for (int i = 0; i < dim_; ++i) {
-    intervals.push_back(interval(std::max(intervals_[i].left_, b.intervals_[i].left_),
-                                 std::min(intervals_[i].right_, b.intervals_[i].right_)));
+    intervals.emplace_back(std::max(intervals_[i].left_, b.intervals_[i].left_),
+                           std::min(intervals_[i].right_, b.intervals_[i].right_));
   }
   return box(std::move(intervals));
 }

@@ -71,9 +71,9 @@ walk_node *walk_node::balanced_rep(std::span<const point> steps, int start, cons
 walk_node walk_node::create_leaf(int dim) {
   std::vector<interval> intervals;
   intervals.reserve(dim);
-  intervals.push_back(interval(1, 1));
+  intervals.emplace_back(1, 1);
   for (int i = 1; i < dim; ++i) {
-    intervals.push_back(interval(0, 0));
+    intervals.emplace_back(0, 0);
   }
   return walk_node(0, 1, transform(dim), box(std::move(intervals)), point::unit(dim, 0));
 }
