@@ -75,7 +75,7 @@ walk_node walk_node::create_leaf(int dim) {
   for (int i = 1; i < dim; ++i) {
     intervals.push_back(interval(0, 0));
   }
-  return walk_node(0, 1, transform(dim), box(intervals), point::unit(dim, 0));
+  return walk_node(0, 1, transform(dim), box(std::move(intervals)), point::unit(dim, 0));
 }
 
 walk_node &walk_node::leaf(int dim) {

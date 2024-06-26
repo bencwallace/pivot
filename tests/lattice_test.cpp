@@ -196,9 +196,7 @@ TEST(TransformTest, Box2D) {
     transform t1(p1, p2);
     EXPECT_EQ(t1 * b, box({interval{-4, -2}, interval{1, 5}}));
 
-    std::vector<int> perm = {0, 1};
-    std::vector<int> signs = {-1, 1};
-    transform t2(perm, signs);
+    transform t2(std::vector<int>{0, 1}, std::vector<int>{-1, 1});
     EXPECT_EQ(t2 * b, box({interval{-5, -1}, interval{2, 4}}));
 }
 
@@ -225,9 +223,7 @@ TEST(TransformTest, Inverse2D) {
     ASSERT_EQ(e1, id * e1);
     ASSERT_EQ(e2, id * e2);
 
-    std::vector<int> perm = {1, 0};
-    std::vector<int> signs = {-1, 1};
-    transform t(perm, signs);
+    transform t(std::vector<int>{1, 0}, std::vector<int>{-1, 1});
     transform t_inv = t.inverse();
     auto f1 = t * e1;
     auto f2 = t * e2;

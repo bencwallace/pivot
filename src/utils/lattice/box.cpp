@@ -41,7 +41,7 @@ box &box::operator-=(const point &b) {
 
 box::box(int dim) : dim_(dim), intervals_(dim) {}
 
-box::box(const std::vector<interval> &intervals) : dim_(intervals.size()), intervals_(intervals) {}
+box::box(std::vector<interval> &&intervals) : dim_(intervals.size()), intervals_(std::move(intervals)) {}
 
 box::box(std::span<const point> points) : dim_(points[0].dim()) {
   std::vector<int> min(dim_, std::numeric_limits<int>::max());
@@ -78,7 +78,7 @@ box box::operator|(const box &b) const {
     intervals.emplace_back(std::min(intervals_[i].left_, b.intervals_[i].left_),
                            std::max(intervals_[i].right_, b.intervals_[i].right_));
   }
-  return box(intervals);
+  return box(std::move(intervals));
 }
 
 box box::operator&(const box &b) const {
@@ -88,7 +88,7 @@ box box::operator&(const box &b) const {
     intervals.push_back(interval(std::max(intervals_[i].left_, b.intervals_[i].left_),
                                  std::min(intervals_[i].right_, b.intervals_[i].right_)));
   }
-  return box(intervals);
+  return box(std::move(intervals));
 }
 
 std::string box::to_string() const {

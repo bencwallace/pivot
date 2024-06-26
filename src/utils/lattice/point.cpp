@@ -6,7 +6,7 @@ namespace pivot {
 
 point::point(int dim) : dim_(dim), coords_(dim, 0) {}
 
-point::point(const std::vector<int> &coords) : dim_(coords.size()), coords_(coords) {}
+point::point(std::vector<int> &&coords) : dim_(coords.size()), coords_(std::move(coords)) {}
 
 point::point(std::initializer_list<int> coords) : dim_(coords.size()), coords_(coords) {}
 
@@ -28,7 +28,7 @@ point point::operator+(const point &p) const {
   for (int i = 0; i < dim_; ++i) {
     sum.push_back(coords_[i] + p.coords_[i]);
   }
-  return point(sum);
+  return point(std::move(sum));
 }
 
 point point::operator-(const point &p) const {
@@ -37,7 +37,7 @@ point point::operator-(const point &p) const {
   for (int i = 0; i < dim_; ++i) {
     diff.push_back(coords_[i] - p.coords_[i]);
   }
-  return point(diff);
+  return point(std::move(diff));
 }
 
 point &point::operator*=(int k) {

@@ -44,7 +44,8 @@ class point : boost::multipliable<point, int> {
 public:
   point(int dim);
 
-  point(const std::vector<int> &coords);
+  point(std::vector<int> &&coords);
+
   point(std::initializer_list<int> coords);
 
   /**
@@ -88,7 +89,7 @@ struct box : boost::additive<box, point> {
 
   box(int dim);
 
-  box(const std::vector<interval> &intervals);
+  box(std::vector<interval> &&intervals);
 
   /**
    * @brief Constructs the smallest box containing a sequence of d-dimensional points.
@@ -164,7 +165,7 @@ public:
   transform(int dim);
 
   // TODO: this should be private
-  transform(const std::vector<int> &perm, const std::vector<int> &signs);
+  transform(std::vector<int> &&perm, std::vector<int> &&signs);
 
   /**
    * @brief Constructs a "pivot" transformation from two input points.
@@ -190,7 +191,7 @@ public:
       signs.push_back(2 * flip_(gen) - 1);
     }
     std::shuffle(perm.begin(), perm.end(), gen);
-    return transform(perm, signs);
+    return transform(std::move(perm), std::move(signs));
   }
 
   static transform rand(int dim);

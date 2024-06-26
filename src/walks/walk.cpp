@@ -24,7 +24,7 @@ std::optional<std::vector<point>> walk::try_pivot(int step, const transform &tra
     if (it != occupied_.end() && it->second <= step) {
       return {};
     }
-    new_points.push_back(q);
+    new_points.push_back(std::move(q));
   }
   return new_points;
 }
