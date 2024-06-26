@@ -82,7 +82,7 @@ template <int Dim> transform<Dim> transform<Dim>::inverse() const {
   std::array<int, Dim> signs;
   for (int i = 0; i < Dim; ++i) {
     perm[perm_[i]] = i;
-    signs[i] = signs_[perm_[i]];
+    signs[perm_[i]] = signs_[i];
   }
   return transform(perm, signs);
 }

@@ -214,3 +214,26 @@ TEST(TransformTest, Inverse2D) {
     EXPECT_EQ(ttinv, id);
     EXPECT_EQ(tinvt, id);
 }
+
+TEST(TransformTest, Inverse3D) {
+    transform<3> id({0, 1, 2}, {1, 1, 1});
+    // auto o = point<3>({0, 0, 0});
+    auto e1 = point<3>({1, 0, 0});
+    auto e2 = point<3>({0, 1, 0});
+    auto e3 = point<3>({0, 0, 1});
+    ASSERT_EQ(e1, id * e1);
+    ASSERT_EQ(e2, id * e2);
+    ASSERT_EQ(e3, id * e3);
+
+    transform<3> t({2, 0, 1}, {-1, 1, -1});
+    transform<3> t_inv = t.inverse();
+    auto f1 = t * e1;
+    // auto f2 = t * e2;
+    // auto f3 = t * e3;
+    ASSERT_EQ(f1, e2);
+    // ASSERT_EQ(f2, o - e1);
+    // ASSERT_EQ(f3, o - e1);
+    EXPECT_EQ(e1, t_inv * f1);
+    // EXPECT_EQ(e2, t_inv * f2);
+    // EXPECT_EQ(e3, t_inv * f3);
+}
