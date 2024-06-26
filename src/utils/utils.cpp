@@ -24,7 +24,7 @@ std::vector<point> from_csv(int dim, const std::string &path) {
       coords.push_back(std::stoi(line.substr(start, end - start)));
       start = end + 1;
     }
-    points.push_back(point(std::move(coords)));
+    points.emplace_back(std::move(coords));
   }
   return points;
 }
