@@ -172,11 +172,19 @@ TEST(TransformTest, Pivot3D) {
     EXPECT_EQ(p1 + t2 * e0, p3);
 }
 
-TEST(TransformTest, Compose) {
+TEST(TransformTest, Compose2D) {
     auto t1 = transform<2>::rand();
     auto t2 = transform<2>::rand();
     auto t3 = t1 * t2;
     auto p = point<2>({1, 2});
+    EXPECT_EQ(t3 * p, t1 * (t2 * p)) << "t1: " << t1.to_string() << ", t2: " << t2.to_string();
+}
+
+TEST(TransformTest, Compose3D) {
+    auto t1 = transform<3>::rand();
+    auto t2 = transform<3>::rand();
+    auto t3 = t1 * t2;
+    auto p = point<3>({1, 2, 3});
     EXPECT_EQ(t3 * p, t1 * (t2 * p)) << "t1: " << t1.to_string() << ", t2: " << t2.to_string();
 }
 

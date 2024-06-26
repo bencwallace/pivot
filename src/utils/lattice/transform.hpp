@@ -61,8 +61,8 @@ template <int Dim> transform<Dim> transform<Dim>::operator*(const transform<Dim>
   std::array<int, Dim> perm;
   std::array<int, Dim> signs;
   for (int i = 0; i < Dim; ++i) {
-    perm[i] = perm_[t.perm_[i]];
-    signs[perm[i]] = signs_[perm[i]] * t.signs_[t.perm_[i]];
+    perm[i] = t.perm_[perm_[i]];
+    signs[i] = signs_[i] * t.signs_[perm_[i]];
   }
   return transform(perm, signs);
 }
