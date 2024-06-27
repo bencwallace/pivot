@@ -26,16 +26,17 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
   }
 
   int num_success = 0;
+  int total_success = 0;
   int num_iter = 0;
   auto interval = static_cast<int>(std::pow(10, std::floor(std::log10(std::max(iters / 10, 1)))));
   while (true) {
     if (num_iter % interval == 0) {
-      std::cout << "Iterations: " << num_iter << " / Successes: " << num_success
+      std::cout << "Iterations: " << num_iter << " / Successes: " << total_success
                 << " / Success rate: " << num_success / static_cast<float>(interval) << std::endl;
       num_success = 0;
     }
     if (require_success) {
-      if (num_success == iters) {
+      if (total_success == iters) {
         break;
       }
     } else if (num_iter == iters) {
@@ -46,6 +47,7 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
     if (success) {
       endpoints.push_back(w->endpoint());
       ++num_success;
+      ++total_success;
     }
     ++num_iter;
   }
