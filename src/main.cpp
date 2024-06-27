@@ -1,5 +1,7 @@
 #include <CLI/CLI.hpp>
 
+#include <boost/preprocessor/repeat_from_to.hpp>
+
 #include "loop.h"
 
 #define CASE_MACRO(z, n, data)                                                                                         \
