@@ -52,7 +52,7 @@ template <int Dim> bool transform<Dim>::operator==(const transform &t) const {
 template <int Dim> point<Dim> transform<Dim>::operator*(const point<Dim> &p) const {
   std::array<int, Dim> coords;
   for (int i = 0; i < Dim; ++i) {
-    coords[i] = signs_[i] * p[perm_[i]];
+    coords[perm_[i]] = signs_[perm_[i]] * p[i];
   }
   return point<Dim>(coords);
 }

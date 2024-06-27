@@ -153,7 +153,8 @@ struct point_hash {
  * @details Such a transformation can be represented by the matrix product S P of a
  * permutation matrix P and a diagonal matrix S with diagonal entries equal to plus or
  * minus one. We denote the action of the permutation on an integer by P(i) and the diagonal
- * entries of S by S(i).
+ * entries of S by S(i). Note that P e(i) = e(P(i)) and S e(i) = S(i) e(i), where e(i)
+ * is the i-th standard unit vector.
  */
 template <int Dim> class transform {
 
@@ -193,7 +194,15 @@ public:
 
   bool operator==(const transform &t) const;
 
-  /** @brief Transforms a point. */
+  /**
+   * @brief Action of a transform on a point.
+   *
+   * @details Given matrix representations (see @ref transform_details) S P of *this and a point p,
+   *
+   * \f[ S P p = S P \sum_j p[j] e(j) = \sum_j S(P(j)) p[j] e(P(j)) \f]
+   *
+   * which means the P(i)-th component of the result is S(P(i)) p[i].
+   */
   point<Dim> operator*(const point<Dim> &p) const;
 
   /**
