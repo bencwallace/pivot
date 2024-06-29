@@ -1,5 +1,6 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
+#include "allocator.h"
 #include "lattice.h"
 
 namespace pivot {
@@ -39,11 +40,16 @@ box &box::operator-=(const point &b) {
   return *this;
 }
 
-box::box(int dim) : dim_(dim), intervals_(dim) {}
+box::box(int dim) : dim_(dim), intervals_(dim, interval(), pool_allocator<interval>(dim)) {}
 
-box::box(std::vector<interval> &&intervals) : dim_(intervals.size()), intervals_(std::move(intervals)) {}
+box::box(std::vector<interval, pool_allocator<interval>> &&intervals)
+    : dim_(intervals.size()), intervals_(std::move(intervals)) {}
 
-box::box(std::span<const point> points) : dim_(points[0].dim()) {
+box::box(std::initializer_list<interval> intervals)
+    : dim_(intervals.size()), intervals_(intervals, pool_allocator<interval>(dim_)) {}
+
+box::box(std::span<const point> points) : dim_(points[0].dim()), intervals_(pool_allocator<interval>(dim_)) {
+  intervals_.reserve(dim_);
   std::vector<int> min(dim_, std::numeric_limits<int>::max());
   std::vector<int> max(dim_, std::numeric_limits<int>::min());
   for (const auto &p : points) {
@@ -53,7 +59,6 @@ box::box(std::span<const point> points) : dim_(points[0].dim()) {
     }
   }
 
-  intervals_.reserve(dim_);
   // anchor at (1, 0, ..., 0)
   intervals_.emplace_back(min[0] - points[0][0] + 1, max[0] - points[0][0] + 1);
   for (int i = 1; i < dim_; ++i) {
@@ -72,7 +77,7 @@ bool box::empty() const {
 }
 
 box box::operator|(const box &b) const {
-  std::vector<interval> intervals;
+  auto intervals = std::vector<interval, pool_allocator<interval>>(pool_allocator<interval>(dim_));
   intervals.reserve(dim_);
   for (int i = 0; i < dim_; ++i) {
     intervals.emplace_back(std::min(intervals_[i].left_, b.intervals_[i].left_),
@@ -82,7 +87,7 @@ box box::operator|(const box &b) const {
 }
 
 box box::operator&(const box &b) const {
-  std::vector<interval> intervals;
+  auto intervals = std::vector<interval, pool_allocator<interval>>(pool_allocator<interval>(dim_));
   intervals.reserve(dim_);
   for (int i = 0; i < dim_; ++i) {
     intervals.emplace_back(std::max(intervals_[i].left_, b.intervals_[i].left_),
