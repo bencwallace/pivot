@@ -9,6 +9,7 @@
 
 #include <boost/operators.hpp>
 
+#include "allocator.h"
 #include "defines.h"
 
 namespace pivot {
@@ -85,11 +86,13 @@ private:
 /** @brief Represents a d-dimensional box. */
 struct box : boost::additive<box, point> {
   int dim_;
-  std::vector<interval> intervals_;
+  std::vector<interval, pool_allocator<interval>> intervals_;
 
   box(int dim);
 
-  box(std::vector<interval> &&intervals);
+  box(std::vector<interval, pool_allocator<interval>> &&intervals);
+
+  box(std::initializer_list<interval>);
 
   /**
    * @brief Constructs the smallest box containing a sequence of d-dimensional points.
