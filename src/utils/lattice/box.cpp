@@ -39,11 +39,16 @@ box &box::operator-=(const point &b) {
   return *this;
 }
 
-box::box(int dim) : dim_(dim), intervals_(dim) {}
+box::box(int dim) : dim_(dim), intervals_(dim, interval(), pool_allocator<interval>(dim)) {}
 
-box::box(std::vector<interval> &&intervals) : dim_(intervals.size()), intervals_(std::move(intervals)) {}
+box::box(std::vector<interval, pool_allocator<interval>> &&intervals)
+    : dim_(intervals.size()), intervals_(std::move(intervals)) {}
 
-box::box(std::span<const point> points) : dim_(points[0].dim()) {
+box::box(std::initializer_list<interval> intervals)
+    : dim_(intervals.size()), intervals_(intervals, pool_allocator<interval>(dim_)) {}
+
+box::box(std::span<const point> points)
+    : dim_(points[0].dim()), intervals_(dim_, interval(), pool_allocator<interval>(dim_)) {
   std::vector<int> min(dim_, std::numeric_limits<int>::max());
   std::vector<int> max(dim_, std::numeric_limits<int>::min());
   for (const auto &p : points) {
@@ -53,11 +58,10 @@ box::box(std::span<const point> points) : dim_(points[0].dim()) {
     }
   }
 
-  intervals_.reserve(dim_);
   // anchor at (1, 0, ..., 0)
-  intervals_.emplace_back(min[0] - points[0][0] + 1, max[0] - points[0][0] + 1);
+  intervals_[0] = interval(min[0] - points[0][0] + 1, max[0] - points[0][0] + 1);
   for (int i = 1; i < dim_; ++i) {
-    intervals_.emplace_back(min[i] - points[0][i], max[i] - points[0][i]);
+    intervals_[i] = interval(min[i] - points[0][i], max[i] - points[0][i]);
   }
 }
 
@@ -72,21 +76,19 @@ bool box::empty() const {
 }
 
 box box::operator|(const box &b) const {
-  std::vector<interval> intervals;
-  intervals.reserve(dim_);
+  std::vector<interval, pool_allocator<interval>> intervals(dim_, interval(), pool_allocator<interval>(dim_));
   for (int i = 0; i < dim_; ++i) {
-    intervals.emplace_back(std::min(intervals_[i].left_, b.intervals_[i].left_),
-                           std::max(intervals_[i].right_, b.intervals_[i].right_));
+    intervals[i] = interval(std::min(intervals_[i].left_, b.intervals_[i].left_),
+                            std::max(intervals_[i].right_, b.intervals_[i].right_));
   }
   return box(std::move(intervals));
 }
 
 box box::operator&(const box &b) const {
-  std::vector<interval> intervals;
-  intervals.reserve(dim_);
+  std::vector<interval, pool_allocator<interval>> intervals(dim_, interval(), pool_allocator<interval>(dim_));
   for (int i = 0; i < dim_; ++i) {
-    intervals.emplace_back(std::max(intervals_[i].left_, b.intervals_[i].left_),
-                           std::min(intervals_[i].right_, b.intervals_[i].right_));
+    intervals[i] = interval(std::max(intervals_[i].left_, b.intervals_[i].left_),
+                            std::min(intervals_[i].right_, b.intervals_[i].right_));
   }
   return box(std::move(intervals));
 }

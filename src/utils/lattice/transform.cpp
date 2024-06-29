@@ -68,7 +68,7 @@ transform transform::operator*(const transform &t) const {
 }
 
 box transform::operator*(const box &b) const {
-  std::vector<interval> intervals(dim_);
+  std::vector<interval, pool_allocator<interval>> intervals(dim_, interval(), pool_allocator<interval>(dim_));
   for (int i = 0; i < dim_; ++i) {
     int x = signs_[perm_[i]] * b.intervals_[i].left_;
     int y = signs_[perm_[i]] * b.intervals_[i].right_;

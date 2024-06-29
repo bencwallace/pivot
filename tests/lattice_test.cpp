@@ -138,10 +138,12 @@ TEST(BoxTest, Intersection2D) {
     EXPECT_TRUE(b5.empty());
 }
 
-TEST(BoxTest, ToString) {
+TEST(BoxTest, ToString1D) {
     box b1({interval{-1, 1}});
     EXPECT_EQ(b1.to_string(), "[-1, 1]");
+}
 
+TEST(BoxTest, ToString2D) {
     box b2({interval{-1, 1}, interval{0, 1}});
     EXPECT_EQ(b2.to_string(), "[-1, 1] x [0, 1]");
 }
