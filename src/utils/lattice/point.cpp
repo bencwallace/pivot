@@ -4,11 +4,11 @@
 
 namespace pivot {
 
-point::point(int dim) : dim_(dim), coords_(dim, 0) {}
+point::point(int dim) : dim_(dim), coords_(dim, 0, pool_allocator<int>(dim)) {}
 
-point::point(std::vector<int> &&coords) : dim_(coords.size()), coords_(std::move(coords)) {}
+point::point(std::vector<int, pool_allocator<int>> &&coords) : dim_(coords.size()), coords_(std::move(coords)) {}
 
-point::point(std::initializer_list<int> coords) : dim_(coords.size()), coords_(coords) {}
+point::point(std::initializer_list<int> coords) : dim_(coords.size()), coords_(coords, pool_allocator<int>(dim_)) {}
 
 point point::unit(int dim, int i) {
   point result(dim);
@@ -23,19 +23,17 @@ bool point::operator==(const point &p) const { return coords_ == p.coords_; }
 bool point::operator!=(const point &p) const { return coords_ != p.coords_; }
 
 point point::operator+(const point &p) const {
-  std::vector<int> sum;
-  sum.reserve(dim_);
+  std::vector<int, pool_allocator<int>> sum(dim_, 0, pool_allocator<int>(dim_));
   for (int i = 0; i < dim_; ++i) {
-    sum.push_back(coords_[i] + p.coords_[i]);
+    sum[i] = coords_[i] + p.coords_[i];
   }
   return point(std::move(sum));
 }
 
 point point::operator-(const point &p) const {
-  std::vector<int> diff;
-  diff.reserve(dim_);
+  std::vector<int, pool_allocator<int>> diff(dim_, 0, pool_allocator<int>(dim_));
   for (int i = 0; i < dim_; ++i) {
-    diff.push_back(coords_[i] - p.coords_[i]);
+    diff[i] = coords_[i] - p.coords_[i];
   }
   return point(std::move(diff));
 }

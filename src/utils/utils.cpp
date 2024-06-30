@@ -13,15 +13,14 @@ std::vector<point> from_csv(int dim, const std::string &path) {
   std::vector<point> points;
   std::string line;
   while (std::getline(file, line)) {
-    std::vector<int> coords;
-    coords.reserve(dim);
+    std::vector<int, pool_allocator<int>> coords(dim, 0, pool_allocator<int>(dim));
     size_t start = 0;
     for (int i = 0; i < dim; ++i) {
       size_t end = line.find(',', start);
       if (end == std::string::npos && i < dim - 1) {
         throw std::invalid_argument("Invalid CSV format at line " + std::to_string(points.size()));
       }
-      coords.push_back(std::stoi(line.substr(start, end - start)));
+      coords[i] = std::stoi(line.substr(start, end - start));
       start = end + 1;
     }
     points.emplace_back(std::move(coords));

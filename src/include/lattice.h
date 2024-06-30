@@ -45,7 +45,7 @@ class point : boost::multipliable<point, int> {
 public:
   point(int dim);
 
-  point(std::vector<int> &&coords);
+  point(std::vector<int, pool_allocator<int>> &&coords);
 
   point(std::initializer_list<int> coords);
 
@@ -80,7 +80,7 @@ public:
 
 private:
   int dim_;
-  std::vector<int> coords_{};
+  std::vector<int, pool_allocator<int>> coords_;
 };
 
 /** @brief Represents a d-dimensional box. */
