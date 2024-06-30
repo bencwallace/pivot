@@ -48,7 +48,7 @@ transform transform::rand(int dim) {
 bool transform::operator==(const transform &t) const { return perm_ == t.perm_ && signs_ == t.signs_; }
 
 point transform::operator*(const point &p) const {
-  std::vector<int> coords(dim_);
+  std::vector<int, pool_allocator<int>> coords(dim_, 0, pool_allocator<int>(dim_));
   for (int i = 0; i < dim_; ++i) {
     coords[perm_[i]] = signs_[perm_[i]] * p[i];
   }

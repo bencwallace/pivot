@@ -13,7 +13,7 @@ std::vector<point> from_csv(int dim, const std::string &path) {
   std::vector<point> points;
   std::string line;
   while (std::getline(file, line)) {
-    std::vector<int> coords;
+    auto coords = std::vector<int, pool_allocator<int>>(pool_allocator<int>(dim));
     coords.reserve(dim);
     size_t start = 0;
     for (int i = 0; i < dim; ++i) {
