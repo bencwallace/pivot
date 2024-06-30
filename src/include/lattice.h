@@ -168,7 +168,7 @@ public:
   transform(int dim);
 
   // TODO: this should be private
-  transform(std::vector<int> &&perm, std::vector<int> &&signs);
+  transform(std::vector<int, pool_allocator<int>> &&perm, std::vector<int, pool_allocator<int>> &&signs);
 
   /**
    * @brief Constructs a "pivot" transformation from two input points.
@@ -185,8 +185,8 @@ public:
   template <typename Gen> static transform rand(int dim, Gen &gen) {
     static std::bernoulli_distribution flip_;
 
-    std::vector<int> perm;
-    std::vector<int> signs;
+    auto perm = std::vector<int, pool_allocator<int>>(pool_allocator<int>(dim));
+    auto signs = std::vector<int, pool_allocator<int>>(pool_allocator<int>(dim));
     perm.reserve(dim);
     signs.reserve(dim);
     for (int i = 0; i < dim; ++i) {
@@ -287,8 +287,8 @@ public:
 
 private:
   int dim_;
-  std::vector<int> perm_;
-  std::vector<int> signs_;
+  std::vector<int, pool_allocator<int>> perm_;
+  std::vector<int, pool_allocator<int>> signs_;
 };
 
 } // namespace pivot

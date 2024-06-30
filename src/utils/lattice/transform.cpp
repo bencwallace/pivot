@@ -1,19 +1,18 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
+#include "allocator.h"
 #include "lattice.h"
 
 namespace pivot {
 
-transform::transform(int dim) : dim_(dim) {
+transform::transform(int dim) : dim_(dim), perm_(pool_allocator<int>(dim)), signs_(dim, 1, pool_allocator<int>(dim)) {
   perm_.reserve(dim);
-  signs_.reserve(dim);
   for (int i = 0; i < dim; ++i) {
-    perm_.push_back(i);  // trivial permutation
-    signs_.push_back(1); // standard orientations (no flips)
+    perm_[i] = i; // trivial permutation
   }
 }
 
-transform::transform(std::vector<int> &&perm, std::vector<int> &&signs)
+transform::transform(std::vector<int, pool_allocator<int>> &&perm, std::vector<int, pool_allocator<int>> &&signs)
     : dim_(perm.size()), perm_(std::move(perm)), signs_(std::move(signs)) {}
 
 transform::transform(const point &p, const point &q) : transform(p.dim()) {
@@ -57,8 +56,8 @@ point transform::operator*(const point &p) const {
 }
 
 transform transform::operator*(const transform &t) const {
-  std::vector<int> perm;
-  std::vector<int> signs(dim_);
+  auto perm = std::vector<int, pool_allocator<int>>(pool_allocator<int>(dim_));
+  std::vector<int, pool_allocator<int>> signs(dim_, 1, pool_allocator<int>(dim_));
   perm.reserve(dim_);
   for (int i = 0; i < dim_; ++i) {
     perm.push_back(perm_[t.perm_[i]]);
@@ -78,8 +77,8 @@ box transform::operator*(const box &b) const {
 }
 
 transform transform::inverse() const {
-  std::vector<int> perm(dim_);
-  std::vector<int> signs;
+  std::vector<int, pool_allocator<int>> perm(dim_, 0, pool_allocator<int>(dim_));
+  auto signs = std::vector<int, pool_allocator<int>>(pool_allocator<int>(dim_));
   signs.reserve(dim_);
   for (int i = 0; i < dim_; ++i) {
     perm[perm_[i]] = i;
