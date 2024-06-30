@@ -4,16 +4,14 @@
 
 namespace pivot {
 
-transform::transform(int dim) : dim_(dim) {
-  perm_.reserve(dim);
-  signs_.reserve(dim);
+transform::transform(int dim)
+    : dim_(dim), perm_(dim, 0, pool_allocator<int>(dim)), signs_(dim, 1, pool_allocator<int>(dim)) {
   for (int i = 0; i < dim; ++i) {
-    perm_.push_back(i);  // trivial permutation
-    signs_.push_back(1); // standard orientations (no flips)
+    perm_[i] = i; // trivial permutation
   }
 }
 
-transform::transform(std::vector<int> &&perm, std::vector<int> &&signs)
+transform::transform(std::vector<int, pool_allocator<int>> &&perm, std::vector<int, pool_allocator<int>> &&signs)
     : dim_(perm.size()), perm_(std::move(perm)), signs_(std::move(signs)) {}
 
 transform::transform(const point &p, const point &q) : transform(p.dim()) {
@@ -57,11 +55,10 @@ point transform::operator*(const point &p) const {
 }
 
 transform transform::operator*(const transform &t) const {
-  std::vector<int> perm;
-  std::vector<int> signs(dim_);
-  perm.reserve(dim_);
+  std::vector<int, pool_allocator<int>> perm(dim_, 0, pool_allocator<int>(dim_));
+  std::vector<int, pool_allocator<int>> signs(dim_, 1, pool_allocator<int>(dim_));
   for (int i = 0; i < dim_; ++i) {
-    perm.push_back(perm_[t.perm_[i]]);
+    perm[i] = perm_[t.perm_[i]];
     signs[perm[i]] = signs_[perm[i]] * t.signs_[t.perm_[i]];
   }
   return transform(std::move(perm), std::move(signs));
@@ -78,12 +75,11 @@ box transform::operator*(const box &b) const {
 }
 
 transform transform::inverse() const {
-  std::vector<int> perm(dim_);
-  std::vector<int> signs;
-  signs.reserve(dim_);
+  std::vector<int, pool_allocator<int>> perm(dim_, 0, pool_allocator<int>(dim_));
+  std::vector<int, pool_allocator<int>> signs(dim_, 1, pool_allocator<int>(dim_));
   for (int i = 0; i < dim_; ++i) {
     perm[perm_[i]] = i;
-    signs.push_back(signs_[perm_[i]]);
+    signs[i] = signs_[perm_[i]];
   }
   return transform(std::move(perm), std::move(signs));
 }
