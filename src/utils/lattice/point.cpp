@@ -22,22 +22,18 @@ bool point::operator==(const point &p) const { return coords_ == p.coords_; }
 
 bool point::operator!=(const point &p) const { return coords_ != p.coords_; }
 
-point point::operator+(const point &p) const {
-  std::vector<int> sum;
-  sum.reserve(dim_);
+point &point::operator+=(const point &p) {
   for (int i = 0; i < dim_; ++i) {
-    sum.push_back(coords_[i] + p.coords_[i]);
+    coords_[i] += p.coords_[i];
   }
-  return point(std::move(sum));
+  return *this;
 }
 
-point point::operator-(const point &p) const {
-  std::vector<int> diff;
-  diff.reserve(dim_);
+point &point::operator-=(const point &p) {
   for (int i = 0; i < dim_; ++i) {
-    diff.push_back(coords_[i] - p.coords_[i]);
+    coords_[i] -= p.coords_[i];
   }
-  return point(std::move(diff));
+  return *this;
 }
 
 point &point::operator*=(int k) {

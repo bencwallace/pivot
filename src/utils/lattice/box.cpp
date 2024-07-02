@@ -71,24 +71,20 @@ bool box::empty() const {
   return std::any_of(intervals_.begin(), intervals_.end(), [](const interval &i) { return i.empty(); });
 }
 
-box box::operator|(const box &b) const {
-  std::vector<interval> intervals;
-  intervals.reserve(dim_);
+box &box::operator|=(const box &b) {
   for (int i = 0; i < dim_; ++i) {
-    intervals.emplace_back(std::min(intervals_[i].left_, b.intervals_[i].left_),
-                           std::max(intervals_[i].right_, b.intervals_[i].right_));
+    intervals_[i].left_ = std::min(intervals_[i].left_, b.intervals_[i].left_);
+    intervals_[i].right_ = std::max(intervals_[i].right_, b.intervals_[i].right_);
   }
-  return box(std::move(intervals));
+  return *this;
 }
 
-box box::operator&(const box &b) const {
-  std::vector<interval> intervals;
-  intervals.reserve(dim_);
+box &box::operator&=(const box &b) {
   for (int i = 0; i < dim_; ++i) {
-    intervals.emplace_back(std::max(intervals_[i].left_, b.intervals_[i].left_),
-                           std::min(intervals_[i].right_, b.intervals_[i].right_));
+    intervals_[i].left_ = std::max(intervals_[i].left_, b.intervals_[i].left_);
+    intervals_[i].right_ = std::min(intervals_[i].right_, b.intervals_[i].right_);
   }
-  return box(std::move(intervals));
+  return *this;
 }
 
 std::string box::to_string() const {

@@ -39,7 +39,7 @@ struct interval {
 /**
  * @brief Represents a d-dimensional point.
  */
-class point : boost::multipliable<point, int> {
+class point : boost::additive<point>, boost::multipliable<point, int> {
 
 public:
   point(int dim);
@@ -62,10 +62,10 @@ public:
   bool operator!=(const point &p) const;
 
   /** @brief Vector addition of points */
-  point operator+(const point &p) const;
+  point &operator+=(const point &p);
 
   /** @brief Vector subtraction of points */
-  point operator-(const point &p) const;
+  point &operator-=(const point &p);
 
   /** @brief Scalar multiplication of a point */
   point &operator*=(int k);
@@ -83,7 +83,7 @@ private:
 };
 
 /** @brief Represents a d-dimensional box. */
-struct box : boost::additive<box, point> {
+struct box : boost::orable<box>, boost::andable<box>, boost::additive<box, point> {
   int dim_;
   std::vector<interval> intervals_;
 
@@ -119,7 +119,7 @@ struct box : boost::additive<box, point> {
    * The union here is not to be understood as the set-theoretic union, but rather as the minimal
    * bounding box containing both input boxes.
    */
-  box operator|(const box &b) const;
+  box &operator|=(const box &b);
 
   /**
    * @brief Returns the intersection of two boxes.
@@ -127,7 +127,7 @@ struct box : boost::additive<box, point> {
    * The intersection is the set-theoretic intersection or, equivalently, the maximal box contained
    * in both input boxes.
    */
-  box operator&(const box &b) const;
+  box &operator&=(const box &b);
 
   /** @brief Returns the string of the form "{intervals_[0]} x ... x {intervals[d - 1]}". */
   std::string to_string() const;
