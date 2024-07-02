@@ -14,6 +14,7 @@
 namespace pivot {
 
 struct box;
+class transform;
 
 /**
  * @brief Represents a closed interval [left_, right_].
@@ -69,6 +70,8 @@ public:
 
   /** @brief Scalar multiplication of a point */
   point &operator*=(int k);
+
+  point &operator*=(const transform &t);
 
   int dim() const;
 
@@ -128,6 +131,8 @@ struct box : boost::orable<box>, boost::andable<box>, boost::additive<box, point
    * in both input boxes.
    */
   box &operator&=(const box &b);
+
+  box &operator*=(const transform &t);
 
   /** @brief Returns the string of the form "{intervals_[0]} x ... x {intervals[d - 1]}". */
   std::string to_string() const;
@@ -286,6 +291,9 @@ private:
   int dim_;
   std::vector<int> perm_;
   std::vector<int> signs_;
+
+  friend class point;
+  friend struct box;
 };
 
 } // namespace pivot

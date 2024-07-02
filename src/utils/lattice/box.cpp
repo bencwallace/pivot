@@ -87,6 +87,17 @@ box &box::operator&=(const box &b) {
   return *this;
 }
 
+box &box::operator*=(const transform &t) {
+  static std::vector<interval> new_intervals(dim_);
+  for (int i = 0; i < dim_; ++i) {
+    int x = t.signs_[t.perm_[i]] * intervals_[i].left_;
+    int y = t.signs_[t.perm_[i]] * intervals_[i].right_;
+    new_intervals[t.perm_[i]] = interval(std::min(x, y), std::max(x, y));
+  }
+  intervals_ = new_intervals;
+  return *this;
+}
+
 std::string box::to_string() const {
   std::string s = "";
   for (int i = 0; i < dim_ - 1; ++i) {

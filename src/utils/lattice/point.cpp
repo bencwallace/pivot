@@ -43,6 +43,15 @@ point &point::operator*=(int k) {
   return *this;
 }
 
+point &point::operator*=(const transform &t) {
+  static std::vector<int> new_coords(dim_);
+  for (int i = 0; i < dim_; ++i) {
+    new_coords[i] = t.signs_[i] * coords_[t.perm_[i]];
+  }
+  coords_ = new_coords;
+  return *this;
+}
+
 int point::dim() const { return dim_; }
 
 int point::norm() const {
