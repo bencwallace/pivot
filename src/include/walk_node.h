@@ -34,6 +34,8 @@ public:
 
   int id() const { return id_; }
 
+  int num_sites() const { return num_sites_; }
+
   const box &bbox() const { return bbox_; }
 
   const point &endpoint() const { return end_; }

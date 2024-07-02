@@ -105,9 +105,6 @@ bool walk_tree::self_avoiding() const {
 
 void walk_tree::export_csv(const std::string &path) const { return to_csv(path, steps()); }
 
-bool walk_tree::intersect() const {
-  return ::pivot::intersect(root_->left_, root_->right_, point(dim_), root_->left_->end_, transform(dim_),
-                            root_->symm());
-}
+bool walk_tree::intersect() const { return get_intersector(dim_, root_->num_sites_).intersect(*root_); }
 
 } // namespace pivot
