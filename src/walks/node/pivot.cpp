@@ -84,17 +84,23 @@ walk_node *walk_node::shuffle_down() {
 }
 
 bool intersect(const walk_node *l_walk, const walk_node *r_walk, const point &l_anchor, const point &r_anchor,
-               const transform &l_symm, const transform &r_symm) {
+               const transform &l_symm, const transform &r_symm, size_t depth) {
   static box l_box(l_walk->bbox_.dim_);
   static box r_box(r_walk->bbox_.dim_);
+  static std::vector<point> l_ends = {point(l_walk->bbox_.dim_)};
+  static std::vector<point> r_ends = {point(r_walk->bbox_.dim_)};
+  if (depth == 0) {
+    l_ends[0] = l_anchor;
+    r_ends[0] = r_anchor;
+  }
 
   l_box = l_walk->bbox_;
   l_box *= l_symm;
-  l_box += l_anchor;
+  l_box += l_ends[depth];
 
   r_box = r_walk->bbox_;
   r_box *= r_symm;
-  r_box += r_anchor;
+  r_box += r_ends[depth];
   r_box &= l_box;
 
   if (r_box.empty()) {
@@ -106,13 +112,45 @@ bool intersect(const walk_node *l_walk, const walk_node *r_walk, const point &l_
   }
 
   if (l_walk->num_sites_ >= r_walk->num_sites_) {
-    return intersect(l_walk->right_, r_walk, l_anchor + l_symm * l_walk->left_->end_, r_anchor, l_symm * l_walk->symm_,
-                     r_symm) ||
-           intersect(l_walk->left_, r_walk, l_anchor, r_anchor, l_symm, r_symm);
+    if (l_ends.size() <= depth + 1) {
+      l_ends.resize(depth + 2, point(l_walk->bbox_.dim_));
+    }
+    l_ends[depth + 1] = l_walk->left_->end_;
+    l_ends[depth + 1] *= l_symm;
+    l_ends[depth + 1] += l_anchor;
+
+    if (r_ends.size() <= depth + 1) {
+      r_ends.push_back(r_anchor);
+    } else {
+      r_ends[depth + 1] = r_anchor;
+    }
+    if (intersect(l_walk->right_, r_walk, l_anchor, r_anchor, l_symm * l_walk->symm_, r_symm, depth + 1)) {
+      return true;
+    }
+
+    l_ends[depth + 1] = l_anchor;
+    r_ends[depth + 1] = r_anchor;
+    return intersect(l_walk->left_, r_walk, l_anchor, r_anchor, l_symm, r_symm, depth + 1);
   } else {
-    return intersect(l_walk, r_walk->left_, l_anchor, r_anchor, l_symm, r_symm) ||
-           intersect(l_walk, r_walk->right_, l_anchor, r_anchor + r_symm * r_walk->left_->end_, l_symm,
-                     r_symm * r_walk->symm_);
+    if (l_ends.size() <= depth + 1) {
+      l_ends.push_back(l_anchor);
+    } else {
+      l_ends[depth + 1] = l_anchor;
+    }
+    if (r_ends.size() <= depth + 1) {
+      r_ends.push_back(r_anchor);
+    } else {
+      r_ends[depth + 1] = r_anchor;
+    }
+    if (intersect(l_walk, r_walk->left_, l_anchor, r_anchor, l_symm, r_symm, depth + 1)) {
+      return true;
+    }
+
+    l_ends[depth + 1] = l_anchor;
+    r_ends[depth + 1] = r_walk->left_->end_;
+    r_ends[depth + 1] *= r_symm;
+    r_ends[depth + 1] += r_anchor;
+    return intersect(l_walk, r_walk->right_, l_anchor, r_anchor, l_symm, r_symm * r_walk->symm_, depth + 1);
   }
 }
 

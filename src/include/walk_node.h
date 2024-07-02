@@ -9,7 +9,7 @@ namespace pivot {
 class walk_node;
 
 bool intersect(const walk_node *l_walk, const walk_node *r_walk, const point &l_anchor, const point &r_anchor,
-               const transform &l_symm, const transform &r_symm);
+               const transform &l_symm, const transform &r_symm, size_t depth = 0);
 
 class walk_tree;
 
@@ -98,7 +98,7 @@ private:
   Agnode_t *todot(Agraph_t *g, const cgraph_t &cgraph) const;
 
   friend bool intersect(const walk_node *l_walk, const walk_node *r_walk, const point &l_anchor, const point &r_anchor,
-                        const transform &l_symm, const transform &r_symm);
+                        const transform &l_symm, const transform &r_symm, size_t depth);
 };
 
 } // namespace pivot
