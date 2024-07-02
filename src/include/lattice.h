@@ -233,6 +233,8 @@ public:
    */
   transform operator*(const transform &t) const;
 
+  transform &operator*=(const transform &t);
+
   /**
    * @brief Action of a transform on a box.
    *

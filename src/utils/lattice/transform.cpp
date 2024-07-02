@@ -67,6 +67,18 @@ transform transform::operator*(const transform &t) const {
   return transform(std::move(perm), std::move(signs));
 }
 
+transform &transform::operator*=(const transform &t) {
+  static std::vector<int> perm(dim_);
+  static std::vector<int> signs(dim_);
+  for (int i = 0; i < dim_; ++i) {
+    perm[i] = perm_[t.perm_[i]];
+    signs[perm[i]] = signs_[perm[i]] * t.signs_[t.perm_[i]];
+  }
+  perm_ = perm;
+  signs_ = signs;
+  return *this;
+}
+
 box transform::operator*(const box &b) const {
   std::vector<interval> intervals(dim_);
   for (int i = 0; i < dim_; ++i) {

@@ -74,10 +74,10 @@ walk_node &walk_tree::find_node(int n) {
 
 bool walk_tree::try_pivot(int n, const transform &r) {
   root_->shuffle_up(n);
-  root_->symm_ = root_->symm_ * r; // modify in-place
+  root_->symm_ *= r;
   auto success = !intersect();
   if (!success) {
-    root_->symm_ = root_->symm_ * r.inverse(); // TODO: backup symm_
+    root_->symm_ *= r.inverse();
   } else {
     root_->merge();
   }
