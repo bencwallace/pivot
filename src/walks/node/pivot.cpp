@@ -85,9 +85,17 @@ walk_node *walk_node::shuffle_down() {
 
 bool intersect(const walk_node *l_walk, const walk_node *r_walk, const point &l_anchor, const point &r_anchor,
                const transform &l_symm, const transform &r_symm) {
-  auto l_box = l_anchor + l_symm * l_walk->bbox_;
-  auto r_box = r_anchor + r_symm * r_walk->bbox_;
-  if ((l_box & r_box).empty()) {
+  static box l_box(l_walk->bbox_.dim_);
+  static box r_box(r_walk->bbox_.dim_);
+
+  l_box = l_symm * l_walk->bbox_;
+  l_box += l_anchor;
+
+  r_box = r_symm * r_walk->bbox_;
+  r_box += r_anchor;
+  r_box &= l_box;
+
+  if (r_box.empty()) {
     return false;
   }
 
@@ -107,10 +115,15 @@ bool intersect(const walk_node *l_walk, const walk_node *r_walk, const point &l_
 }
 
 void walk_node::merge() {
-  num_sites_ = left_->num_sites_ + right_->num_sites_;
+  num_sites_ = left_->num_sites_;
+  num_sites_ += right_->num_sites_;
 
-  bbox_ = left_->bbox_ | (left_->end_ + symm_ * right_->bbox_);
-  end_ = left_->end_ + symm_ * right_->end_;
+  bbox_ = symm_ * right_->bbox_;
+  bbox_ += left_->end_;
+  bbox_ |= left_->bbox_;
+
+  end_ = symm_ * right_->end_;
+  end_ += left_->end_;
 }
 
 } // namespace pivot
