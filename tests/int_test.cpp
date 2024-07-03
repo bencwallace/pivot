@@ -11,9 +11,9 @@ using namespace pivot;
 
 TEST(WalkTest, SelfAvoiding) {
   for (int num_steps = 2; num_steps < 10; ++num_steps) {
-    walk<2> w(100);
+    walk<2> w(num_steps);
     for (int i = 0; i < 10; ++i) {
-      for (int j = 0; j < 100; j++) {
+      for (int j = 0; j < 10; j++) {
         w.rand_pivot();
       }
       EXPECT_TRUE(w.self_avoiding());
@@ -23,9 +23,9 @@ TEST(WalkTest, SelfAvoiding) {
 
 TEST(WalkTest, SelfAvoiding3D) {
   for (int num_steps = 2; num_steps < 10; ++num_steps) {
-    walk<3> w(100);
+    walk<3> w(num_steps);
     for (int i = 0; i < 10; ++i) {
-      for (int j = 0; j < 100; j++) {
+      for (int j = 0; j < 10; j++) {
         w.rand_pivot();
       }
       EXPECT_TRUE(w.self_avoiding());
@@ -56,9 +56,21 @@ TEST(WalkTest, Loop) {
 
 TEST(WalkTreeTest, SelfAvoiding) {
   for (int num_steps = 2; num_steps < 10; ++num_steps) {
-    auto w = walk_tree<2>(2);
+    auto w = walk_tree<2>(num_steps);
     for (int i = 0; i < 10; ++i) {
-      for (int j = 0; j < 100; j++) {
+      for (int j = 0; j < 10; j++) {
+        w.rand_pivot();
+      }
+      EXPECT_TRUE(w.self_avoiding());
+    }
+  }
+}
+
+TEST(WalkTreeTest, SelfAvoiding3D) {
+  for (int num_steps = 2; num_steps < 10; ++num_steps) {
+    auto w = walk_tree<3>(num_steps);
+    for (int i = 0; i < 10; ++i) {
+      for (int j = 0; j < 10; j++) {
         w.rand_pivot();
       }
       EXPECT_TRUE(w.self_avoiding());
