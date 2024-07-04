@@ -15,6 +15,17 @@ template <int Dim>
 transform<Dim>::transform(const std::array<int, Dim> &perm, const std::array<int, Dim> &signs)
     : perm_(perm), signs_(signs) {}
 
+template <int Dim> transform<Dim>::transform(const transform &t) {
+  std::copy(t.perm_.begin(), t.perm_.end(), perm_.begin());
+  std::copy(t.signs_.begin(), t.signs_.end(), signs_.begin());
+}
+
+template <int Dim> transform<Dim> &transform<Dim>::operator=(const transform &t) {
+  std::copy(t.perm_.begin(), t.perm_.end(), perm_.begin());
+  std::copy(t.signs_.begin(), t.signs_.end(), signs_.begin());
+  return *this;
+}
+
 template <int Dim> transform<Dim>::transform(const point<Dim> &p, const point<Dim> &q) : transform() {
   // The input points should differ by 1 in a single coordinate. Start by finding this coordinate or fail.
   point<Dim> diff = q - p;

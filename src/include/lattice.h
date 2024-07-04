@@ -46,6 +46,9 @@ public:
 
   point(const std::array<int, Dim> &coords);
 
+  point(const point &);
+  point &operator=(const point &);
+
   /**
    * @brief Returns the unit vector e_i.
    *
@@ -86,6 +89,9 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
   box() = delete;
 
   box(const std::array<interval, Dim> &intervals);
+
+  box(const box &b);
+  box &operator=(const box &b);
 
   /**
    * @brief Constructs the smallest box containing a sequence of Dim-dimensional points.
@@ -164,6 +170,9 @@ public:
 
   // TODO: this should be private
   transform(const std::array<int, Dim> &perm, const std::array<int, Dim> &signs);
+
+  transform(const transform &t);
+  transform &operator=(const transform &t);
 
   /**
    * @brief Constructs a "pivot" transformation from two input points.

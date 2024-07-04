@@ -41,6 +41,15 @@ template <int Dim> box<Dim> &box<Dim>::operator-=(const point<Dim> &b) {
 
 template <int Dim> box<Dim>::box(const std::array<interval, Dim> &intervals) : intervals_(intervals) {}
 
+template <int Dim> box<Dim>::box(const box<Dim> &b) {
+  std::copy(b.intervals_.begin(), b.intervals_.end(), intervals_.begin());
+}
+
+template <int Dim> box<Dim> &box<Dim>::operator=(const box<Dim> &b) {
+  std::copy(b.intervals_.begin(), b.intervals_.end(), intervals_.begin());
+  return *this;
+}
+
 template <int Dim> box<Dim>::box(std::span<const point<Dim>> points) {
   std::array<int, Dim> min;
   std::array<int, Dim> max;
