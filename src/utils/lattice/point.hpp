@@ -6,9 +6,7 @@ namespace pivot {
 
 template <int Dim> point<Dim>::point(const std::array<int, Dim> &coords) : coords_(coords) {}
 
-template <int Dim> point<Dim>::point(const point &p) {
-  std::copy(p.coords_.begin(), p.coords_.end(), coords_.begin());
-}
+template <int Dim> point<Dim>::point(const point &p) { std::copy(p.coords_.begin(), p.coords_.end(), coords_.begin()); }
 
 template <int Dim> point<Dim> &point<Dim>::operator=(const point &p) {
   std::copy(p.coords_.begin(), p.coords_.end(), coords_.begin());

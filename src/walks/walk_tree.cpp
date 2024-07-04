@@ -6,7 +6,7 @@
 
 #include "defines.h"
 #include "utils.h"
-#include "walk_node.h"
+#include "node/walk_node.hpp"
 #include "walk_tree.h"
 
 namespace pivot {
@@ -20,18 +20,12 @@ walk_tree<Dim>::walk_tree(const std::string &path, std::optional<unsigned int> s
     : walk_tree(from_csv<Dim>(path), seed, balanced) {}
 
 template <int Dim>
-walk_tree<Dim>::walk_tree(const std::vector<point<Dim>> &steps, std::optional<unsigned int> seed, bool balanced) {
+walk_tree<Dim>::walk_tree(const std::vector<point<Dim>> &steps, std::optional<unsigned int> seed, bool balanced) : nodes_(steps.size() - 1) {
   if (steps.size() < 2) {
     throw std::invalid_argument("walk must have at least 2 sites (1 step)");
   }
-  buf_ = nullptr;
-  if (balanced) {
-    size_t buf_size = sizeof(walk_node<Dim>) * (steps.size() - 1);
-    constexpr auto alignment = std::align_val_t(alignof(walk_node<Dim>));
-    buf_ = static_cast<walk_node<Dim> *>(::operator new[](buf_size, alignment));
-  }
-  root_ = balanced ? std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::balanced_rep(steps, buf_))
-                   : std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::pivot_rep(steps, buf_));
+  root_ = balanced ? std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::balanced_rep(steps, this))
+                   : std::unique_ptr<walk_node<Dim>>(walk_node<Dim>::pivot_rep(steps, this));
 
   rng_ = std::mt19937(seed.value_or(std::random_device()()));
   dist_ = std::uniform_int_distribution<int>(1, steps.size() - 1);
@@ -49,11 +43,7 @@ template <int Dim> walk_tree<Dim>::~walk_tree() {
     if (curr->right_ && !curr->right_->is_leaf()) {
       nodes.push(curr->right_);
     }
-    curr->~walk_node();
-  }
-
-  if (buf_) {
-    ::operator delete[](buf_, std::align_val_t(alignof(walk_node<Dim>)));
+    delete curr;
   }
 }
 
@@ -68,10 +58,7 @@ template <int Dim> bool walk_tree<Dim>::is_leaf() const { return root_->is_leaf(
 template <int Dim> std::vector<point<Dim>> walk_tree<Dim>::steps() const { return root_->steps(); }
 
 template <int Dim> walk_node<Dim> &walk_tree<Dim>::find_node(int n) {
-  if (!buf_) {
-    throw std::runtime_error("find_node can only be used on trees initialized with balanced=true");
-  }
-  walk_node<Dim> &result = buf_[n - 1];
+  walk_node<Dim> &result = *nodes_[n - 1];
   assert(result.id_ == n);
   return result;
 }
@@ -110,8 +97,14 @@ template <int Dim> bool walk_tree<Dim>::self_avoiding() const {
 template <int Dim> void walk_tree<Dim>::export_csv(const std::string &path) const { return to_csv(path, steps()); }
 
 #define WALK_TREE_INST(z, n, data) template class walk_tree<n>;
+#define INTERSECT_INST(z, n, data)                                                                                     \
+  template bool intersect<n>(const walk_node<n> *l_walk, const walk_node<n> *r_walk, const point<n> &l_anchor,         \
+                             const point<n> &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
+#define WALK_NODE_INST(z, n, data) template class walk_node<n>;
 
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_TREE_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, INTERSECT_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_NODE_INST, ~)
 
 } // namespace pivot

@@ -54,9 +54,11 @@ private:
   std::unique_ptr<walk_node<Dim>> root_;
   std::mt19937 rng_;
   std::uniform_int_distribution<int> dist_;
-  walk_node<Dim> *buf_;
+  std::vector<walk_node<Dim> *> nodes_;
 
   walk_tree(walk_node<Dim> *root);
+
+  friend class walk_node<Dim>;
 };
 
 } // namespace pivot
