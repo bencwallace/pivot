@@ -27,7 +27,6 @@ public:
    */
   static walk_node *balanced_rep(const std::vector<point<Dim>> &steps, walk_node *buf = nullptr);
 
-  walk_node(const walk_node &w) = delete;
   walk_node(walk_node &&w) = delete;
   walk_node &operator=(const walk_node &w) = delete;
 
@@ -76,6 +75,9 @@ private:
   friend class walk_tree<Dim>;
 
   walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end);
+
+  walk_node(const walk_node &w);
+  walk_node &operator=(walk_node &w);
 
   static walk_node *balanced_rep(std::span<const point<Dim>> steps, int start, const transform<Dim> &glob_symm,
                                  walk_node *buf);

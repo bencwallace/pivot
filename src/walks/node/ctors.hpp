@@ -7,6 +7,17 @@ walk_node<Dim>::walk_node(int id, int num_sites, const transform<Dim> &symm, con
                           const point<Dim> &end)
     : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
 
+template <int Dim> walk_node<Dim>::walk_node(const walk_node &w) : walk_node(w.id_, w.num_sites_, w.symm_, w.bbox_, w.end_) {}
+
+template <int Dim> walk_node<Dim> &walk_node<Dim>::operator=(walk_node &w) {
+  id_ = w.id_;
+  num_sites_ = w.num_sites_;
+  symm_ = w.symm_;
+  bbox_ = w.bbox_;
+  end_ = w.end_;
+  return *this;
+}
+
 template <int Dim> walk_node<Dim> *walk_node<Dim>::pivot_rep(const std::vector<point<Dim>> &steps, walk_node *buf) {
   int num_sites = steps.size();
   if (num_sites < 2) {
