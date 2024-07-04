@@ -71,10 +71,12 @@ private:
   transform<Dim> symm_;
   box<Dim> bbox_;
   point<Dim> end_;
+  walk_tree<Dim> *const tree_;
 
   friend class walk_tree<Dim>;
 
-  walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end);
+  walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end,
+            walk_tree<Dim> *tree);
 
   walk_node(const walk_node &w);
   walk_node &operator=(walk_node &w);
