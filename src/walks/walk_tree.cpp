@@ -90,8 +90,9 @@ template <int Dim> void walk_tree<Dim>::shuffle_up(int id) {
   }
 }
 
-template <int Dim> void walk_tree<Dim>::shuffle_down() {
-  walk_node<Dim> *node = root_.get();
+template <int Dim> void walk_tree<Dim>::shuffle_down() { shuffle_down(root_.get()); }
+
+template <int Dim> void walk_tree<Dim>::shuffle_down(walk_node<Dim> *node) {
   int id = std::floor((node->num_sites_ + 1) / 2.0);
   while (id != node->left_->num_sites_) {
     if (id < node->left_->num_sites_) {
@@ -137,9 +138,11 @@ template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Di
   if (success) { // w must be at the root
     root_->symm_ = root_->symm_ * t;
     w->merge();
-    root_->shuffle_down();
+    // root_->shuffle_down();
+    shuffle_down(w);
   } else {
-    w->shuffle_down(); // TODO
+    // w->shuffle_down(); // TODO
+    shuffle_down(w);
   }
 
   return success;

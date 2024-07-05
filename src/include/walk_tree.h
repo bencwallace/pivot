@@ -43,6 +43,7 @@ public:
   void shuffle_up(int id);
 
   void shuffle_down();
+  void shuffle_down(walk_node<Dim> *node);
 
   bool try_pivot(int n, const transform<Dim> &r);
 
