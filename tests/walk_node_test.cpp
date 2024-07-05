@@ -251,6 +251,36 @@ TEST(WalkNode, RotateRightLeftRand2D) {
     EXPECT_EQ(*root1->rotate_right()->rotate_left(), *root2);
 }
 
+TEST(WalkNode, ShuffleUpRand2D) {
+    int num_sites = 100;
+    auto steps = random_walk<2>(num_sites);
+
+    std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<int> dist(1, num_sites - 1);
+    int id = dist(gen);
+
+    auto tree1 = walk_tree<2>(steps);
+    auto root1 = tree1.root();
+    root1->shuffle_up(id);
+    EXPECT_EQ(root1->id(), id);
+}
+
+TEST(WalkNode, ShuffleDownRand2D) {
+    int num_sites = 100;
+    auto steps = random_walk<2>(num_sites);
+
+    std::mt19937 gen(std::random_device{}());
+    std::uniform_int_distribution<int> dist(1, num_sites - 1);
+    int id = dist(gen);
+
+    auto tree1 = walk_tree<2>(steps);
+    auto root1 = tree1.root();
+    int root_id = root1->id();
+    root1->shuffle_up(id);
+    root1->shuffle_down();
+    EXPECT_EQ(root1->id(), root_id);
+}
+
 TEST(WalkNode, Steps2D) {
     auto steps = random_walk<2>(100);
     auto tree = walk_tree<2>(steps);
