@@ -45,6 +45,10 @@ public:
   void shuffle_down();
   void shuffle_down(walk_node<Dim> *node);
 
+  std::pair<walk_node<Dim> *, bool> shuffle_intersect(walk_node<Dim> *w, const transform<Dim> &t,
+                                                      std::optional<bool> was_left_child,
+                                                      std::optional<bool> is_left_child);
+
   bool try_pivot(int n, const transform<Dim> &r);
 
   bool try_pivot_fast(int n, const transform<Dim> &r);

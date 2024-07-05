@@ -107,6 +107,53 @@ template <int Dim> void walk_tree<Dim>::shuffle_down(walk_node<Dim> *node) {
   }
 }
 
+template <int Dim>
+std::pair<walk_node<Dim> *, bool> walk_tree<Dim>::shuffle_intersect(walk_node<Dim> *w, const transform<Dim> &t,
+                                                                    std::optional<bool> was_left_child,
+                                                                    std::optional<bool> is_left_child) {
+  while (true) {
+    if (was_left_child.has_value()) {
+      if (was_left_child.value()) {
+        if (::pivot::intersect(w->left_, w->right_->right_, point<Dim>(), w->left_->end_ + w->symm_ * t * w->right_->left_->end_,
+                              transform<Dim>(), w->symm_ * t * w->right_->symm_)) {
+          return {w, true};
+        }
+      } else {
+        if (::pivot::intersect(w->left_->left_, w->right_, point<Dim>(), w->left_->end_, transform<Dim>(), w->symm_ * t)) {
+          return {w, true};
+        }
+      }
+    } else {
+      if (::pivot::intersect(w->left_, w->right_, point<Dim>(), w->left_->end_, transform<Dim>(), w->symm_ * t)) {
+        return {w, true};
+      }
+    }
+
+    if (w->parent_ == nullptr) {
+      return {w, false};
+    }
+
+    was_left_child = is_left_child;
+    if (w->parent_->parent_ == nullptr) {
+      is_left_child = std::nullopt;
+    } else if (w->parent_->parent_->left_ == w->parent_) {
+      is_left_child = true;
+    } else {
+      is_left_child = false;
+    }
+
+    w = w->parent_;
+    if (was_left_child.has_value()) {
+      if (was_left_child.value()) {
+        w->rotate_right();
+      } else {
+        w->rotate_left();
+      }
+    }
+  }
+  return {w, false};
+}
+
 template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r) {
   shuffle_up(n);
   root_->symm_ = root_->symm_ * r; // modify in-place
@@ -132,7 +179,7 @@ template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Di
     is_left_child = false;
   }
 
-  auto [node, intersection] = w->shuffle_intersect(t, std::nullopt, is_left_child);
+  auto [node, intersection] = shuffle_intersect(w, t, std::nullopt, is_left_child);
   w = node;
   auto success = !intersection;
   if (success) { // w must be at the root
