@@ -76,6 +76,8 @@ template <int Dim> walk_node<Dim> &walk_tree<Dim>::find_node(int n) {
   return result;
 }
 
+template <int Dim> void walk_tree<Dim>::shuffle_up(int id) { root_->shuffle_up(id); }
+
 template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r) {
   root_->shuffle_up(n);
   root_->symm_ = root_->symm_ * r; // modify in-place

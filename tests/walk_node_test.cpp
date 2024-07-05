@@ -259,10 +259,9 @@ TEST(WalkNode, ShuffleUpRand2D) {
     std::uniform_int_distribution<int> dist(1, num_sites - 1);
     int id = dist(gen);
 
-    auto tree1 = walk_tree<2>(steps);
-    auto root1 = tree1.root();
-    root1->shuffle_up(id);
-    EXPECT_EQ(root1->id(), id);
+    auto tree = walk_tree<2>(steps);
+    tree.shuffle_up(id);
+    EXPECT_EQ(tree.root()->id(), id);
 }
 
 TEST(WalkNode, ShuffleDownRand2D) {
@@ -273,12 +272,11 @@ TEST(WalkNode, ShuffleDownRand2D) {
     std::uniform_int_distribution<int> dist(1, num_sites - 1);
     int id = dist(gen);
 
-    auto tree1 = walk_tree<2>(steps);
-    auto root1 = tree1.root();
-    int root_id = root1->id();
-    root1->shuffle_up(id);
-    root1->shuffle_down();
-    EXPECT_EQ(root1->id(), root_id);
+    auto tree = walk_tree<2>(steps);
+    int root_id = tree.root()->id();
+    tree.shuffle_up(id);
+    tree.root()->shuffle_down();
+    EXPECT_EQ(tree.root()->id(), root_id);
 }
 
 TEST(WalkNode, Steps2D) {
