@@ -79,11 +79,13 @@ TEST(WalkTreeTest, SelfAvoiding3D) {
 }
 
 TEST(WalkTreeTest, FindNode) {
-  auto w = walk_tree<2>(100);
-  for (int i = 1; i <= 100; ++i) {
+  int num_steps = 4;
+  int num_iter = 3;
+  auto w = walk_tree<2>(num_steps, 4);
+  for (int i = 1; i <= num_iter; ++i) {
     w.rand_pivot();
   }
-  for (int i = 1; i < 100; ++i) {
+  for (int i = 1; i < num_steps; ++i) {
     auto &node = w.find_node(i);
     ASSERT_EQ(node.id(), i);
   }

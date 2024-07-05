@@ -119,10 +119,37 @@ template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r
   return success;
 }
 
+template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Dim> &t) {
+  walk_node<Dim> *w = &find_node(n);
+
+  std::optional<bool> is_left_child;
+  if (w->parent_ == nullptr || w->parent_->left_ == nullptr) {
+    is_left_child = std::nullopt;
+  } else if (w->parent_->left_ == w) {
+    is_left_child = true;
+  } else {
+    is_left_child = false;
+  }
+
+  auto [node, intersection] = w->shuffle_intersect(t, std::nullopt, is_left_child);
+  w = node;
+  auto success = !intersection;
+  if (success) { // w must be at the root
+    root_->symm_ = root_->symm_ * t;
+    w->merge();
+    root_->shuffle_down();
+  } else {
+    w->shuffle_down(); // TODO
+  }
+
+  return success;
+}
+
 template <int Dim> bool walk_tree<Dim>::rand_pivot() {
   auto site = dist_(rng_);
   auto r = transform<Dim>::rand(rng_);
-  return try_pivot(site, r);
+  // return try_pivot(site, r);
+  return try_pivot_fast(site, r);
 }
 
 template <int Dim> bool walk_tree<Dim>::self_avoiding() const {

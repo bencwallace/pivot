@@ -46,6 +46,8 @@ public:
 
   bool try_pivot(int n, const transform<Dim> &r);
 
+  bool try_pivot_fast(int n, const transform<Dim> &r);
+
   bool rand_pivot() override;
 
   std::vector<point<Dim>> steps() const;

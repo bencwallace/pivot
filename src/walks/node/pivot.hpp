@@ -111,6 +111,51 @@ bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const
   }
 }
 
+template <int Dim>
+std::pair<walk_node<Dim> *, bool> walk_node<Dim>::shuffle_intersect(const transform<Dim> &t,
+                                                                    std::optional<bool> was_left_child,
+                                                                    std::optional<bool> is_left_child) {
+  if (was_left_child.has_value()) {
+    if (was_left_child.value()) {
+      if (::pivot::intersect(left_, right_->right_, point<Dim>(), left_->end_ + symm_ * t * right_->left_->end_,
+                             transform<Dim>(), symm_ * t * right_->symm_)) {
+        return {this, true};
+      }
+    } else {
+      if (::pivot::intersect(left_->left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_ * t)) {
+        return {this, true};
+      }
+    }
+  } else {
+    if (::pivot::intersect(left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_ * t)) {
+      return {this, true};
+    }
+  }
+
+  if (parent_ == nullptr) {
+    return {this, false};
+  }
+
+  std::optional<bool> is_left_child_new;
+  if (parent_->parent_ == nullptr) {
+    is_left_child_new = std::nullopt;
+  } else if (parent_->parent_->left_ == parent_) {
+    is_left_child_new = true;
+  } else {
+    is_left_child_new = false;
+  }
+
+  walk_node *w = parent_;
+  if (is_left_child.has_value()) {
+    if (is_left_child.value()) {
+      w->rotate_right();
+    } else {
+      w->rotate_left();
+    }
+  }
+  return w->shuffle_intersect(t, is_left_child, is_left_child_new);
+}
+
 template <int Dim> void walk_node<Dim>::merge() {
   num_sites_ = left_->num_sites_ + right_->num_sites_;
 
