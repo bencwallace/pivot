@@ -90,6 +90,10 @@ template <int Dim> void walk_tree<Dim>::shuffle_up(int id) {
   }
 }
 
+template <int Dim> void walk_tree<Dim>::shuffle_down() {
+  root_->shuffle_down();
+}
+
 template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r) {
   shuffle_up(n);
   root_->symm_ = root_->symm_ * r; // modify in-place

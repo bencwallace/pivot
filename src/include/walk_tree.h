@@ -42,6 +42,8 @@ public:
 
   void shuffle_up(int id);
 
+  void shuffle_down();
+
   bool try_pivot(int n, const transform<Dim> &r);
 
   bool rand_pivot() override;

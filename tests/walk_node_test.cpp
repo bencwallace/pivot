@@ -275,7 +275,7 @@ TEST(WalkNode, ShuffleDownRand2D) {
     auto tree = walk_tree<2>(steps);
     int root_id = tree.root()->id();
     tree.shuffle_up(id);
-    tree.root()->shuffle_down();
+    tree.shuffle_down();
     EXPECT_EQ(tree.root()->id(), root_id);
 }
 
