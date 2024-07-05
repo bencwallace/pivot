@@ -115,7 +115,7 @@ template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r
   } else {
     root_->merge();
   }
-  root_->shuffle_down();
+  shuffle_down();
   return success;
 }
 
