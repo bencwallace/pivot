@@ -2,16 +2,22 @@
 
 namespace pivot {
 
-template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_left() {
+template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_left(bool set_parent) {
   if (right_->is_leaf()) {
     throw std::invalid_argument("can't rotate left on a leaf node");
   }
   auto temp_tree = right_;
 
   // update pointers
-  set_right(temp_tree->right_);
+  right_ = temp_tree->right_;
+  if (set_parent && temp_tree->right_ != nullptr) {
+    temp_tree->right_->parent_ = this;
+  }
   temp_tree->right_ = temp_tree->left_; // temp_tree->set_right(temp_tree->left_) sets parent unnecessarily
-  temp_tree->set_left(left_);
+  temp_tree->left_ = left_;
+  if (set_parent && left_ != nullptr) {
+    left_->parent_ = temp_tree;
+  }
   left_ = temp_tree; // set_left(temp_tree) sets parent unnecessarily
 
   // update symmetries
@@ -30,16 +36,22 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_left() {
   return this;
 }
 
-template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_right() {
+template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_right(bool set_parent) {
   if (left_->is_leaf()) {
     throw std::invalid_argument("can't rotate right on a leaf node");
   }
   auto temp_tree = left_;
 
   // update pointers
-  set_left(temp_tree->left_);
+  left_ = temp_tree->left_;
+  if (set_parent && temp_tree->left_ != nullptr) {
+    temp_tree->left_->parent_ = this;
+  }
   temp_tree->left_ = temp_tree->right_; // temp_tree->set_left(temp_tree->right_) sets parent unnecessarily
-  temp_tree->set_right(right_);
+  temp_tree->right_ = right_;
+  if (set_parent && right_ != nullptr) {
+    right_->parent_ = temp_tree;
+  }
   right_ = temp_tree; // set_right(temp_tree) sets parent unnecessarily
 
   // update symmetries
@@ -109,6 +121,57 @@ bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const
            intersect(l_walk, r_walk->right_, l_anchor, r_anchor + r_symm * r_walk->left_->end_, l_symm,
                      r_symm * r_walk->symm_);
   }
+}
+
+template <int Dim>
+bool walk_node<Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
+                                       std::optional<bool> is_left_child) {
+  if (was_left_child.has_value()) {
+    if (was_left_child.value()) {
+      if (::pivot::intersect(left_, right_->right_, point<Dim>(), left_->end_ + symm_ * t * right_->left_->end_,
+                             transform<Dim>(), symm_ * t * right_->symm_)) {
+        return true;
+      }
+    } else {
+      if (::pivot::intersect(left_->left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_ * t)) {
+        return true;
+      }
+    }
+  } else {
+    if (::pivot::intersect(left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_ * t)) {
+      return true;
+    }
+  }
+
+  if (parent_ == nullptr) {
+    return false;
+  }
+
+  std::optional<bool> is_left_child_new;
+  if (parent_->parent_ == nullptr) {
+    is_left_child_new = std::nullopt;
+  } else if (parent_->parent_->left_ == parent_) {
+    is_left_child_new = true;
+  } else {
+    is_left_child_new = false;
+  }
+
+  walk_node w(*parent_);
+  bool result = false;
+  if (is_left_child.value()) {
+    auto w1 = parent_->right_->is_leaf() ? leaf() : walk_node(*parent_->right_);
+    w.set_left(this);
+    w.set_right(&w1);
+    w.rotate_right(false);
+    result = w.shuffle_intersect(t, is_left_child, is_left_child_new);
+  } else {
+    auto w1 = parent_->left_->is_leaf() ? leaf() : walk_node(*parent_->left_);
+    w.set_left(&w1);
+    w.set_right(this);
+    w.rotate_left(false);
+    result = w.shuffle_intersect(t, is_left_child, is_left_child_new);
+  }
+  return result;
 }
 
 template <int Dim> void walk_node<Dim>::merge() {
