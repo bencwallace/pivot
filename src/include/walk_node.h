@@ -1,5 +1,7 @@
 #pragma once
 
+#include <optional>
+
 #include "defines.h"
 #include "graphviz.h"
 #include "lattice.h"
@@ -27,7 +29,8 @@ public:
    */
   static walk_node *balanced_rep(const std::vector<point<Dim>> &steps, walk_node *buf = nullptr);
 
-  walk_node(const walk_node &w) = delete;
+  walk_node(const walk_node &w) = default;
+
   walk_node(walk_node &&w) = delete;
   walk_node &operator=(const walk_node &w) = delete;
 
@@ -53,13 +56,16 @@ public:
 
   void todot(const std::string &path) const;
 
-  walk_node *rotate_left();
+  walk_node *rotate_left(bool set_parent = true);
 
-  walk_node *rotate_right();
+  walk_node *rotate_right(bool set_parent = true);
 
   walk_node *shuffle_up(int id);
 
   walk_node *shuffle_down();
+
+  bool shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
+                         std::optional<bool> is_left_child);
 
   bool intersect() const;
 

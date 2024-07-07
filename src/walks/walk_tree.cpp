@@ -89,6 +89,29 @@ template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r
   return success;
 }
 
+template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Dim> &t) {
+  walk_node<Dim> *w = &find_node(n); // TODO: a pointer seems to be needed, but why?
+
+  std::optional<bool> is_left_child;
+  if (w->parent_ == nullptr || w->parent_->left_ == nullptr) {
+    is_left_child = std::nullopt;
+  } else if (w->parent_->left_ == w) {
+    is_left_child = true;
+  } else {
+    is_left_child = false;
+  }
+
+  walk_node<Dim> w_copy(*w);
+  auto success = !w_copy.shuffle_intersect(t, std::nullopt, is_left_child);
+  if (success) {
+    root_->shuffle_up(n);
+    root_->symm_ = root_->symm_ * t;
+    root_->merge();
+    root_->shuffle_down();
+  }
+  return success;
+}
+
 template <int Dim> bool walk_tree<Dim>::rand_pivot() {
   auto site = dist_(rng_);
   auto r = transform<Dim>::rand(rng_);
