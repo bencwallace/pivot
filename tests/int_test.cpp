@@ -50,7 +50,7 @@ TEST(WalkTest, Seed) {
 }
 
 TEST(WalkTest, Loop) {
-  auto ret = main_loop<2>(100, 10, true, 42, false, false, "", "");
+  auto ret = main_loop<2>(100, 10, true, false, 42, false, false, "", "");
   ASSERT_EQ(ret, 0);
 }
 
@@ -113,6 +113,6 @@ TEST(WalkTreeTest, Seed) {
 }
 
 TEST(WalkTreeTest, Loop) {
-  auto ret = main_loop<2>(100, 10, false, 42, false, false, "", "");
+  auto ret = main_loop<2>(100, 10, false, true, 42, false, false, "", "");
   ASSERT_EQ(ret, 0);
 }

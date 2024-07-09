@@ -7,7 +7,7 @@
 #include "walk_tree.h"
 
 template <int Dim>
-int main_loop(int num_steps, int iters, bool naive, int seed, bool require_success, bool verify,
+int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool require_success, bool verify,
               const std::string &in_path, const std::string &out_dir) {
   std::unique_ptr<pivot::walk_base<Dim>> w;
   if (!naive) {
@@ -43,7 +43,7 @@ int main_loop(int num_steps, int iters, bool naive, int seed, bool require_succe
       break;
     }
 
-    auto success = w->rand_pivot();
+    auto success = w->rand_pivot(fast);
     if (success) {
       endpoints.push_back(w->endpoint());
       ++num_success;

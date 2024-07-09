@@ -112,10 +112,10 @@ template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Di
   return success;
 }
 
-template <int Dim> bool walk_tree<Dim>::rand_pivot() {
+template <int Dim> bool walk_tree<Dim>::rand_pivot(bool fast) {
   auto site = dist_(rng_);
   auto r = transform<Dim>::rand(rng_);
-  return try_pivot(site, r);
+  return fast ? try_pivot_fast(site, r) : try_pivot(site, r);
 }
 
 template <int Dim> bool walk_tree<Dim>::self_avoiding() const {

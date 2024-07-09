@@ -38,7 +38,11 @@ template <int Dim> std::pair<int, std::optional<std::vector<point<Dim>>>> walk<D
   return {step, try_pivot(step, r)};
 }
 
-template <int Dim> bool walk<Dim>::rand_pivot() {
+template <int Dim> bool walk<Dim>::rand_pivot(bool fast) {
+  if (fast) { // TODO: implement Kennedy algorithm
+    throw std::invalid_argument("fast pivot not implemented for naive walk");
+  }
+
   auto [step, new_points] = try_rand_pivot();
   if (!new_points) {
     return false;
