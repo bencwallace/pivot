@@ -55,11 +55,13 @@ TEST(WalkTest, Loop) {
 }
 
 TEST(WalkTreeTest, SelfAvoiding) {
+  std::mt19937 gen(std::random_device{}());
+  std::uniform_int_distribution<int> dist(0, 1);
   for (int num_steps = 2; num_steps < 10; ++num_steps) {
     auto w = walk_tree<2>(num_steps);
     for (int i = 0; i < 10; ++i) {
       for (int j = 0; j < 10; j++) {
-        w.rand_pivot();
+        w.rand_pivot(static_cast<bool>(dist(gen)));
       }
       EXPECT_TRUE(w.self_avoiding());
     }
