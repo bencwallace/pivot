@@ -32,7 +32,7 @@ public:
 
   std::pair<int, std::optional<std::vector<point<Dim>>>> try_rand_pivot() const;
 
-  bool rand_pivot() override;
+  bool rand_pivot(bool fast = false) override;
 
   bool rand_pivot(int num_workers);
 
