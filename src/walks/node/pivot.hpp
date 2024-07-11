@@ -2,6 +2,11 @@
 
 namespace pivot {
 
+/* PRIMITIVE OPERATIONS */
+
+// Note: A detail missing from Clisby's paper regarding tree rotations is that parent pointers must be updated,
+// except when the rotation is called from shuffle_intersect.
+
 template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_left(bool set_parent) {
   if (right_->is_leaf()) {
     throw std::invalid_argument("can't rotate left on a leaf node");
@@ -28,7 +33,7 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_left(bool set_parent) 
   // merge
   left_->merge();
 
-  // update IDs
+  // update IDs (TODO: this should be part of merge)
   int temp_id = id_;
   id_ = left_->id_;
   left_->id_ = temp_id;
@@ -69,6 +74,15 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_right(bool set_parent)
 
   return this;
 }
+
+template <int Dim> void walk_node<Dim>::merge() {
+  num_sites_ = left_->num_sites_ + right_->num_sites_;
+
+  bbox_ = left_->bbox_ | (left_->end_ + symm_ * right_->bbox_);
+  end_ = left_->end_ + symm_ * right_->end_;
+}
+
+/* USER LEVEL OPERATIONS */
 
 template <int Dim> walk_node<Dim> *walk_node<Dim>::shuffle_up(int id) {
   if (id < left_->num_sites_) {
@@ -123,9 +137,14 @@ bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const
   }
 }
 
+template <int Dim> bool walk_node<Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bool> is_left_child) {
+  return shuffle_intersect(t, std::nullopt, is_left_child);
+}
+
 template <int Dim>
 bool walk_node<Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
                                        std::optional<bool> is_left_child) {
+  /* BASE CASE */
   if (was_left_child.has_value()) {
     if (was_left_child.value()) {
       if (::pivot::intersect(left_, right_->right_, point<Dim>(), left_->end_ + symm_ * t * right_->left_->end_,
@@ -147,6 +166,7 @@ bool walk_node<Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bo
     return false;
   }
 
+  /* RECURSION */
   std::optional<bool> is_left_child_new;
   if (parent_->parent_ == nullptr) {
     is_left_child_new = std::nullopt;
@@ -156,6 +176,9 @@ bool walk_node<Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bo
     is_left_child_new = false;
   }
 
+  // Note: A detail left out in Clisby's paper is that the left or right sub-node must also be copied
+  // and the copied parent node must be have its left and right children updated. This is to avoid
+  // modifying the original tree when performing a right or left rotation.
   walk_node w(*parent_);
   bool result = false;
   if (is_left_child.value()) {
@@ -172,13 +195,6 @@ bool walk_node<Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bo
     result = w.shuffle_intersect(t, is_left_child, is_left_child_new);
   }
   return result;
-}
-
-template <int Dim> void walk_node<Dim>::merge() {
-  num_sites_ = left_->num_sites_ + right_->num_sites_;
-
-  bbox_ = left_->bbox_ | (left_->end_ + symm_ * right_->bbox_);
-  end_ = left_->end_ + symm_ * right_->end_;
 }
 
 } // namespace pivot
