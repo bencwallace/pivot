@@ -170,6 +170,13 @@ private:
     }
   }
 
+  std::optional<bool> is_left_child() const {
+    if (parent_ == nullptr) {
+      return std::nullopt;
+    }
+    return parent_->left_ == this;
+  }
+
   static walk_node create_leaf();
   static walk_node &leaf();
 
