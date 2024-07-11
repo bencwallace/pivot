@@ -167,14 +167,7 @@ bool walk_node<Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bo
   }
 
   /* RECURSION */
-  std::optional<bool> is_left_child_new;
-  if (parent_->parent_ == nullptr) {
-    is_left_child_new = std::nullopt;
-  } else if (parent_->parent_->left_ == parent_) {
-    is_left_child_new = true;
-  } else {
-    is_left_child_new = false;
-  }
+  auto is_left_child_new = parent_->is_left_child();
 
   // Note: A detail left out in Clisby's paper is that the left or right sub-node must also be copied
   // and the copied parent node must be have its left and right children updated. This is to avoid
