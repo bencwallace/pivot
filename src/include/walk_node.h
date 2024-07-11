@@ -136,11 +136,8 @@ public:
 
   /* OTHER FUNCTIONS */
 
-  // TODO: make private
   std::vector<point<Dim>> steps() const;
 
-  // TODO: make private
-  // TODO: add corresponding method to walk_tree
   void todot(const std::string &path) const;
 
 private:
@@ -159,17 +156,16 @@ private:
 
   walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end);
 
-  // TODO: don't set leaf parent
   void set_left(walk_node *left) {
     left_ = left;
-    if (left != nullptr) {
+    if (left != nullptr && !left->is_leaf()) {
       left->parent_ = this;
     }
   }
 
   void set_right(walk_node *right) {
     right_ = right;
-    if (right != nullptr) {
+    if (right != nullptr && !right->is_leaf()) {
       right->parent_ = this;
     }
   }

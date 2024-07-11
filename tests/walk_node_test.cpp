@@ -144,8 +144,7 @@ TEST(RandomWalk, IsNearestNeighbor) {
 TEST(WalkNode, BalancedSteps) {
     auto steps = random_walk<2>(100);
     auto tree = walk_tree<2>(steps);
-    auto root = tree.root();
-    auto result = root->steps();
+    auto result = tree.steps();
     EXPECT_EQ(steps, result);
 }
 
@@ -215,7 +214,7 @@ TEST(WalkNode, RotateRightStepsRand2D) {
 
     auto tree = walk_tree<2>(steps);
     auto root = tree.root();
-    ASSERT_EQ(root->steps(), steps);
+    ASSERT_EQ(tree.steps(), steps);
     EXPECT_EQ(root->rotate_right()->steps(), steps);
 }
 
@@ -225,7 +224,7 @@ TEST(WalkNode, RotateLeftStepsRand2D) {
 
     auto tree = walk_tree<2>(steps);
     auto root = tree.root();
-    ASSERT_EQ(root->steps(), steps);
+    ASSERT_EQ(tree.steps(), steps);
     EXPECT_EQ(root->rotate_left()->steps(), steps);
 }
 

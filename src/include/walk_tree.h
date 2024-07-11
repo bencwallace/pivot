@@ -145,6 +145,9 @@ public:
   /** @brief Export the walk to a CSV file. */
   void export_csv(const std::string &path) const override;
 
+  /** @brief Export tree to GraphViz format. */
+  void todot(const std::string &path) const;
+
 private:
   std::unique_ptr<walk_node<Dim>> root_;
   std::mt19937 rng_;
