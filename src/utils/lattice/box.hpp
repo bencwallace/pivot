@@ -8,8 +8,9 @@ interval::interval() : interval(0, 0) {}
 
 interval::interval(int left, int right) : left_(left), right_(right) {}
 
-// TODO: don't distinguish empty intervals
-bool interval::operator==(const interval &other) const { return left_ == other.left_ && right_ == other.right_; }
+bool interval::operator==(const interval &other) const {
+  return (left_ == other.left_ && right_ == other.right_) || (empty() && other.empty());
+}
 
 bool interval::operator!=(const interval &other) const { return !(*this == other); }
 

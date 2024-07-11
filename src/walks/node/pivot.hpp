@@ -33,7 +33,7 @@ template <int Dim> walk_node<Dim> *walk_node<Dim>::rotate_left(bool set_parent) 
   // merge
   left_->merge();
 
-  // update IDs (TODO: this should be part of merge)
+  // update IDs
   int temp_id = id_;
   id_ = left_->id_;
   left_->id_ = temp_id;

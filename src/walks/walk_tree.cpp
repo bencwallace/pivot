@@ -82,10 +82,11 @@ template <int Dim> walk_node<Dim> &walk_tree<Dim>::find_node(int n) {
 
 template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r) {
   root_->shuffle_up(n);
-  root_->symm_ = root_->symm_ * r; // modify in-place
+  auto root_symm = root_->symm_;
+  root_->symm_ = root_->symm_ * r;
   auto success = !root_->intersect();
   if (!success) {
-    root_->symm_ = root_->symm_ * r.inverse(); // TODO: backup symm_
+    root_->symm_ = root_symm;
   } else {
     root_->merge();
   }
@@ -140,6 +141,8 @@ template <int Dim> bool walk_tree<Dim>::self_avoiding() const {
 }
 
 template <int Dim> void walk_tree<Dim>::export_csv(const std::string &path) const { return to_csv(path, steps()); }
+
+template <int Dim> void walk_tree<Dim>::todot(const std::string &path) const { root_->todot(path); }
 
 /* TEMPLATE INSTANTIATION */
 
