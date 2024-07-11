@@ -96,6 +96,7 @@ template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r
 template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Dim> &t) {
   walk_node<Dim> *w = &find_node(n); // TODO: a pointer seems to be needed, but why?
 
+  // TODO: it might be simpler to actually determine this in the shuffle_intersect function
   std::optional<bool> is_left_child;
   if (w->parent_ == nullptr || w->parent_->left_ == nullptr) {
     is_left_child = std::nullopt;
@@ -106,7 +107,7 @@ template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Di
   }
 
   walk_node<Dim> w_copy(*w);
-  auto success = !w_copy.shuffle_intersect(t, std::nullopt, is_left_child);
+  auto success = !w_copy.shuffle_intersect(t, is_left_child);
   if (success) {
     root_->shuffle_up(n);
     root_->symm_ = root_->symm_ * t;
