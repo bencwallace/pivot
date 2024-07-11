@@ -154,17 +154,15 @@ The output should be close to 3/4, the predicted value for $\nu$ in 2 dimensions
 
 I hope to make the following changes in the future:
 
-* Use Clisby's `fast_pivot` method
 * Improve initialization methods (e.g. Clisby's `pseudo_dimerize` method)
-* Support multithreaded pivot proposals
+* Support multithreaded pivot proposals (cf. [[3]](#3))
 
-Some other interesting directions to explore would be the following:
+The following are some other potentially interesting directions to explore:
 
 * Allow soft-core interactions (Domb-Joyce model) [[2]](#2)
 * Allow attractive interactions
-* Add Python bindings
-* Support non-cubic lattices
 * Allow long-range step distributions
+* Support non-cubic lattices
 
 ## References
 
@@ -180,4 +178,11 @@ Journal of Statistical Physics., 140:349-392, (2010).
 N. Clisby.
 High resolution Monte Carlo study of the Domb-Joyce model.
 Journal of Physics: Conference Series., 921:012012, (2017).
+</a>
+
+<a id="3">[3]</a>
+<a href="https://iopscience.iop.org/article/10.1088/1742-6596/2122/1/012008">
+N.Clisby and D. Ho.
+Off-lattice and parallel implementations of the pivot algorithm.
+Journal of Physics: Conference Series., 2122:012008, (2021).
 </a>
