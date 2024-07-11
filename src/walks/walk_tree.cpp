@@ -11,6 +11,8 @@
 
 namespace pivot {
 
+/* CONSTRUCTORS, DESTRUCTOR */
+
 template <int Dim>
 walk_tree<Dim>::walk_tree(int num_sites, std::optional<unsigned int> seed, bool balanced)
     : walk_tree(line<Dim>(num_sites), seed, balanced) {}
@@ -57,7 +59,7 @@ template <int Dim> walk_tree<Dim>::~walk_tree() {
   }
 }
 
-template <int Dim> walk_tree<Dim>::walk_tree(walk_node<Dim> *root) : root_(root) {}
+/* GETTERS, SETTERS, SIMPLE UTILITIES */
 
 template <int Dim> walk_node<Dim> *walk_tree<Dim>::root() const { return root_.get(); }
 
@@ -65,7 +67,7 @@ template <int Dim> point<Dim> walk_tree<Dim>::endpoint() const { return root_->e
 
 template <int Dim> bool walk_tree<Dim>::is_leaf() const { return root_->is_leaf(); }
 
-template <int Dim> std::vector<point<Dim>> walk_tree<Dim>::steps() const { return root_->steps(); }
+/* PRIMITIVE OPERATIONS */
 
 template <int Dim> walk_node<Dim> &walk_tree<Dim>::find_node(int n) {
   if (!buf_) {
@@ -75,6 +77,8 @@ template <int Dim> walk_node<Dim> &walk_tree<Dim>::find_node(int n) {
   assert(result.id_ == n);
   return result;
 }
+
+/* HIGH-LEVEL FUNCTIONS */
 
 template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r) {
   root_->shuffle_up(n);
@@ -118,6 +122,10 @@ template <int Dim> bool walk_tree<Dim>::rand_pivot(bool fast) {
   return fast ? try_pivot_fast(site, r) : try_pivot(site, r);
 }
 
+/* OTHER FUNCTIONS */
+
+template <int Dim> std::vector<point<Dim>> walk_tree<Dim>::steps() const { return root_->steps(); }
+
 template <int Dim> bool walk_tree<Dim>::self_avoiding() const {
   auto steps = this->steps();
   for (size_t i = 0; i < steps.size(); ++i) {
@@ -131,6 +139,8 @@ template <int Dim> bool walk_tree<Dim>::self_avoiding() const {
 }
 
 template <int Dim> void walk_tree<Dim>::export_csv(const std::string &path) const { return to_csv(path, steps()); }
+
+/* TEMPLATE INSTANTIATION */
 
 #define WALK_TREE_INST(z, n, data) template class walk_tree<n>;
 
