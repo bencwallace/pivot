@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <future>
 #include <new>
 #include <stack>
 
@@ -119,6 +120,50 @@ template <int Dim> bool walk_tree<Dim>::rand_pivot(bool fast) {
   auto site = dist_(rng_);
   auto r = transform<Dim>::rand(rng_);
   return fast ? try_pivot_fast(site, r) : try_pivot(site, r);
+}
+
+template <int Dim> std::optional<std::pair<int, transform<Dim>>> walk_tree<Dim>::try_rand_pivot() {
+  auto site = dist_(rng_);
+  auto r = transform<Dim>::rand(rng_);
+  walk_node<Dim> *w = &find_node(site);
+  walk_node<Dim> w_copy(*w);
+  if (!w_copy.shuffle_intersect(r, w->is_left_child())) {
+    return std::make_pair(site, r);
+  }
+  return std::nullopt;
+}
+
+template <int Dim> void walk_tree<Dim>::do_pivot(int n, const transform<Dim> &r) {
+  root_->shuffle_up(n);
+  root_->symm_ = root_->symm_ * r;
+  root_->merge();
+  root_->shuffle_down();
+}
+
+template <int Dim> bool walk_tree<Dim>::rand_pivot(int num_workers, bool fast) {
+  if (num_workers == 0) {
+    return rand_pivot(fast);
+  }
+  if (!fast) {
+    throw std::invalid_argument("multiple workers only supported for fast pivot");
+  }
+
+  // TODO
+  std::vector<int> sites(num_workers);
+  std::vector<transform<Dim>> transforms(num_workers);
+  std::vector<std::future<std::optional<std::pair<int, transform<Dim>>>>> futures(num_workers);
+  for (int i = 0; i < num_workers; ++i) {
+    futures[i] = std::async(&walk_tree::try_rand_pivot, this);
+  }
+  for (int i = 0; i < num_workers; ++i) {
+    auto result = futures[i].get();
+    if (result.has_value()) {
+      auto [site, r] = result.value();
+      do_pivot(site, r);
+      return true;
+    }
+  }
+  return false;
 }
 
 /* OTHER FUNCTIONS */

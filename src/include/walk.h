@@ -34,9 +34,8 @@ public:
 
   std::pair<int, std::optional<std::vector<point<Dim>>>> try_rand_pivot() const;
 
-  bool rand_pivot(bool fast = false) override;
-
-  bool rand_pivot(int num_workers);
+  bool rand_pivot();
+  bool rand_pivot(int num_workers, bool fast = false) override;
 
   bool self_avoiding() const override;
 
