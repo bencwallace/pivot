@@ -9,7 +9,8 @@ template <int Dim> class walk_base {
 public:
   virtual ~walk_base() = default;
 
-  virtual bool rand_pivot(bool fast) = 0;
+  virtual bool rand_pivot(int num_workers, bool fast) = 0;
+  bool rand_pivot(bool fast) { return rand_pivot(0, fast); }
 
   virtual bool self_avoiding() const = 0;
 

@@ -121,7 +121,8 @@ public:
    *
    * @return Whether the pivot was successful.
    */
-  bool rand_pivot(bool fast = true) override;
+  bool rand_pivot(int num_workers, bool fast = true) override;
+  bool rand_pivot(bool fast = true);
 
   /* OTHER FUNCTIONS */
 
@@ -153,6 +154,9 @@ private:
   std::mt19937 rng_;
   std::uniform_int_distribution<int> dist_; // distribution for choosing a random lattice site
   walk_node<Dim> *buf_;                     // buffer into which nodes are allocated (used for fast node lookup by id)
+
+  std::optional<std::pair<int, transform<Dim>>> try_rand_pivot();
+  void do_pivot(int n, const transform<Dim> &t);
 };
 
 } // namespace pivot
