@@ -180,14 +180,31 @@ for n in num_steps:
 squared_dists = {key: np.linalg.norm(val, ord=2, axis=1) ** 2 for key, val in data.items()}
 mean_sq_dists = {key: np.mean(val) for key, val in squared_dists.items()}
 
-# fit curve with scipy
+# curve to fit
 def f(n, nu, C):
   return C * n ** (2 * nu)
+
+# (optional) plot data and curve
+x_scatter = list(mean_sq_dists.keys())
+y_scatter = list(mean_sq_dists.values())
+x_curve = np.linspace(min(x_scatter), max(x_scatter), 100)
+y_curve = f(x_curve, 0.75, 1)  # C = 1 is not very accurate but good enough for the plot
+plt.scatter(x_scatter, y_scatter)
+plt.plot(x_curve, y_curve, color="red")
+
+# fit curve with scipy
 params, _ = curve_fit(f, list(mean_sq_dists.keys()), list(mean_sq_dists.values()))
-print(f"nu estimate: {params[0]}")
+nu, C = params
+print(f"nu estimate: {nu}")
+
+# (optional) show plot
+plt.show()
 ```
 
 The output should be close to 3/4, the predicted value for $\nu$ in 2 dimensions.
+An example plot as generated above is shown below.
+
+![](assets/curve.png)
 
 ## Limitations and future work
 
