@@ -12,8 +12,8 @@ statistical properties as the number of steps in the path increases. These probl
 been studied using techniques from theoretical physics and rigorous mathematics as well
 as computational methods, which are the focus of this project.
 
-The *pivot algorithm* is a [Monte Carlo](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo) approach
-to simulating the SAW. The algorithm consists of a sequence of "pivot moves": random
+The *pivot algorithm* is a [Markov chain Monte Carlo](https://en.wikipedia.org/wiki/Markov_chain_Monte_Carlo)
+approach to simulating the SAW. The algorithm consists of a sequence of "pivot moves": random
 rigid transformations applied at random points of a walk, thereby pivoting one end about the other.
 In a [2010 paper](#1), [Nathan Clisby](https://clisby.net) introduced the
 *saw-tree* data structure, enabling a massive performance improvement to this algorithm.
