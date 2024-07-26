@@ -86,18 +86,26 @@ For usage instructions, run the following command from the directory containing 
 
 **Plotting a walk**
 
-Attempt $10^5$ pivots on a $10^6$ step walk:
+Attempt $10^6$ pivots on a $10^6$ step walk in $2$ dimensions:
 
 ```
 mkdir out
-./pivot --steps 1000000 --iters 100000 --out out
+./pivot -d 2 --steps 1000000 --iters 1000000 --out out
 ```
 
-Plot the output:
+Plot the output (requires [matplotlib](https://matplotlib.org/)):
 
 ```
 python plot.py out/walk.csv
 ```
+
+An interactive plot can also be made with [Plotly](https://plotly.com/) if you have it available by
+adding a second, truthy argument (e.g. `python plot.py out/walk.csv 1`).
+For instance, the plot below was generated as above (with `--seed 42`):
+
+[![follow link for interactive version](assets/pivot2d_1e6_1e6_42.png)](https://bcwallace.com/pivot2d_1e6_1e6_42.html)
+
+The interactive version of this plot is available by clicking on the image above.
 
 **Estimating critical exponents**
 
