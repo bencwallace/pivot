@@ -111,7 +111,7 @@ The interactive version of this plot is available by clicking on the image above
 
 `pivot`'s C++ API allows the internal saw-tree data structures used by Clisby's pivot algorithm to be
 exported to GraphViz format (i.e. dot format). For instance, the following generates the walk-tree
-depicted in [[1, Figure 23]](#1) (note that the [GraphViz runtime](https://graphviz.org/download/) is
+depicted in [[1, Figure 23]](https://arxiv.org/pdf/1005.1444#page=33) (note that the [GraphViz runtime](https://graphviz.org/download/) is
 required).
 
 ```cpp
