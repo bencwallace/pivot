@@ -3,6 +3,9 @@
 #include <new>
 #include <stack>
 
+#include <boost/asio/post.hpp>
+#include <boost/asio/thread_pool.hpp>
+#include <boost/asio/use_future.hpp>
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 #include "defines.h"
@@ -140,21 +143,22 @@ template <int Dim> bool walk_tree<Dim>::rand_pivot(int num_workers, bool fast) {
     throw std::invalid_argument("multiple workers only supported for fast pivot");
   }
 
-  // TODO
-  std::vector<int> sites(num_workers);
-  std::vector<transform<Dim>> transforms(num_workers);
+  static boost::asio::thread_pool pool(num_workers);
   std::vector<std::future<std::optional<std::pair<int, transform<Dim>>>>> futures(num_workers);
+
   for (int i = 0; i < num_workers; ++i) {
-    futures[i] = std::async(&walk_tree::try_rand_pivot, this);
+    futures[i] = boost::asio::post(pool, boost::asio::use_future([this] { return try_rand_pivot(); }));
   }
-  for (int i = 0; i < num_workers; ++i) {
-    auto result = futures[i].get();
+
+  for (auto &f : futures) {
+    auto result = f.get();
     if (result.has_value()) {
       auto [site, r] = result.value();
       do_pivot(site, r);
       return true;
     }
   }
+
   return false;
 }
 
