@@ -210,8 +210,9 @@ An example plot as generated above is shown below.
 
 I hope to make the following changes in the future:
 
-* Improve initialization methods (e.g. Clisby's `pseudo_dimerize` method)
+* Add reproducible benchmarks
 * Support multithreaded pivot proposals (cf. [[3]](#3))
+* Improve initialization methods (e.g. Clisby's `pseudo_dimerize` method)
 
 The following are some other potentially interesting directions to explore:
 
