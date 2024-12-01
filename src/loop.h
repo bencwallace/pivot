@@ -1,5 +1,6 @@
 #include <iostream>
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "logging.h"
@@ -9,7 +10,7 @@
 
 template <int Dim>
 int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool require_success, bool verify,
-              const std::string &in_path, const std::string &out_dir) {
+              std::optional<int> freq, const std::string &in_path, const std::string &out_dir) {
   pivot::configureLogger();
   auto logger = spdlog::get("pivot");
 
@@ -32,7 +33,7 @@ int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool re
   int num_success = 0;
   int total_success = 0;
   int num_iter = 0;
-  auto interval = static_cast<int>(std::pow(10, std::floor(std::log10(std::max(iters / 10, 1)))));
+  auto interval = freq.value_or(static_cast<int>(std::pow(10, std::floor(std::log10(std::max(iters / 10, 1))))));
   logger->info("Starting loop with {} iterations", iters);
   while (true) {
     if (num_iter % interval == 0) {

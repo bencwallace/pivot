@@ -6,7 +6,7 @@
 
 #define CASE_MACRO(z, n, data)                                                                                         \
   case n:                                                                                                              \
-    return main_loop<n>(num_steps, iters, naive, fast, seed, require_success, verify, in_path, out_dir);               \
+    return main_loop<n>(num_steps, iters, naive, fast, seed, require_success, verify, freq, in_path, out_dir);         \
     break;
 
 int main(int argc, char **argv) {
@@ -18,6 +18,7 @@ int main(int argc, char **argv) {
   int num_workers{0};
   bool require_success{false};
   bool verify{false};
+  std::optional<int> freq{std::nullopt};
   std::string in_path{""};
   std::string out_dir{""};
   unsigned int seed;
@@ -33,6 +34,7 @@ int main(int argc, char **argv) {
   app.add_option("-w,--workers", num_workers, "number of workers");
   app.add_flag("--success", require_success, "require success");
   app.add_flag("--verify", verify, "verify");
+  app.add_option("--freq", freq, "logging frequency");
   app.add_option("--in", in_path, "input path");
   app.add_option("--out", out_dir, "output directory");
   app.add_option("--seed", seed, "seed")->default_val(std::random_device()());
