@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 
+#include "logging.h"
 #include "utils.h"
 #include "walk.h"
 #include "walk_tree.h"
@@ -9,6 +10,9 @@
 template <int Dim>
 int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool require_success, bool verify,
               const std::string &in_path, const std::string &out_dir) {
+  pivot::configureLogger();
+  auto logger = spdlog::get("pivot");
+
   std::unique_ptr<pivot::walk_base<Dim>> w;
   if (!naive) {
     if (in_path.empty()) {
@@ -29,10 +33,11 @@ int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool re
   int total_success = 0;
   int num_iter = 0;
   auto interval = static_cast<int>(std::pow(10, std::floor(std::log10(std::max(iters / 10, 1)))));
+  logger->info("Starting loop with {} iterations", iters);
   while (true) {
     if (num_iter % interval == 0) {
-      std::cout << "Iterations: " << num_iter << " / Successes: " << total_success
-                << " / Success rate: " << num_success / static_cast<float>(interval) << std::endl;
+      logger->info("Iterations: {}/{} / Successes: {} / Success rate: {}", num_iter, iters, total_success,
+                   num_success / static_cast<float>(interval));
       num_success = 0;
     }
     if (require_success) {
@@ -51,15 +56,17 @@ int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool re
     }
     ++num_iter;
   }
+  logger->info("Iterations: {}/{} / Successes: {} / Success rate: {}", num_iter, iters, total_success,
+               num_success / static_cast<float>(interval));
   if (!out_dir.empty()) {
-    std::cout << "Saving to: " << out_dir << '\n';
+    logger->info("Saving to: {}", out_dir);
     w->export_csv(out_dir + "/walk.csv");
     pivot::to_csv(out_dir + "/endpoints.csv", endpoints);
   }
   if (verify) {
-    std::cout << "Verifying self-avoiding\n";
+    logger->info("Verifying self-avoiding");
     if (!w->self_avoiding()) {
-      std::cerr << "Walk is not self-avoiding\n";
+      logger->error("Walk is not self-avoiding");
       return 1;
     }
   }

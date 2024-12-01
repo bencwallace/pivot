@@ -35,8 +35,9 @@ The following third-party dependencies are used:
 * [boost](https://www.boost.org/doc/libs/1_85_0/more/getting_started/unix-variants.html) (headers only)
 * [libgraphviz](https://gitlab.com/graphviz/graphviz)
   * Only needed at build time (optional at runtime)
-* [CLI11](https://github.com/CLIUtils/CLI11)
-  * Included via CMake
+* Included via CMake
+  * [spdlog](https://github.com/gabime/spdlog)
+  * [CLI11](https://github.com/CLIUtils/CLI11)
 
 Only the first two requirements must be available prior to building. On Debian/Ubuntu,
 this can be accomplished as follows:

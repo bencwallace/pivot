@@ -28,6 +28,13 @@ FetchContent_MakeAvailable(cli11_proj)
 find_package(Boost)
 include_directories(${Boost_INCLUDE_DIRS})
 
+FetchContent_Declare(
+    spdlog
+    GIT_REPOSITORY https://github.com/gabime/spdlog.git
+    GIT_TAG v1.15.0
+)
+FetchContent_MakeAvailable(spdlog)
+
 option(GRAPHVIZ_INCLUDE_PATH "Path to graphviz headers" OFF)
 if(NOT GRAPHVIZ_INCLUDE_PATH)
   set(GRAPHVIZ_INCLUDE_PATH "/usr/include/graphviz" CACHE STRING "Default path to graphviz headers" FORCE)
@@ -48,5 +55,6 @@ add_library(pivot ${pivot_lib_SRC})
 add_executable(pivot_exec "src/main.cpp")
 set_property(TARGET pivot_exec PROPERTY OUTPUT_NAME pivot)
 target_link_libraries(pivot_exec PUBLIC pivot PRIVATE CLI11::CLI11)
+target_link_libraries(pivot_exec PUBLIC spdlog::spdlog_header_only)
 
 add_subdirectory(tests)
