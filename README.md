@@ -106,7 +106,7 @@ mkdir out
 Plot the output (requires [matplotlib](https://matplotlib.org/)):
 
 ```
-python plot.py out/walk.csv
+python scripts/plot.py out/walk.csv
 ```
 
 An interactive plot can also be made with [Plotly](https://plotly.com/) if you have it available by
