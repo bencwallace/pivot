@@ -85,12 +85,12 @@ For usage instructions, run the following command from the directory containing 
 ## Benchmarks
 
 A simple [benchmark script](./scripts/benchmark.py) in Python (requires matplotlib) is included.
-Log-log plots of running times per pivot attempt (after a warm up period) in dimensions 2 and 3 are provided below.
+Semi-log plots of running times per pivot attempt (after a warm up period) in dimensions 2 and 3 are provided below.
 Both plots reflect the results of benchmarking on an Apple Silicon M3 Pro CPU.
 
-![](assets/bench_d2.png)
-
-![](assets/bench_d3.png)
+| | |
+|-|-|
+|![](assets/bench_d2.png)|![](assets/bench_d3.png)|
 
 ## Examples
 
