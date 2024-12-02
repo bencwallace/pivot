@@ -85,10 +85,10 @@ doxygen Doxyfile
 
 ## Usage
 
-For usage instructions, run the following command from the directory containing the `pivot` executable:
+For usage instructions, run the following command (assuming the `pivot` executable is in the `build` directory):
 
 ```
-./pivot --help
+./build/pivot --help
 ```
 
 ## Benchmarks
@@ -109,7 +109,7 @@ Attempt $10^6$ pivots on a $10^6$ step walk in $2$ dimensions:
 
 ```
 mkdir out
-./pivot -d 2 --steps 1000000 --iters 1000000 --out out
+./build/pivot -d 2 --steps 1000000 --iters 1000000 --out out
 ```
 
 Plot the output (requires [matplotlib](https://matplotlib.org/)):
