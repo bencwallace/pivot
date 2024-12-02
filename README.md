@@ -150,7 +150,7 @@ An example log-log plot as generated above is shown below.
 
 ![](assets/curve.png)
 
-**Draw the saw-tree data structure**
+**Print the saw-tree data structure**
 
 `pivot`'s C++ API allows the internal saw-tree data structures used by Clisby's pivot algorithm to be
 exported to GraphViz format (i.e. dot format). For instance, the following generates the walk-tree
