@@ -3,6 +3,15 @@
 A fast implementation of the pivot algorithm for sampling the
 [self-avoiding walk](https://en.wikipedia.org/wiki/Self-avoiding_walk).
 
+1. [Description](#description)
+2. [Download](#download)
+3. [Build](#build)
+4. [Usage](#usage)
+5. [Benchmarks](#benchmarks)
+6. [Examples](#examples)
+7. [Limitations and future work](#limitations-and-future-work)
+8. [References](#references)
+
 ## Description
 
 The self-avoiding walk (SAW) is a model of linear polymers given by uniformly sampling
