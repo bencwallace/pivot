@@ -117,37 +117,6 @@ For instance, the plot below was generated as above (with `--seed 42`):
 
 The interactive version of this plot is available by clicking on the image above.
 
-**Draw the saw-tree data structure**
-
-`pivot`'s C++ API allows the internal saw-tree data structures used by Clisby's pivot algorithm to be
-exported to GraphViz format (i.e. dot format). For instance, the following generates the walk-tree
-depicted in [[1, Figure 23]](https://arxiv.org/pdf/1005.1444#page=33) (note that the [GraphViz runtime](https://graphviz.org/download/) is
-required).
-
-```cpp
-#include <vector>
-
-#include "walk_tree.h"
-
-int main() {
-  auto steps = std::vector{pivot::point<2>({1, 0}), pivot::point<2>({1, 1}), pivot::point<2>({2, 1}),
-                           pivot::point<2>({3, 1}), pivot::point<2>({3, 0})};
-  auto walk = pivot::walk_tree<2>(steps);
-  walk.todot("walk.dot");
-
-  return 0;
-}
-```
-
-The resulting dot file can be found under [assets/walk.dot](assets/walk.dot). The image below can
-be generated from this file by running GraphViz as follows:
-
-```
-dot -Tpng walk.dot -o walk.png
-```
-
-![Clisby (2010), Figure 23](assets/walk.png)
-
 **Estimating critical exponents**
 
 The expected squared end-to-end distance $\langle |X(N)|^2 \rangle$ of an $N$-step self-avoiding walk
@@ -180,6 +149,37 @@ The output should be close to 3/4, the predicted value for $\nu$ in 2 dimensions
 An example log-log plot as generated above is shown below.
 
 ![](assets/curve.png)
+
+**Draw the saw-tree data structure**
+
+`pivot`'s C++ API allows the internal saw-tree data structures used by Clisby's pivot algorithm to be
+exported to GraphViz format (i.e. dot format). For instance, the following generates the walk-tree
+depicted in [[1, Figure 23]](https://arxiv.org/pdf/1005.1444#page=33) (note that the [GraphViz runtime](https://graphviz.org/download/) is
+required).
+
+```cpp
+#include <vector>
+
+#include "walk_tree.h"
+
+int main() {
+  auto steps = std::vector{pivot::point<2>({1, 0}), pivot::point<2>({1, 1}), pivot::point<2>({2, 1}),
+                           pivot::point<2>({3, 1}), pivot::point<2>({3, 0})};
+  auto walk = pivot::walk_tree<2>(steps);
+  walk.todot("walk.dot");
+
+  return 0;
+}
+```
+
+The resulting dot file can be found under [assets/walk.dot](assets/walk.dot). The image below can
+be generated from this file by running GraphViz as follows:
+
+```
+dot -Tpng walk.dot -o walk.png
+```
+
+![Clisby (2010), Figure 23](assets/walk.png)
 
 ## Limitations and future work
 
