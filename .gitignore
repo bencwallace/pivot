@@ -5,3 +5,4 @@ pivot
 build/
 html/
 latex/
+vcpkg_installed/
