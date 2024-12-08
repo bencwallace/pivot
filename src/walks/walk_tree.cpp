@@ -118,8 +118,24 @@ template <int Dim> bool walk_tree<Dim>::rand_pivot_serial(bool fast) {
 }
 
 template <int Dim> bool walk_tree<Dim>::rand_pivot_parallel(int num_workers) {
-  (void)num_workers;
-  throw std::invalid_argument("concurrent pivot attempts not yet implemented");
+  std::vector<int> sites(num_workers);
+  std::vector<transform<Dim>> transforms(num_workers);
+  std::vector<bool> results(num_workers);
+
+#pragma omp parallel for num_threads(num_workers)
+  for (int i = 0; i < num_workers; ++i) {
+    sites[i] = dist_(rng_);
+    transforms[i] = transform<Dim>::rand(rng_);
+    results[i] = try_pivot_fast(sites[i], transforms[i]);
+  }
+
+  for (int i = 0; i < num_workers; ++i) {
+    if (results[i]) {
+      do_pivot(sites[i], transforms[i]);
+      return true;
+    }
+  }
+  return false;
 }
 
 template <int Dim> bool walk_tree<Dim>::rand_pivot(bool fast, int num_workers) {

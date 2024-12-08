@@ -45,6 +45,11 @@ file(GLOB_RECURSE pivot_lib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 list(REMOVE_ITEM pivot_lib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
 add_library(pivot ${pivot_lib_SRC})
 
+if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+  find_package(OpenMP REQUIRED)
+  target_link_libraries(pivot PRIVATE OpenMP::OpenMP_CXX)
+endif()
+
 add_executable(pivot_exec "src/main.cpp")
 set_property(TARGET pivot_exec PROPERTY OUTPUT_NAME pivot)
 target_link_libraries(pivot_exec PUBLIC pivot PRIVATE CLI11::CLI11)
