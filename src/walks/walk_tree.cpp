@@ -107,10 +107,26 @@ template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Di
   return success;
 }
 
-template <int Dim> bool walk_tree<Dim>::rand_pivot(bool fast) {
+template <int Dim> bool walk_tree<Dim>::rand_pivot_serial(bool fast) {
   auto site = dist_(rng_);
   auto r = transform<Dim>::rand(rng_);
   return fast ? try_pivot_fast(site, r) : try_pivot(site, r);
+}
+
+template <int Dim> bool walk_tree<Dim>::rand_pivot_parallel(int num_workers) {
+  (void)num_workers;
+  throw std::invalid_argument("concurrent pivot attempts not yet implemented");
+}
+
+template <int Dim> bool walk_tree<Dim>::rand_pivot(bool fast, int num_workers) {
+  if (num_workers == 0) {
+    return rand_pivot_serial(fast);
+  }
+
+  if (!fast) {
+    throw std::invalid_argument("concurrent pivot attempts only supported for fast pivots");
+  }
+  return rand_pivot_parallel(num_workers);
 }
 
 /* OTHER FUNCTIONS */

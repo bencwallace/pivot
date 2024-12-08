@@ -38,11 +38,7 @@ template <int Dim> std::pair<int, std::optional<std::vector<point<Dim>>>> walk<D
   return {step, try_pivot(step, r)};
 }
 
-template <int Dim> bool walk<Dim>::rand_pivot(bool fast) {
-  if (fast) { // TODO: implement Kennedy algorithm
-    throw std::invalid_argument("fast pivot not implemented for naive walk");
-  }
-
+template <int Dim> bool walk<Dim>::rand_pivot_serial() {
   auto [step, new_points] = try_rand_pivot();
   if (!new_points) {
     return false;
@@ -51,11 +47,7 @@ template <int Dim> bool walk<Dim>::rand_pivot(bool fast) {
   return true;
 }
 
-template <int Dim> bool walk<Dim>::rand_pivot(int num_workers) {
-  if (num_workers == 0) {
-    return rand_pivot();
-  }
-
+template <int Dim> bool walk<Dim>::rand_pivot_parallel(int num_workers) {
   std::vector<int> steps(num_workers);
   std::vector<std::optional<std::vector<point<Dim>>>> proposals(num_workers);
   std::vector<std::future<std::pair<int, std::optional<std::vector<point<Dim>>>>>> futures(num_workers);
@@ -78,6 +70,18 @@ template <int Dim> bool walk<Dim>::rand_pivot(int num_workers) {
     }
   }
   return success;
+}
+
+template <int Dim> bool walk<Dim>::rand_pivot(bool fast, int num_workers) {
+  if (fast) {
+    throw std::invalid_argument("fast pivot not implemented for naive walk");
+  }
+
+  if (num_workers == 0) {
+    return rand_pivot_serial();
+  }
+
+  return rand_pivot_parallel(num_workers);
 }
 
 template <int Dim> bool walk<Dim>::self_avoiding() const {

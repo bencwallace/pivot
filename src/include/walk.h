@@ -32,9 +32,7 @@ public:
 
   std::pair<int, std::optional<std::vector<point<Dim>>>> try_rand_pivot() const;
 
-  bool rand_pivot(bool fast = false) override;
-
-  bool rand_pivot(int num_workers);
+  bool rand_pivot(bool fast = false, int num_workers = 0) override;
 
   bool self_avoiding() const override;
 
@@ -50,6 +48,9 @@ protected:
   void do_pivot(int step, std::vector<point<Dim>> &new_points);
 
   point<Dim> pivot_point(int step, int i, const transform<Dim> &trans) const;
+
+  bool rand_pivot_serial();
+  bool rand_pivot_parallel(int num_workers);
 };
 
 } // namespace pivot

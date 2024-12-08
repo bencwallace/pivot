@@ -6,7 +6,7 @@
 
 #define CASE_MACRO(z, n, data)                                                                                         \
   case n:                                                                                                              \
-    return main_loop<n>(num_steps, iters, naive, fast, seed, require_success, verify, in_path, out_dir);               \
+    return main_loop<n>(num_steps, iters, naive, fast, seed, require_success, verify, in_path, out_dir, num_workers);  \
     break;
 
 int main(int argc, char **argv) {

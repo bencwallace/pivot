@@ -118,10 +118,11 @@ public:
    * @brief Attempts to pivot the walk about a randomly chosen lattice site with a random transform.
    *
    * @param fast Whether to use the fast version of the pivot function.
+   * @param num_workers Number of workers to use for concurrent pivot attempts. If 0, no concurrency is used.
    *
    * @return Whether the pivot was successful.
    */
-  bool rand_pivot(bool fast = true) override;
+  bool rand_pivot(bool fast = true, int num_workers = 0) override;
 
   /* OTHER FUNCTIONS */
 
@@ -153,6 +154,9 @@ private:
   std::mt19937 rng_;
   std::uniform_int_distribution<int> dist_; // distribution for choosing a random lattice site
   walk_node<Dim> *buf_;                     // buffer into which nodes are allocated (used for fast node lookup by id)
+
+  bool rand_pivot_parallel(int num_workers);
+  bool rand_pivot_serial(bool fast);
 };
 
 } // namespace pivot
