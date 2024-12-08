@@ -155,6 +155,8 @@ private:
   std::uniform_int_distribution<int> dist_; // distribution for choosing a random lattice site
   walk_node<Dim> *buf_;                     // buffer into which nodes are allocated (used for fast node lookup by id)
 
+  void do_pivot(int n, const transform<Dim> &r);
+
   bool rand_pivot_parallel(int num_workers);
   bool rand_pivot_serial(bool fast);
 };

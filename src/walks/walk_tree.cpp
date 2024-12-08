@@ -80,6 +80,13 @@ template <int Dim> walk_node<Dim> &walk_tree<Dim>::find_node(int n) {
 
 /* HIGH-LEVEL FUNCTIONS */
 
+template <int Dim> void walk_tree<Dim>::do_pivot(int n, const transform<Dim> &r) {
+  root_->shuffle_up(n);
+  root_->symm_ = root_->symm_ * r;
+  root_->merge();
+  root_->shuffle_down();
+}
+
 template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r) {
   root_->shuffle_up(n);
   auto root_symm = root_->symm_;
@@ -97,20 +104,17 @@ template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r
 template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Dim> &t) {
   walk_node<Dim> *w = &find_node(n); // TODO: a pointer seems to be needed, but why?
   walk_node<Dim> w_copy(*w);
-  auto success = !w_copy.shuffle_intersect(t, w->is_left_child());
-  if (success) {
-    root_->shuffle_up(n);
-    root_->symm_ = root_->symm_ * t;
-    root_->merge();
-    root_->shuffle_down();
-  }
-  return success;
+  return !w_copy.shuffle_intersect(t, w->is_left_child());
 }
 
 template <int Dim> bool walk_tree<Dim>::rand_pivot_serial(bool fast) {
   auto site = dist_(rng_);
   auto r = transform<Dim>::rand(rng_);
-  return fast ? try_pivot_fast(site, r) : try_pivot(site, r);
+  bool success = fast ? try_pivot_fast(site, r) : try_pivot(site, r);
+  if (success && fast) {
+    do_pivot(site, r);
+  }
+  return success;
 }
 
 template <int Dim> bool walk_tree<Dim>::rand_pivot_parallel(int num_workers) {
