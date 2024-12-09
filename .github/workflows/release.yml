@@ -43,7 +43,7 @@ jobs:
 
       - name: InstallGraphviz
         run: |
-          git clone https://gitlab.com/graphviz/graphviz.git
+          git clone --depth 1 -b 12.2.0 https://gitlab.com/graphviz/graphviz.git
           cmake -S ${{github.workspace}}/graphviz -B ${{github.workspace}}/graphviz/build \
             -DCMAKE_BUILD_TYPE=Release \
             -DBISON_EXECUTABLE=$(brew --prefix bison)/bin/bison \
