@@ -21,6 +21,36 @@ TEST(WalkTreeInit, Line) {
     }
 }
 
+TEST(WalkTreeInit, FromPoints2D) {
+    // initialize a walk that isn't just a list of points
+    pivot::walk_tree<2> w1(100);
+    for (size_t i = 0; i < 100; ++i) {
+        w1.rand_pivot();
+    }
+
+    // make sure outputs from steps is consistent with steps constructor
+    auto steps1 = w1.steps();
+    pivot::walk_tree<2> w2(steps1);
+    auto steps2 = w2.steps();
+    EXPECT_EQ(steps1.size(), steps2.size());
+    EXPECT_EQ(steps1, steps2);
+}
+
+TEST(WalkTreeInit, FromPoints3D) {
+    // initialize a walk that isn't just a list of points
+    pivot::walk_tree<3> w1(100);
+    for (size_t i = 0; i < 100; ++i) {
+        w1.rand_pivot();
+    }
+
+    // make sure outputs from steps is consistent with steps constructor
+    auto steps1 = w1.steps();
+    pivot::walk_tree<3> w2(steps1);
+    auto steps2 = w2.steps();
+    EXPECT_EQ(steps1.size(), steps2.size());
+    EXPECT_EQ(steps1, steps2);
+}
+
 TEST(WalkTreePivot, PivotLine) {
     auto w = walk_tree<2>(2);
     pivot::transform<2> trans = transform<2>({1, 0}, {-1, 1});
