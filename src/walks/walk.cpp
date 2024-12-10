@@ -20,6 +20,10 @@ walk<Dim>::walk(int num_steps, std::optional<unsigned int> seed)
 
 template <int Dim>
 std::optional<std::vector<point<Dim>>> walk<Dim>::try_pivot(int step, const transform<Dim> &trans) const {
+  if (trans.is_identity()) {
+    return {};
+  }
+
   std::vector<point<Dim>> new_points(num_steps() - step - 1);
   for (int i = step + 1; i < num_steps(); ++i) {
     auto q = pivot_point(step, i, trans);

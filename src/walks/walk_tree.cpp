@@ -81,6 +81,10 @@ template <int Dim> walk_node<Dim> &walk_tree<Dim>::find_node(int n) {
 /* HIGH-LEVEL FUNCTIONS */
 
 template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r) {
+  if (r.is_identity()) {
+    return false;
+  }
+
   root_->shuffle_up(n);
   auto root_symm = root_->symm_;
   root_->symm_ = root_->symm_ * r;
@@ -95,6 +99,10 @@ template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r
 }
 
 template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Dim> &t) {
+  if (t.is_identity()) {
+    return false;
+  }
+
   walk_node<Dim> *w = &find_node(n); // TODO: a pointer seems to be needed, but why?
   walk_node<Dim> w_copy(*w);
   auto success = !w_copy.shuffle_intersect(t, w->is_left_child());

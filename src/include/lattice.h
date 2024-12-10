@@ -240,6 +240,9 @@ public:
    */
   box<Dim> operator*(const box<Dim> &b) const;
 
+  /** @brief Returns true if the transform is the identity. */
+  bool is_identity() const;
+
   /**
    * @brief Returns the inverse transform.
    *
