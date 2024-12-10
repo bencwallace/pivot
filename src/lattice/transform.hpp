@@ -77,6 +77,15 @@ template <int Dim> box<Dim> transform<Dim>::operator*(const box<Dim> &b) const {
   return box<Dim>(intervals);
 }
 
+template <int Dim> bool transform<Dim>::is_identity() const {
+  for (int i = 0; i < Dim; ++i) {
+    if (perm_[i] != i || signs_[i] != 1) {
+      return false;
+    }
+  }
+  return true;
+}
+
 template <int Dim> transform<Dim> transform<Dim>::inverse() const {
   std::array<int, Dim> perm;
   std::array<int, Dim> signs;
