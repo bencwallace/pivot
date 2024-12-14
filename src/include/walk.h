@@ -14,7 +14,9 @@ namespace pivot {
 template <int Dim> class walk : public walk_base<Dim> {
 
 public:
+  walk(const std::vector<point<Dim>> &steps, std::optional<unsigned int> seed = std::nullopt);
   walk(int num_steps, std::optional<unsigned int> seed = std::nullopt);
+  walk(const std::string &path, std::optional<unsigned int> seed = std::nullopt);
 
   walk(const walk &w) = delete;
   walk(walk &&w) = delete;
