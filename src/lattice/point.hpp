@@ -14,9 +14,18 @@ template <int Dim> point<Dim> point<Dim>::unit(int i) {
 
 template <int Dim> int point<Dim>::operator[](int i) const { return coords_[i]; }
 
-template <int Dim> bool point<Dim>::operator==(const point &p) const { return coords_ == p.coords_; }
+template <int Dim> bool point<Dim>::operator==(const point &p) const {
+  // Faster than using std::equal, at least for small arrays
+  // https://stackoverflow.com/questions/39262496/why-is-stdequal-much-slower-than-a-hand-rolled-loop-for-two-small-stdarray
+  for (int i = 0; i < Dim; ++i) {
+    if (coords_[i] != p.coords_[i]) {
+      return false;
+    }
+  }
+  return true;
+}
 
-template <int Dim> bool point<Dim>::operator!=(const point &p) const { return coords_ != p.coords_; }
+template <int Dim> bool point<Dim>::operator!=(const point &p) const { return !(*this == p); }
 
 template <int Dim> point<Dim> point<Dim>::operator+(const point<Dim> &p) const {
   std::array<int, Dim> sum;
