@@ -7,16 +7,21 @@
 namespace pivot {
 
 template <int Dim>
-walk<Dim>::walk(int num_steps, std::optional<unsigned int> seed)
-    : steps_(num_steps), occupied_(num_steps, point_hash(num_steps)) {
-  for (int i = 0; i < num_steps; ++i) {
-    steps_[i] = i * point<Dim>::unit(0);
+walk<Dim>::walk(const std::vector<point<Dim>> &steps, std::optional<unsigned int> seed)
+    : steps_(steps), occupied_(steps.size(), point_hash(steps.size())) {
+  for (int i = 0; i < num_steps(); ++i) {
     occupied_[steps_[i]] = i;
   }
 
   rng_ = std::mt19937(seed.value_or(std::random_device()()));
-  dist_ = std::uniform_int_distribution<int>(0, num_steps - 1);
+  dist_ = std::uniform_int_distribution<int>(0, num_steps() - 1);
 }
+
+template <int Dim>
+walk<Dim>::walk(int num_steps, std::optional<unsigned int> seed) : walk(line<Dim>(num_steps), seed) {}
+
+template <int Dim>
+walk<Dim>::walk(const std::string &path, std::optional<unsigned int> seed) : walk(from_csv<Dim>(path), seed) {}
 
 template <int Dim>
 std::optional<std::vector<point<Dim>>> walk<Dim>::try_pivot(int step, const transform<Dim> &trans) const {
