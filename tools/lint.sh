@@ -17,4 +17,4 @@ cppcheck \
     --suppress=missingIncludeSystem \
     -i build/$1 \
     --project=build/$1/compile_commands.json
-find src \( -name *.cpp -o -name *.h \) -print0 | xargs -0 -n1 clang-tidy-14 -p build/$1 ${ARGS}
+find src \( -name *.cpp -o -name *.h \) -print0 | xargs -0 -n1 clang-tidy -p build/$1 ${ARGS}

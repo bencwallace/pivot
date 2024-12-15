@@ -27,7 +27,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(cli11_proj)
 
 ## boost
-find_package(Boost REQUIRED)
+find_package(Boost 1.81.0 REQUIRED)
 
 # core library
 file(GLOB_RECURSE pivot_lib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")

@@ -43,12 +43,12 @@ Aside from CMake and a suitable C/C++ compiler toolchain (gcc, clang), the follo
 
 * [libgraphviz](https://gitlab.com/graphviz/graphviz)
   * Only needed at build time (optional at runtime)
-* [boost](https://www.boost.org/doc/libs/1_85_0/more/getting_started/unix-variants.html) (headers only)
+* [boost 1.81+](https://www.boost.org/doc/libs/1_81_0/more/getting_started/index.html) (headers only)
 
-For instance, these can be installed as follows on Ubuntu/Debian:
+For instance, these can be installed as follows on Ubuntu 22.04+ as follows:
 
 ```bash
-sudo apt-get update && sudo apt-get install libboost-dev libgraphviz-dev
+sudo apt update && sudo apt install libboost-dev libgraphviz-dev
 ```
 
 **Build**

@@ -8,11 +8,11 @@ on:
 
 jobs:
   debug-test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     env:
-      CC: clang-13
-      CXX: clang++-13
+      CC: clang
+      CXX: clang++
 
     steps:
     - uses: actions/checkout@v4
@@ -36,7 +36,7 @@ jobs:
       run: ctest --test-dir ${{github.workspace}}/build --output-on-failure
 
   release-build:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     env:
       CC: gcc
@@ -61,7 +61,7 @@ jobs:
           path: ${{github.workspace}}/build/tests/test_pivot
 
   release-test:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
 
     needs: release-build
 

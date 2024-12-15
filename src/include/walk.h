@@ -4,7 +4,7 @@
 #include <optional>
 #include <random>
 
-#include <boost/unordered/unordered_map.hpp>
+#include <boost/unordered/unordered_flat_map.hpp>
 
 #include "lattice.h"
 #include "walk_base.h"
@@ -44,7 +44,7 @@ public:
 
 protected:
   std::vector<point<Dim>> steps_;
-  boost::unordered_map<point<Dim>, int, point_hash> occupied_;
+  boost::unordered_flat_map<point<Dim>, int, point_hash> occupied_;
 
   mutable std::mt19937 rng_;
   mutable std::uniform_int_distribution<int> dist_;
