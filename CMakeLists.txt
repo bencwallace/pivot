@@ -18,7 +18,7 @@ set(DIMS_UB 6 CACHE STRING "Upper bound on dimensions handled" FORCE)
 
 # dependencies
 find_package(CLI11 CONFIG REQUIRED)
-find_package(Boost REQUIRED)
+find_package(Boost 1.81.0 REQUIRED)
 
 # core library
 file(GLOB_RECURSE pivot_lib_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")

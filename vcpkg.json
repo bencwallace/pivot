@@ -1,7 +1,10 @@
 {
   "dependencies": [
     "boost-preprocessor",
-    "boost-unordered",
+    {
+      "name": "boost-unordered",
+      "version>=": "1.81.0"
+    },
     "boost-utility",
     "cli11"
   ],
