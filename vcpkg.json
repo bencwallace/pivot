@@ -1,0 +1,12 @@
+{
+  "dependencies": [
+    "boost-preprocessor",
+    "boost-unordered",
+    "boost-utility",
+    "cli11"
+  ],
+  "$notes": {
+    "boost-utility": "Hacky way of getting boost::operators without installing the whole boost library"
+  }
+    
+}

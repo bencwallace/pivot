@@ -1,5 +1,6 @@
 # cmake settings
 cmake_minimum_required(VERSION 3.19.0)
+set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake" CACHE STRING "Vcpkg toolchain file")
 project(pivot VERSION 0.1.0 LANGUAGES C CXX)
 
 # global settings
@@ -9,7 +10,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # imports
 include(CTest)
-include(FetchContent)
 
 # options
 option(SANITIZE "Enable sanitizers" OFF)
@@ -17,16 +17,7 @@ option(GRAPHVIZ_INCLUDE_PATH "Custom path to graphviz headers" OFF)
 set(DIMS_UB 6 CACHE STRING "Upper bound on dimensions handled" FORCE)
 
 # dependencies
-# CLI11
-FetchContent_Declare(
-    cli11_proj
-    QUIET
-    GIT_REPOSITORY https://github.com/CLIUtils/CLI11.git
-    GIT_TAG ccd6801
-)
-FetchContent_MakeAvailable(cli11_proj)
-
-## boost
+find_package(CLI11 CONFIG REQUIRED)
 find_package(Boost REQUIRED)
 
 # core library
