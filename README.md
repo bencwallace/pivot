@@ -43,13 +43,16 @@ Aside from CMake and a suitable C/C++ compiler toolchain (gcc, clang), the follo
 
 * [libgraphviz](https://gitlab.com/graphviz/graphviz)
   * Only needed at build time (optional at runtime)
-* [boost](https://www.boost.org/doc/libs/1_85_0/more/getting_started/unix-variants.html) (headers only)
+* [vcpkg](https://vcpkg.io/en/)
+  * Manages the remaining dependencies. GraphViz is included from these because the vcpkg port for it is needlessly bloated.
 
-For instance, these can be installed as follows on Ubuntu/Debian:
+On Ubuntu/Debian, `libgraphviz` can be installed as follows:
 
 ```bash
-sudo apt-get update && sudo apt-get install libboost-dev libgraphviz-dev
+sudo apt-get update && sudo apt-get install libgraphviz-dev
 ```
+
+To install vcpkg, follow the instructions linked to above.
 
 **Build**
 
