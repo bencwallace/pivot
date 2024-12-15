@@ -37,24 +37,23 @@ This repository provides an implementation of the saw-tree pivot algorithm.
 
 CMake and a suitable C/C++ compiler toolchain are required.
 
-**Dependencies**
+**Requirements**
 
-The following third-party dependencies are used:
+Aside from CMake and a suitable C/C++ compiler toolchain (gcc, clang), the following are required:
 
-* [boost](https://www.boost.org/doc/libs/1_85_0/more/getting_started/unix-variants.html) (headers only)
 * [libgraphviz](https://gitlab.com/graphviz/graphviz)
   * Only needed at build time (optional at runtime)
-* [CLI11](https://github.com/CLIUtils/CLI11)
-  * Included via CMake
+* [boost](https://www.boost.org/doc/libs/1_85_0/more/getting_started/unix-variants.html) (headers only)
 
-Only the first two requirements must be available prior to building. On Debian/Ubuntu,
-this can be accomplished as follows:
+For instance, these can be installed as follows on Ubuntu/Debian:
 
 ```bash
-sudo apt-get update && sudo apt-get install libboost-all-dev libgraphviz-dev
+sudo apt-get update && sudo apt-get install libboost-dev libgraphviz-dev
 ```
 
 **Build**
+
+Some recommended [CMake presets](CMakePresets.json) are included. For instance, a release build proceeds as follows:
 
 ```
 cmake --preset release
@@ -161,10 +160,16 @@ An example log-log plot as generated above is shown below.
 
 **Print the saw-tree data structure**
 
+The following example requires the [GraphViz runtime](https://graphviz.org/download/). On Ubuntu, for instance,
+this can be installed as follows:
+
+```bash
+sudo apt-get update && sudo apt-get install graphviz
+```
+
 `pivot`'s C++ API allows the internal saw-tree data structures used by Clisby's pivot algorithm to be
 exported to GraphViz format (i.e. dot format). For instance, the following generates the walk-tree
-depicted in [[1, Figure 23]](https://arxiv.org/pdf/1005.1444#page=33) (note that the [GraphViz runtime](https://graphviz.org/download/) is
-required).
+depicted in [[1, Figure 23]](https://arxiv.org/pdf/1005.1444#page=33):
 
 ```cpp
 #include <vector>
