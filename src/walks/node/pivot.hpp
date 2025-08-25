@@ -112,12 +112,12 @@ template <class P, class B, class T, int Dim> walk_node<P, B, T, Dim> *walk_node
 }
 
 template <class P, class B, class T, int Dim> bool walk_node<P, B, T, Dim>::intersect() const {
-  return ::pivot::intersect<P, B, Dim>(left_, right_, P(), left_->end_, transform<Dim>(), symm_);
+  return ::pivot::intersect<P, B, T, Dim>(left_, right_, P(), left_->end_, T(), symm_);
 }
 
-template <class P, class B, int Dim>
-bool intersect(const walk_node<P, B, transform<Dim>, Dim> *l_walk, const walk_node<P, B, transform<Dim>, Dim> *r_walk,
-               const P &l_anchor, const P &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
+template <class P, class B, class T, int Dim>
+bool intersect(const walk_node<P, B, T, Dim> *l_walk, const walk_node<P, B, T, Dim> *r_walk, const P &l_anchor,
+               const P &r_anchor, const T &l_symm, const T &r_symm) {
   auto l_box = l_anchor + l_symm * l_walk->bbox_;
   auto r_box = r_anchor + r_symm * r_walk->bbox_;
   if ((l_box & r_box).empty()) {

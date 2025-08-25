@@ -41,10 +41,10 @@ template <class P, class B, class T, int Dim> std::vector<P> walk_node<P, B, T, 
 }
 
 #define INTERSECT_INST(z, n, data)                                                                                     \
-  template bool intersect<point<n>, box<n>, n>(const walk_node<point<n>, box<n>, transform<n>, n> *l_walk,             \
-                                               const walk_node<point<n>, box<n>, transform<n>, n> *r_walk,             \
-                                               const point<n> &l_anchor, const point<n> &r_anchor,                     \
-                                               const transform<n> &l_symm, const transform<n> &r_symm);
+  template bool intersect<point<n>, box<n>, transform<n>, n>(                                                          \
+      const walk_node<point<n>, box<n>, transform<n>, n> *l_walk,                                                      \
+      const walk_node<point<n>, box<n>, transform<n>, n> *r_walk, const point<n> &l_anchor, const point<n> &r_anchor,  \
+      const transform<n> &l_symm, const transform<n> &r_symm);
 #define WALK_NODE_INST(z, n, data) template class walk_node<point<n>, box<n>, transform<n>, n>;
 
 // cppcheck-suppress syntaxError
