@@ -7,7 +7,7 @@ namespace pivot {
 // Note: A detail missing from Clisby's paper regarding tree rotations is that parent pointers must be updated,
 // except when the rotation is called from shuffle_intersect.
 
-template <class P, int Dim> walk_node<P, Dim> *walk_node<P, Dim>::rotate_left(bool set_parent) {
+template <class P, class B, int Dim> walk_node<P, B, Dim> *walk_node<P, B, Dim>::rotate_left(bool set_parent) {
   if (right_->is_leaf()) {
     throw std::invalid_argument("can't rotate left on a leaf node");
   }
@@ -41,7 +41,7 @@ template <class P, int Dim> walk_node<P, Dim> *walk_node<P, Dim>::rotate_left(bo
   return this;
 }
 
-template <class P, int Dim> walk_node<P, Dim> *walk_node<P, Dim>::rotate_right(bool set_parent) {
+template <class P, class B, int Dim> walk_node<P, B, Dim> *walk_node<P, B, Dim>::rotate_right(bool set_parent) {
   if (left_->is_leaf()) {
     throw std::invalid_argument("can't rotate right on a leaf node");
   }
@@ -75,7 +75,7 @@ template <class P, int Dim> walk_node<P, Dim> *walk_node<P, Dim>::rotate_right(b
   return this;
 }
 
-template <class P, int Dim> void walk_node<P, Dim>::merge() {
+template <class P, class B, int Dim> void walk_node<P, B, Dim>::merge() {
   num_sites_ = left_->num_sites_ + right_->num_sites_;
 
   bbox_ = left_->bbox_ | (left_->end_ + symm_ * right_->bbox_);
@@ -84,7 +84,7 @@ template <class P, int Dim> void walk_node<P, Dim>::merge() {
 
 /* USER LEVEL OPERATIONS */
 
-template <class P, int Dim> walk_node<P, Dim> *walk_node<P, Dim>::shuffle_up(int id) {
+template <class P, class B, int Dim> walk_node<P, B, Dim> *walk_node<P, B, Dim>::shuffle_up(int id) {
   if (id < left_->num_sites_) {
     left_->shuffle_up(id);
     rotate_right();
@@ -96,7 +96,7 @@ template <class P, int Dim> walk_node<P, Dim> *walk_node<P, Dim>::shuffle_up(int
   return this;
 }
 
-template <class P, int Dim> walk_node<P, Dim> *walk_node<P, Dim>::shuffle_down() {
+template <class P, class B, int Dim> walk_node<P, B, Dim> *walk_node<P, B, Dim>::shuffle_down() {
   int id = std::floor((num_sites_ + 1) / 2.0);
   if (id < left_->num_sites_) {
     rotate_right();
@@ -109,13 +109,13 @@ template <class P, int Dim> walk_node<P, Dim> *walk_node<P, Dim>::shuffle_down()
   return this;
 }
 
-template <class P, int Dim> bool walk_node<P, Dim>::intersect() const {
+template <class P, class B, int Dim> bool walk_node<P, B, Dim>::intersect() const {
   return ::pivot::intersect<P, Dim>(left_, right_, P(), left_->end_, transform<Dim>(), symm_);
 }
 
 template <class P, int Dim>
-bool intersect(const walk_node<P, Dim> *l_walk, const walk_node<P, Dim> *r_walk, const P &l_anchor, const P &r_anchor,
-               const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
+bool intersect(const walk_node<P, box<Dim>, Dim> *l_walk, const walk_node<P, box<Dim>, Dim> *r_walk, const P &l_anchor,
+               const P &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
   auto l_box = l_anchor + l_symm * l_walk->bbox_;
   auto r_box = r_anchor + r_symm * r_walk->bbox_;
   if ((l_box & r_box).empty()) {
@@ -137,14 +137,14 @@ bool intersect(const walk_node<P, Dim> *l_walk, const walk_node<P, Dim> *r_walk,
   }
 }
 
-template <class P, int Dim>
-bool walk_node<P, Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bool> is_left_child) {
+template <class P, class B, int Dim>
+bool walk_node<P, B, Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bool> is_left_child) {
   return shuffle_intersect(t, std::nullopt, is_left_child);
 }
 
-template <class P, int Dim>
-bool walk_node<P, Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
-                                          std::optional<bool> is_left_child) {
+template <class P, class B, int Dim>
+bool walk_node<P, B, Dim>::shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
+                                             std::optional<bool> is_left_child) {
   /* BASE CASE */
   if (was_left_child.has_value()) {
     if (was_left_child.value()) {
