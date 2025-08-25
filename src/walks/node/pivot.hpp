@@ -110,13 +110,12 @@ template <class P, int Dim> walk_node<P, Dim> *walk_node<P, Dim>::shuffle_down()
 }
 
 template <class P, int Dim> bool walk_node<P, Dim>::intersect() const {
-  return ::pivot::intersect<Dim>(left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_);
+  return ::pivot::intersect<P, Dim>(left_, right_, P(), left_->end_, transform<Dim>(), symm_);
 }
 
-template <int Dim>
-bool intersect(const walk_node<point<Dim>, Dim> *l_walk, const walk_node<point<Dim>, Dim> *r_walk,
-               const point<Dim> &l_anchor, const point<Dim> &r_anchor, const transform<Dim> &l_symm,
-               const transform<Dim> &r_symm) {
+template <class P, int Dim>
+bool intersect(const walk_node<P, Dim> *l_walk, const walk_node<P, Dim> *r_walk, const P &l_anchor, const P &r_anchor,
+               const transform<Dim> &l_symm, const transform<Dim> &r_symm) {
   auto l_box = l_anchor + l_symm * l_walk->bbox_;
   auto r_box = r_anchor + r_symm * r_walk->bbox_;
   if ((l_box & r_box).empty()) {
@@ -149,17 +148,17 @@ bool walk_node<P, Dim>::shuffle_intersect(const transform<Dim> &t, std::optional
   /* BASE CASE */
   if (was_left_child.has_value()) {
     if (was_left_child.value()) {
-      if (::pivot::intersect(left_, right_->right_, point<Dim>(), left_->end_ + symm_ * t * right_->left_->end_,
+      if (::pivot::intersect(left_, right_->right_, P(), left_->end_ + symm_ * t * right_->left_->end_,
                              transform<Dim>(), symm_ * t * right_->symm_)) {
         return true;
       }
     } else {
-      if (::pivot::intersect(left_->left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_ * t)) {
+      if (::pivot::intersect(left_->left_, right_, P(), left_->end_, transform<Dim>(), symm_ * t)) {
         return true;
       }
     }
   } else {
-    if (::pivot::intersect(left_, right_, point<Dim>(), left_->end_, transform<Dim>(), symm_ * t)) {
+    if (::pivot::intersect(left_, right_, P(), left_->end_, transform<Dim>(), symm_ * t)) {
       return true;
     }
   }
