@@ -2,7 +2,7 @@
 
 namespace pivot {
 
-template <class P, class B, int Dim> void walk_node<P, B, Dim>::todot(const std::string &path) const {
+template <class P, class B, class T, int Dim> void walk_node<P, B, T, Dim>::todot(const std::string &path) const {
   gvc_t &gvc = gvc_t::load();
   cgraph_t &cgraph = cgraph_t::load();
 
@@ -20,7 +20,8 @@ template <class P, class B, int Dim> void walk_node<P, B, Dim>::todot(const std:
   gvc.gvFreeContext(context);
 }
 
-template <class P, class B, int Dim> Agnode_t *walk_node<P, B, Dim>::todot(Agraph_t *g, const cgraph_t &cgraph) const {
+template <class P, class B, class T, int Dim>
+Agnode_t *walk_node<P, B, T, Dim>::todot(Agraph_t *g, const cgraph_t &cgraph) const {
   auto name = std::to_string(id_);
   Agnode_t *node = cgraph.agnode(g, (char *)name.c_str(), 1);
   if (cgraph.agset((void *)node, (char *)"shape", (char *)"box") != 0) {

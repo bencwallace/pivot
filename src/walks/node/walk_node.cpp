@@ -10,7 +10,7 @@
 
 namespace pivot {
 
-template <class P, class B, int Dim> bool walk_node<P, B, Dim>::operator==(const walk_node &other) const {
+template <class P, class B, class T, int Dim> bool walk_node<P, B, T, Dim>::operator==(const walk_node &other) const {
   if (is_leaf() && other.is_leaf()) {
     return true;
   }
@@ -18,11 +18,11 @@ template <class P, class B, int Dim> bool walk_node<P, B, Dim>::operator==(const
          end_ == other.end_ && *left_ == *other.left_ && *right_ == *other.right_;
 }
 
-template <class P, class B, int Dim> bool walk_node<P, B, Dim>::is_leaf() const {
+template <class P, class B, class T, int Dim> bool walk_node<P, B, T, Dim>::is_leaf() const {
   return left_ == nullptr && right_ == nullptr;
 }
 
-template <class P, class B, int Dim> std::vector<P> walk_node<P, B, Dim>::steps() const {
+template <class P, class B, class T, int Dim> std::vector<P> walk_node<P, B, T, Dim>::steps() const {
   std::vector<P> result;
   if (is_leaf()) {
     result.push_back(end_);
@@ -41,10 +41,11 @@ template <class P, class B, int Dim> std::vector<P> walk_node<P, B, Dim>::steps(
 }
 
 #define INTERSECT_INST(z, n, data)                                                                                     \
-  template bool intersect<point<n>, box<n>, n>(                                                                        \
-      const walk_node<point<n>, box<n>, n> *l_walk, const walk_node<point<n>, box<n>, n> *r_walk,                      \
-      const point<n> &l_anchor, const point<n> &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
-#define WALK_NODE_INST(z, n, data) template class walk_node<point<n>, box<n>, n>;
+  template bool intersect<point<n>, box<n>, n>(const walk_node<point<n>, box<n>, transform<n>, n> *l_walk,             \
+                                               const walk_node<point<n>, box<n>, transform<n>, n> *r_walk,             \
+                                               const point<n> &l_anchor, const point<n> &r_anchor,                     \
+                                               const transform<n> &l_symm, const transform<n> &r_symm);
+#define WALK_NODE_INST(z, n, data) template class walk_node<point<n>, box<n>, transform<n>, n>;
 
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, INTERSECT_INST, ~)
