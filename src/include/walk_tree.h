@@ -10,7 +10,7 @@
 
 namespace pivot {
 
-template <class P, class B, int Dim> class walk_node;
+template <class P, class B, class T, int Dim> class walk_node;
 
 /** @brief Represents an entire saw-tree (as per Clisby's 2010 paper). */
 template <int Dim> class walk_tree : public walk_base<Dim> {
@@ -64,7 +64,7 @@ public:
 
   /* GETTERS, SETTERS, SIMPLE UTILITIES */
 
-  walk_node<point<Dim>, box<Dim>, Dim> *root() const;
+  walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim> *root() const;
 
   point<Dim> endpoint() const override;
 
@@ -84,7 +84,7 @@ public:
    *
    * @return reference to the node
    */
-  walk_node<point<Dim>, box<Dim>, Dim> &find_node(int n);
+  walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim> &find_node(int n);
 
   /* HIGH-LEVEL FUNCTIONS (see Clisby (2010), Section 2.7) */
 
@@ -149,10 +149,11 @@ public:
   void todot(const std::string &path) const;
 
 private:
-  std::unique_ptr<walk_node<point<Dim>, box<Dim>, Dim>> root_;
+  std::unique_ptr<walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim>> root_;
   std::mt19937 rng_;
-  std::uniform_int_distribution<int> dist_;   // distribution for choosing a random lattice site
-  walk_node<point<Dim>, box<Dim>, Dim> *buf_; // buffer into which nodes are allocated (used for fast node lookup by id)
+  std::uniform_int_distribution<int> dist_; // distribution for choosing a random lattice site
+  walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim>
+      *buf_; // buffer into which nodes are allocated (used for fast node lookup by id)
 };
 
 } // namespace pivot

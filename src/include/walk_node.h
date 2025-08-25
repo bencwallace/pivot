@@ -10,18 +10,18 @@ namespace pivot {
 
 /* FORWARD REFERENCES */
 
-template <class P, class B, int Dim> class walk_node;
+template <class P, class B, class T, int Dim> class walk_node;
 
 template <class P, class B, int Dim>
-bool intersect(const walk_node<P, B, Dim> *l_walk, const walk_node<P, B, Dim> *r_walk, const P &l_anchor,
-               const P &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm);
+bool intersect(const walk_node<P, B, transform<Dim>, Dim> *l_walk, const walk_node<P, B, transform<Dim>, Dim> *r_walk,
+               const P &l_anchor, const P &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm);
 
 template <int Dim> class walk_tree;
 
 /* WALK NODE */
 
 /** @brief Represents a node in a walk tree. */
-template <class P, class B, int Dim> class walk_node {
+template <class P, class B, class T, int Dim> class walk_node {
 
 public:
   /* CONSTRUCTORS, DESTRUCTOR */
@@ -61,7 +61,7 @@ public:
 
   const P &endpoint() const { return end_; }
 
-  const transform<Dim> &symm() const { return symm_; }
+  const T &symm() const { return symm_; }
 
   walk_node *left() const { return left_; }
 
@@ -125,7 +125,7 @@ public:
    *
    * @return Whether the transform creates an intersection.
    */
-  bool shuffle_intersect(const transform<Dim> &t, std::optional<bool> is_left_child);
+  bool shuffle_intersect(const T &t, std::optional<bool> is_left_child);
 
   /**
    * @brief Checks if the current walk has an intersection via a top-down algorithm.
@@ -146,7 +146,7 @@ private:
   walk_node *parent_{};
   walk_node *left_{};
   walk_node *right_{};
-  transform<Dim> symm_;
+  T symm_;
   B bbox_;
   P end_;
 
@@ -154,7 +154,7 @@ private:
 
   /* CONVENIENCE METHODS */
 
-  walk_node(int id, int num_sites, const transform<Dim> &symm, const B &bbox, const P &end);
+  walk_node(int id, int num_sites, const T &symm, const B &bbox, const P &end);
 
   void set_left(walk_node *left) {
     left_ = left;
@@ -185,15 +185,14 @@ private:
   Agnode_t *todot(Agraph_t *g, const cgraph_t &cgraph) const;
 
   // recursive helper
-  static walk_node *balanced_rep(std::span<const P> steps, int start, const transform<Dim> &glob_symm, walk_node *buf);
+  static walk_node *balanced_rep(std::span<const P> steps, int start, const T &glob_symm, walk_node *buf);
 
-  bool shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
-                         std::optional<bool> is_left_child);
+  bool shuffle_intersect(const T &t, std::optional<bool> was_left_child, std::optional<bool> is_left_child);
 
   template <class Point, class Box, int D>
-  friend bool intersect(const walk_node<Point, Box, D> *l_walk, const walk_node<Point, Box, D> *r_walk,
-                        const Point &l_anchor, const Point &r_anchor, const transform<D> &l_symm,
-                        const transform<D> &r_symm);
+  friend bool intersect(const walk_node<Point, Box, transform<D>, D> *l_walk,
+                        const walk_node<Point, Box, transform<D>, D> *r_walk, const Point &l_anchor,
+                        const Point &r_anchor, const transform<D> &l_symm, const transform<D> &r_symm);
 };
 
 } // namespace pivot
