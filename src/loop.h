@@ -2,6 +2,7 @@
 #include <memory>
 #include <string>
 
+#include "lattice.h"
 #include "utils.h"
 #include "walk.h"
 #include "walk_tree.h"
@@ -18,9 +19,11 @@ int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool re
     }
   } else {
     if (in_path.empty()) {
-      w = std::make_unique<pivot::walk_tree<Dim>>(num_steps, seed);
+      w = std::make_unique<pivot::walk_tree<pivot::point<Dim>, pivot::box<Dim>, pivot::transform<Dim>, Dim>>(num_steps,
+                                                                                                             seed);
     } else {
-      w = std::make_unique<pivot::walk_tree<Dim>>(in_path, seed);
+      w = std::make_unique<pivot::walk_tree<pivot::point<Dim>, pivot::box<Dim>, pivot::transform<Dim>, Dim>>(in_path,
+                                                                                                             seed);
     }
   }
 
