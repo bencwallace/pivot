@@ -12,10 +12,9 @@ namespace pivot {
 
 template <class P, int Dim> class walk_node;
 
-template <int Dim>
-bool intersect(const walk_node<point<Dim>, Dim> *l_walk, const walk_node<point<Dim>, Dim> *r_walk,
-               const point<Dim> &l_anchor, const point<Dim> &r_anchor, const transform<Dim> &l_symm,
-               const transform<Dim> &r_symm);
+template <class P, int Dim>
+bool intersect(const walk_node<P, Dim> *l_walk, const walk_node<P, Dim> *r_walk, const P &l_anchor, const P &r_anchor,
+               const transform<Dim> &l_symm, const transform<Dim> &r_symm);
 
 template <int Dim> class walk_tree;
 
@@ -191,10 +190,9 @@ private:
   bool shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
                          std::optional<bool> is_left_child);
 
-  template <int D>
-  friend bool intersect(const walk_node<point<D>, D> *l_walk, const walk_node<point<D>, D> *r_walk,
-                        const point<D> &l_anchor, const point<D> &r_anchor, const transform<D> &l_symm,
-                        const transform<D> &r_symm);
+  template <class Point, int D>
+  friend bool intersect(const walk_node<Point, D> *l_walk, const walk_node<Point, D> *r_walk, const Point &l_anchor,
+                        const Point &r_anchor, const transform<D> &l_symm, const transform<D> &r_symm);
 };
 
 } // namespace pivot
