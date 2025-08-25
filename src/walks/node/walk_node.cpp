@@ -10,7 +10,7 @@
 
 namespace pivot {
 
-template <int Dim> bool walk_node<Dim>::operator==(const walk_node &other) const {
+template <class P, int Dim> bool walk_node<P, Dim>::operator==(const walk_node &other) const {
   if (is_leaf() && other.is_leaf()) {
     return true;
   }
@@ -18,10 +18,10 @@ template <int Dim> bool walk_node<Dim>::operator==(const walk_node &other) const
          end_ == other.end_ && *left_ == *other.left_ && *right_ == *other.right_;
 }
 
-template <int Dim> bool walk_node<Dim>::is_leaf() const { return left_ == nullptr && right_ == nullptr; }
+template <class P, int Dim> bool walk_node<P, Dim>::is_leaf() const { return left_ == nullptr && right_ == nullptr; }
 
-template <int Dim> std::vector<point<Dim>> walk_node<Dim>::steps() const {
-  std::vector<point<Dim>> result;
+template <class P, int Dim> std::vector<P> walk_node<P, Dim>::steps() const {
+  std::vector<P> result;
   if (is_leaf()) {
     result.push_back(end_);
     return result;
@@ -39,9 +39,10 @@ template <int Dim> std::vector<point<Dim>> walk_node<Dim>::steps() const {
 }
 
 #define INTERSECT_INST(z, n, data)                                                                                     \
-  template bool intersect<n>(const walk_node<n> *l_walk, const walk_node<n> *r_walk, const point<n> &l_anchor,         \
-                             const point<n> &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
-#define WALK_NODE_INST(z, n, data) template class walk_node<n>;
+  template bool intersect<n>(const walk_node<point<n>, n> *l_walk, const walk_node<point<n>, n> *r_walk,               \
+                             const point<n> &l_anchor, const point<n> &r_anchor, const transform<n> &l_symm,           \
+                             const transform<n> &r_symm);
+#define WALK_NODE_INST(z, n, data) template class walk_node<point<n>, n>;
 
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, INTERSECT_INST, ~)

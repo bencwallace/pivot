@@ -10,18 +10,19 @@ namespace pivot {
 
 /* FORWARD REFERENCES */
 
-template <int Dim> class walk_node;
+template <class P, int Dim> class walk_node;
 
 template <int Dim>
-bool intersect(const walk_node<Dim> *l_walk, const walk_node<Dim> *r_walk, const point<Dim> &l_anchor,
-               const point<Dim> &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm);
+bool intersect(const walk_node<point<Dim>, Dim> *l_walk, const walk_node<point<Dim>, Dim> *r_walk,
+               const point<Dim> &l_anchor, const point<Dim> &r_anchor, const transform<Dim> &l_symm,
+               const transform<Dim> &r_symm);
 
 template <int Dim> class walk_tree;
 
 /* WALK NODE */
 
 /** @brief Represents a node in a walk tree. */
-template <int Dim> class walk_node {
+template <class P, int Dim> class walk_node {
 
 public:
   /* CONSTRUCTORS, DESTRUCTOR */
@@ -33,7 +34,7 @@ public:
    *
    * @return The root of the walk tree.
    */
-  static walk_node *pivot_rep(const std::vector<point<Dim>> &steps, walk_node *buf = nullptr);
+  static walk_node *pivot_rep(const std::vector<P> &steps, walk_node *buf = nullptr);
 
   /** @brief Returns the root of a walk tree for the balanced representation of a walk given by a sequence of points.
    *
@@ -42,7 +43,7 @@ public:
    *
    * @return The root of the walk tree.
    */
-  static walk_node *balanced_rep(const std::vector<point<Dim>> &steps, walk_node *buf = nullptr);
+  static walk_node *balanced_rep(const std::vector<P> &steps, walk_node *buf = nullptr);
 
   /** @brief Copies the given node but none of the nodes it links to. */
   walk_node(const walk_node &w) = default;
@@ -59,7 +60,7 @@ public:
 
   const box<Dim> &bbox() const { return bbox_; }
 
-  const point<Dim> &endpoint() const { return end_; }
+  const P &endpoint() const { return end_; }
 
   const transform<Dim> &symm() const { return symm_; }
 
@@ -136,7 +137,7 @@ public:
 
   /* OTHER FUNCTIONS */
 
-  std::vector<point<Dim>> steps() const;
+  std::vector<P> steps() const;
 
   void todot(const std::string &path) const;
 
@@ -148,13 +149,13 @@ private:
   walk_node *right_{};
   transform<Dim> symm_;
   box<Dim> bbox_;
-  point<Dim> end_;
+  P end_;
 
   friend class walk_tree<Dim>;
 
   /* CONVENIENCE METHODS */
 
-  walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const point<Dim> &end);
+  walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const P &end);
 
   void set_left(walk_node *left) {
     left_ = left;
@@ -185,15 +186,15 @@ private:
   Agnode_t *todot(Agraph_t *g, const cgraph_t &cgraph) const;
 
   // recursive helper
-  static walk_node *balanced_rep(std::span<const point<Dim>> steps, int start, const transform<Dim> &glob_symm,
-                                 walk_node *buf);
+  static walk_node *balanced_rep(std::span<const P> steps, int start, const transform<Dim> &glob_symm, walk_node *buf);
 
   bool shuffle_intersect(const transform<Dim> &t, std::optional<bool> was_left_child,
                          std::optional<bool> is_left_child);
 
   template <int D>
-  friend bool intersect(const walk_node<D> *l_walk, const walk_node<D> *r_walk, const point<D> &l_anchor,
-                        const point<D> &r_anchor, const transform<D> &l_symm, const transform<D> &r_symm);
+  friend bool intersect(const walk_node<point<D>, D> *l_walk, const walk_node<point<D>, D> *r_walk,
+                        const point<D> &l_anchor, const point<D> &r_anchor, const transform<D> &l_symm,
+                        const transform<D> &r_symm);
 };
 
 } // namespace pivot
