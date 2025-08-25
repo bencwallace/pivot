@@ -58,7 +58,7 @@ TEST(WalkTreeTest, SelfAvoiding) {
   std::mt19937 gen(std::random_device{}());
   std::uniform_int_distribution<int> dist(0, 1);
   for (int num_steps = 2; num_steps < 10; ++num_steps) {
-    auto w = walk_tree<2>(num_steps);
+    auto w = walk_tree<pivot::point<2>, pivot::box<2>, pivot::transform<2>, 2>(num_steps);
     for (int i = 0; i < 10; ++i) {
       for (int j = 0; j < 10; j++) {
         w.rand_pivot(static_cast<bool>(dist(gen)));
@@ -70,7 +70,7 @@ TEST(WalkTreeTest, SelfAvoiding) {
 
 TEST(WalkTreeTest, SelfAvoiding3D) {
   for (int num_steps = 2; num_steps < 10; ++num_steps) {
-    auto w = walk_tree<3>(num_steps);
+    auto w = walk_tree<pivot::point<3>, pivot::box<3>, pivot::transform<3>, 3>(num_steps);
     for (int i = 0; i < 10; ++i) {
       for (int j = 0; j < 10; j++) {
         w.rand_pivot();
@@ -81,7 +81,7 @@ TEST(WalkTreeTest, SelfAvoiding3D) {
 }
 
 TEST(WalkTreeTest, FindNode) {
-  auto w = walk_tree<2>(100);
+  auto w = walk_tree<pivot::point<2>, pivot::box<2>, pivot::transform<2>, 2>(100);
   for (int i = 1; i <= 100; ++i) {
     w.rand_pivot();
   }
@@ -96,9 +96,9 @@ TEST(WalkTreeTest, Seed) {
   auto seed = rd();
   std::mt19937 gen(seed);
 
-  walk_tree<2> w1(100, seed);
-  walk_tree<2> w2(100, seed);
-  walk_tree<2> w3(100);
+  walk_tree<pivot::point<2>, pivot::box<2>, pivot::transform<2>, 2> w1(100, seed);
+  walk_tree<pivot::point<2>, pivot::box<2>, pivot::transform<2>, 2> w2(100, seed);
+  walk_tree<pivot::point<2>, pivot::box<2>, pivot::transform<2>, 2> w3(100);
   std::srand(seed);
   for (int i = 0; i < 10; ++i) {
     w1.rand_pivot();

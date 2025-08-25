@@ -16,7 +16,7 @@ template <class P, class B, class T, int Dim>
 bool intersect(const walk_node<P, B, T, Dim> *l_walk, const walk_node<P, B, T, Dim> *r_walk, const P &l_anchor,
                const P &r_anchor, const T &l_symm, const T &r_symm);
 
-template <int Dim> class walk_tree;
+template <class P, class B, class T, int Dim> class walk_tree;
 
 /* WALK NODE */
 
@@ -150,7 +150,7 @@ private:
   B bbox_;
   P end_;
 
-  friend class walk_tree<Dim>;
+  friend class walk_tree<P, B, T, Dim>;
 
   /* CONVENIENCE METHODS */
 

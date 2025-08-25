@@ -13,36 +13,36 @@ namespace pivot {
 
 /* CONSTRUCTORS, DESTRUCTOR */
 
-template <int Dim>
-walk_tree<Dim>::walk_tree(int num_sites, std::optional<unsigned int> seed, bool balanced)
+template <class P, class B, class T, int Dim>
+walk_tree<P, B, T, Dim>::walk_tree(int num_sites, std::optional<unsigned int> seed, bool balanced)
     : walk_tree(line<Dim>(num_sites), seed, balanced) {}
 
-template <int Dim>
-walk_tree<Dim>::walk_tree(const std::string &path, std::optional<unsigned int> seed, bool balanced)
+template <class P, class B, class T, int Dim>
+walk_tree<P, B, T, Dim>::walk_tree(const std::string &path, std::optional<unsigned int> seed, bool balanced)
     : walk_tree(from_csv<Dim>(path), seed, balanced) {}
 
-template <int Dim>
-walk_tree<Dim>::walk_tree(const std::vector<point<Dim>> &steps, std::optional<unsigned int> seed, bool balanced) {
+template <class P, class B, class T, int Dim>
+walk_tree<P, B, T, Dim>::walk_tree(const std::vector<P> &steps, std::optional<unsigned int> seed, bool balanced) {
   if (steps.size() < 2) {
     throw std::invalid_argument("walk must have at least 2 sites (1 step)");
   }
   buf_ = nullptr;
   if (balanced) {
-    size_t buf_size = sizeof(walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim>) * (steps.size() - 1);
-    constexpr auto alignment = std::align_val_t(alignof(walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim>));
-    buf_ = static_cast<walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim> *>(::operator new[](buf_size, alignment));
+    size_t buf_size = sizeof(walk_node<P, box<Dim>, transform<Dim>, Dim>) * (steps.size() - 1);
+    constexpr auto alignment = std::align_val_t(alignof(walk_node<P, box<Dim>, transform<Dim>, Dim>));
+    buf_ = static_cast<walk_node<P, box<Dim>, transform<Dim>, Dim> *>(::operator new[](buf_size, alignment));
   }
-  root_ = balanced ? std::unique_ptr<walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim>>(
-                         walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim>::balanced_rep(steps, buf_))
-                   : std::unique_ptr<walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim>>(
-                         walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim>::pivot_rep(steps, buf_));
+  root_ = balanced ? std::unique_ptr<walk_node<P, box<Dim>, transform<Dim>, Dim>>(
+                         walk_node<P, box<Dim>, transform<Dim>, Dim>::balanced_rep(steps, buf_))
+                   : std::unique_ptr<walk_node<P, box<Dim>, transform<Dim>, Dim>>(
+                         walk_node<P, box<Dim>, transform<Dim>, Dim>::pivot_rep(steps, buf_));
 
   rng_ = std::mt19937(seed.value_or(std::random_device()()));
   dist_ = std::uniform_int_distribution<int>(1, steps.size() - 1);
 }
 
-template <int Dim> walk_tree<Dim>::~walk_tree() {
-  std::stack<walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim> *> nodes;
+template <class P, class B, class T, int Dim> walk_tree<P, B, T, Dim>::~walk_tree() {
+  std::stack<walk_node<P, box<Dim>, transform<Dim>, Dim> *> nodes;
   nodes.push(root_.release());
   while (!nodes.empty()) {
     auto curr = nodes.top();
@@ -57,34 +57,34 @@ template <int Dim> walk_tree<Dim>::~walk_tree() {
   }
 
   if (buf_) {
-    ::operator delete[](buf_, std::align_val_t(alignof(walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim>)));
+    ::operator delete[](buf_, std::align_val_t(alignof(walk_node<P, box<Dim>, transform<Dim>, Dim>)));
   }
 }
 
 /* GETTERS, SETTERS, SIMPLE UTILITIES */
 
-template <int Dim> walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim> *walk_tree<Dim>::root() const {
+template <class P, class B, class T, int Dim> walk_node<P, B, T, Dim> *walk_tree<P, B, T, Dim>::root() const {
   return root_.get();
 }
 
-template <int Dim> point<Dim> walk_tree<Dim>::endpoint() const { return root_->endpoint(); }
+template <class P, class B, class T, int Dim> P walk_tree<P, B, T, Dim>::endpoint() const { return root_->endpoint(); }
 
-template <int Dim> bool walk_tree<Dim>::is_leaf() const { return root_->is_leaf(); }
+template <class P, class B, class T, int Dim> bool walk_tree<P, B, T, Dim>::is_leaf() const { return root_->is_leaf(); }
 
 /* PRIMITIVE OPERATIONS */
 
-template <int Dim> walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim> &walk_tree<Dim>::find_node(int n) {
+template <class P, class B, class T, int Dim> walk_node<P, B, T, Dim> &walk_tree<P, B, T, Dim>::find_node(int n) {
   if (!buf_) {
     throw std::runtime_error("find_node can only be used on trees initialized with balanced=true");
   }
-  walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim> &result = buf_[n - 1];
+  walk_node<P, B, T, Dim> &result = buf_[n - 1];
   assert(result.id_ == n);
   return result;
 }
 
 /* HIGH-LEVEL FUNCTIONS */
 
-template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r) {
+template <class P, class B, class T, int Dim> bool walk_tree<P, B, T, Dim>::try_pivot(int n, const T &r) {
   if (r.is_identity()) {
     return false;
   }
@@ -102,14 +102,13 @@ template <int Dim> bool walk_tree<Dim>::try_pivot(int n, const transform<Dim> &r
   return success;
 }
 
-template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Dim> &t) {
+template <class P, class B, class T, int Dim> bool walk_tree<P, B, T, Dim>::try_pivot_fast(int n, const T &t) {
   if (t.is_identity()) {
     return false;
   }
 
-  walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim> *w =
-      &find_node(n); // TODO: a pointer seems to be needed, but why?
-  walk_node<point<Dim>, box<Dim>, transform<Dim>, Dim> w_copy(*w);
+  walk_node<P, box<Dim>, transform<Dim>, Dim> *w = &find_node(n); // TODO: a pointer seems to be needed, but why?
+  walk_node<P, box<Dim>, transform<Dim>, Dim> w_copy(*w);
   auto success = !w_copy.shuffle_intersect(t, w->is_left_child());
   if (success) {
     root_->shuffle_up(n);
@@ -120,7 +119,7 @@ template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Di
   return success;
 }
 
-template <int Dim> bool walk_tree<Dim>::rand_pivot(bool fast) {
+template <class P, class B, class T, int Dim> bool walk_tree<P, B, T, Dim>::rand_pivot(bool fast) {
   auto site = dist_(rng_);
   auto r = transform<Dim>::rand(rng_);
   return fast ? try_pivot_fast(site, r) : try_pivot(site, r);
@@ -128,9 +127,11 @@ template <int Dim> bool walk_tree<Dim>::rand_pivot(bool fast) {
 
 /* OTHER FUNCTIONS */
 
-template <int Dim> std::vector<point<Dim>> walk_tree<Dim>::steps() const { return root_->steps(); }
+template <class P, class B, class T, int Dim> std::vector<P> walk_tree<P, B, T, Dim>::steps() const {
+  return root_->steps();
+}
 
-template <int Dim> bool walk_tree<Dim>::self_avoiding() const {
+template <class P, class B, class T, int Dim> bool walk_tree<P, B, T, Dim>::self_avoiding() const {
   auto steps = this->steps();
   for (size_t i = 0; i < steps.size(); ++i) {
     for (size_t j = i + 1; j < steps.size(); ++j) {
@@ -142,13 +143,17 @@ template <int Dim> bool walk_tree<Dim>::self_avoiding() const {
   return true;
 }
 
-template <int Dim> void walk_tree<Dim>::export_csv(const std::string &path) const { return to_csv(path, steps()); }
+template <class P, class B, class T, int Dim> void walk_tree<P, B, T, Dim>::export_csv(const std::string &path) const {
+  return to_csv(path, steps());
+}
 
-template <int Dim> void walk_tree<Dim>::todot(const std::string &path) const { root_->todot(path); }
+template <class P, class B, class T, int Dim> void walk_tree<P, B, T, Dim>::todot(const std::string &path) const {
+  root_->todot(path);
+}
 
 /* TEMPLATE INSTANTIATION */
 
-#define WALK_TREE_INST(z, n, data) template class walk_tree<n>;
+#define WALK_TREE_INST(z, n, data) template class walk_tree<point<n>, box<n>, transform<n>, n>;
 
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_TREE_INST, ~)
