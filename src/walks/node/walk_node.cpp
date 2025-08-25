@@ -41,7 +41,7 @@ template <class P, class B, int Dim> std::vector<P> walk_node<P, B, Dim>::steps(
 }
 
 #define INTERSECT_INST(z, n, data)                                                                                     \
-  template bool intersect<point<n>, n>(                                                                                \
+  template bool intersect<point<n>, box<n>, n>(                                                                        \
       const walk_node<point<n>, box<n>, n> *l_walk, const walk_node<point<n>, box<n>, n> *r_walk,                      \
       const point<n> &l_anchor, const point<n> &r_anchor, const transform<n> &l_symm, const transform<n> &r_symm);
 #define WALK_NODE_INST(z, n, data) template class walk_node<point<n>, box<n>, n>;
