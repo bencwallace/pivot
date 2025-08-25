@@ -28,19 +28,21 @@ walk_tree<Dim>::walk_tree(const std::vector<point<Dim>> &steps, std::optional<un
   }
   buf_ = nullptr;
   if (balanced) {
-    size_t buf_size = sizeof(walk_node<point<Dim>, Dim>) * (steps.size() - 1);
-    constexpr auto alignment = std::align_val_t(alignof(walk_node<point<Dim>, Dim>));
-    buf_ = static_cast<walk_node<point<Dim>, Dim> *>(::operator new[](buf_size, alignment));
+    size_t buf_size = sizeof(walk_node<point<Dim>, box<Dim>, Dim>) * (steps.size() - 1);
+    constexpr auto alignment = std::align_val_t(alignof(walk_node<point<Dim>, box<Dim>, Dim>));
+    buf_ = static_cast<walk_node<point<Dim>, box<Dim>, Dim> *>(::operator new[](buf_size, alignment));
   }
-  root_ = balanced ? std::unique_ptr<walk_node<point<Dim>, Dim>>(walk_node<point<Dim>, Dim>::balanced_rep(steps, buf_))
-                   : std::unique_ptr<walk_node<point<Dim>, Dim>>(walk_node<point<Dim>, Dim>::pivot_rep(steps, buf_));
+  root_ = balanced ? std::unique_ptr<walk_node<point<Dim>, box<Dim>, Dim>>(
+                         walk_node<point<Dim>, box<Dim>, Dim>::balanced_rep(steps, buf_))
+                   : std::unique_ptr<walk_node<point<Dim>, box<Dim>, Dim>>(
+                         walk_node<point<Dim>, box<Dim>, Dim>::pivot_rep(steps, buf_));
 
   rng_ = std::mt19937(seed.value_or(std::random_device()()));
   dist_ = std::uniform_int_distribution<int>(1, steps.size() - 1);
 }
 
 template <int Dim> walk_tree<Dim>::~walk_tree() {
-  std::stack<walk_node<point<Dim>, Dim> *> nodes;
+  std::stack<walk_node<point<Dim>, box<Dim>, Dim> *> nodes;
   nodes.push(root_.release());
   while (!nodes.empty()) {
     auto curr = nodes.top();
@@ -55,13 +57,13 @@ template <int Dim> walk_tree<Dim>::~walk_tree() {
   }
 
   if (buf_) {
-    ::operator delete[](buf_, std::align_val_t(alignof(walk_node<point<Dim>, Dim>)));
+    ::operator delete[](buf_, std::align_val_t(alignof(walk_node<point<Dim>, box<Dim>, Dim>)));
   }
 }
 
 /* GETTERS, SETTERS, SIMPLE UTILITIES */
 
-template <int Dim> walk_node<point<Dim>, Dim> *walk_tree<Dim>::root() const { return root_.get(); }
+template <int Dim> walk_node<point<Dim>, box<Dim>, Dim> *walk_tree<Dim>::root() const { return root_.get(); }
 
 template <int Dim> point<Dim> walk_tree<Dim>::endpoint() const { return root_->endpoint(); }
 
@@ -69,11 +71,11 @@ template <int Dim> bool walk_tree<Dim>::is_leaf() const { return root_->is_leaf(
 
 /* PRIMITIVE OPERATIONS */
 
-template <int Dim> walk_node<point<Dim>, Dim> &walk_tree<Dim>::find_node(int n) {
+template <int Dim> walk_node<point<Dim>, box<Dim>, Dim> &walk_tree<Dim>::find_node(int n) {
   if (!buf_) {
     throw std::runtime_error("find_node can only be used on trees initialized with balanced=true");
   }
-  walk_node<point<Dim>, Dim> &result = buf_[n - 1];
+  walk_node<point<Dim>, box<Dim>, Dim> &result = buf_[n - 1];
   assert(result.id_ == n);
   return result;
 }
@@ -103,8 +105,8 @@ template <int Dim> bool walk_tree<Dim>::try_pivot_fast(int n, const transform<Di
     return false;
   }
 
-  walk_node<point<Dim>, Dim> *w = &find_node(n); // TODO: a pointer seems to be needed, but why?
-  walk_node<point<Dim>, Dim> w_copy(*w);
+  walk_node<point<Dim>, box<Dim>, Dim> *w = &find_node(n); // TODO: a pointer seems to be needed, but why?
+  walk_node<point<Dim>, box<Dim>, Dim> w_copy(*w);
   auto success = !w_copy.shuffle_intersect(t, w->is_left_child());
   if (success) {
     root_->shuffle_up(n);

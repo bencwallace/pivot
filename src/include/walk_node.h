@@ -10,18 +10,18 @@ namespace pivot {
 
 /* FORWARD REFERENCES */
 
-template <class P, int Dim> class walk_node;
+template <class P, class B, int Dim> class walk_node;
 
 template <class P, int Dim>
-bool intersect(const walk_node<P, Dim> *l_walk, const walk_node<P, Dim> *r_walk, const P &l_anchor, const P &r_anchor,
-               const transform<Dim> &l_symm, const transform<Dim> &r_symm);
+bool intersect(const walk_node<P, box<Dim>, Dim> *l_walk, const walk_node<P, box<Dim>, Dim> *r_walk, const P &l_anchor,
+               const P &r_anchor, const transform<Dim> &l_symm, const transform<Dim> &r_symm);
 
 template <int Dim> class walk_tree;
 
 /* WALK NODE */
 
 /** @brief Represents a node in a walk tree. */
-template <class P, int Dim> class walk_node {
+template <class P, class B, int Dim> class walk_node {
 
 public:
   /* CONSTRUCTORS, DESTRUCTOR */
@@ -57,7 +57,7 @@ public:
 
   int id() const { return id_; }
 
-  const box<Dim> &bbox() const { return bbox_; }
+  const B &bbox() const { return bbox_; }
 
   const P &endpoint() const { return end_; }
 
@@ -147,14 +147,14 @@ private:
   walk_node *left_{};
   walk_node *right_{};
   transform<Dim> symm_;
-  box<Dim> bbox_;
+  B bbox_;
   P end_;
 
   friend class walk_tree<Dim>;
 
   /* CONVENIENCE METHODS */
 
-  walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const P &end);
+  walk_node(int id, int num_sites, const transform<Dim> &symm, const B &bbox, const P &end);
 
   void set_left(walk_node *left) {
     left_ = left;
@@ -191,8 +191,9 @@ private:
                          std::optional<bool> is_left_child);
 
   template <class Point, int D>
-  friend bool intersect(const walk_node<Point, D> *l_walk, const walk_node<Point, D> *r_walk, const Point &l_anchor,
-                        const Point &r_anchor, const transform<D> &l_symm, const transform<D> &r_symm);
+  friend bool intersect(const walk_node<Point, box<D>, D> *l_walk, const walk_node<Point, box<D>, D> *r_walk,
+                        const Point &l_anchor, const Point &r_anchor, const transform<D> &l_symm,
+                        const transform<D> &r_symm);
 };
 
 } // namespace pivot

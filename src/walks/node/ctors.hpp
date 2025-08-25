@@ -2,19 +2,19 @@
 
 namespace pivot {
 
-template <class P, int Dim>
-walk_node<P, Dim>::walk_node(int id, int num_sites, const transform<Dim> &symm, const box<Dim> &bbox, const P &end)
+template <class P, class B, int Dim>
+walk_node<P, B, Dim>::walk_node(int id, int num_sites, const transform<Dim> &symm, const B &bbox, const P &end)
     : id_(id), num_sites_(num_sites), symm_(symm), bbox_(bbox), end_(end) {}
 
-template <class P, int Dim>
-walk_node<P, Dim> *walk_node<P, Dim>::pivot_rep(const std::vector<P> &steps, walk_node *buf) {
+template <class P, class B, int Dim>
+walk_node<P, B, Dim> *walk_node<P, B, Dim>::pivot_rep(const std::vector<P> &steps, walk_node *buf) {
   int num_sites = steps.size();
   if (num_sites < 2) {
     throw std::invalid_argument("num_sites must be at least 2");
   }
-  walk_node<P, Dim> *root =
-      buf ? new (buf) walk_node(1, num_sites, transform(steps[0], steps[1]), box<Dim>(steps), steps[num_sites - 1])
-          : new walk_node(1, num_sites, transform(steps[0], steps[1]), box<Dim>(steps), steps[num_sites - 1]);
+  walk_node<P, B, Dim> *root =
+      buf ? new (buf) walk_node(1, num_sites, transform(steps[0], steps[1]), B(steps), steps[num_sites - 1])
+          : new walk_node(1, num_sites, transform(steps[0], steps[1]), B(steps), steps[num_sites - 1]);
   auto node = root;
   for (int i = 0; i < num_sites - 2; ++i) {
     auto id = i + 2;
@@ -30,14 +30,14 @@ walk_node<P, Dim> *walk_node<P, Dim>::pivot_rep(const std::vector<P> &steps, wal
   return root;
 }
 
-template <class P, int Dim>
-walk_node<P, Dim> *walk_node<P, Dim>::balanced_rep(const std::vector<P> &steps, walk_node<P, Dim> *buf) {
+template <class P, class B, int Dim>
+walk_node<P, B, Dim> *walk_node<P, B, Dim>::balanced_rep(const std::vector<P> &steps, walk_node<P, B, Dim> *buf) {
   return balanced_rep(steps, 1, transform<Dim>(), buf);
 }
 
-template <class P, int Dim>
-walk_node<P, Dim> *walk_node<P, Dim>::balanced_rep(std::span<const P> steps, int start, const transform<Dim> &glob_symm,
-                                                   walk_node<P, Dim> *buf) {
+template <class P, class B, int Dim>
+walk_node<P, B, Dim> *walk_node<P, B, Dim>::balanced_rep(std::span<const P> steps, int start,
+                                                         const transform<Dim> &glob_symm, walk_node<P, B, Dim> *buf) {
   int num_sites = steps.size();
   if (num_sites < 1) {
     throw std::invalid_argument("num_sites must be at least 1");
@@ -71,7 +71,7 @@ walk_node<P, Dim> *walk_node<P, Dim>::balanced_rep(std::span<const P> steps, int
   return root;
 }
 
-template <class P, int Dim> walk_node<P, Dim> walk_node<P, Dim>::create_leaf() {
+template <class P, class B, int Dim> walk_node<P, B, Dim> walk_node<P, B, Dim>::create_leaf() {
   std::array<interval, Dim> intervals;
   intervals[0] = interval(1, 1);
   for (int i = 1; i < Dim; ++i) {
@@ -80,11 +80,11 @@ template <class P, int Dim> walk_node<P, Dim> walk_node<P, Dim>::create_leaf() {
   return walk_node(0, 1, transform<Dim>(), box<Dim>(intervals), P::unit(0));
 }
 
-template <class P, int Dim> walk_node<P, Dim> &walk_node<P, Dim>::leaf() {
-  static walk_node<P, Dim> leaf = create_leaf();
+template <class P, class B, int Dim> walk_node<P, B, Dim> &walk_node<P, B, Dim>::leaf() {
+  static walk_node<P, B, Dim> leaf = create_leaf();
   return leaf;
 }
 
-template <class P, int Dim> walk_node<P, Dim>::~walk_node() = default;
+template <class P, class B, int Dim> walk_node<P, B, Dim>::~walk_node() = default;
 
 } // namespace pivot
