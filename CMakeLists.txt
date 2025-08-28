@@ -49,6 +49,7 @@ endif()
 target_compile_options(pivot
   PUBLIC
     -Wall -Wextra -Werror -Wpedantic
+    -msse4.1
     $<$<CONFIG:Debug>:-O0 -g>
 )
 target_compile_definitions(pivot
