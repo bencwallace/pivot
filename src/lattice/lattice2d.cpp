@@ -32,6 +32,20 @@ static inline __m128i insert_epi32(__m128i data, int32_t val, size_t i) {
   }
 }
 
+// Given a vector (a, b, c, d) representing potentially unsorted intervals
+// {a, c} and {b, d}, return [min(a, c), min(b, d), max(a, c), max(b, d)]
+// representing intervals [min(a, c), max(a, c)] and [min(b, d), max(b, d)].
+inline __m128i sort_bounds(__m128i pairs) {
+  __m128i swapped = _mm_shuffle_epi32(pairs, _MM_SHUFFLE(1, 0, 3, 2));
+  __m128i minima = _mm_min_epi32(pairs, swapped);
+  __m128i maxima = _mm_max_epi32(pairs, swapped);
+  return _mm_blend_epi32(minima, maxima, 0b1100);
+}
+
+inline __m128i permutevar_epi32(__m128i data, __m128i perm) {
+  return _mm_castps_si128(_mm_permutevar_ps(_mm_castsi128_ps(data), perm));
+}
+
 namespace pivot {
 
 point2d::point2d() : data_(_mm_setzero_si128()) {}
@@ -151,6 +165,94 @@ box2d box2d::operator&(const box2d &b) const {
 std::string box2d::to_string() const {
   std::string s = "";
   s += (*this)[0].to_string() + " x " + (*this)[1].to_string();
+  return s;
+}
+
+transform2d::transform2d() : perm_(_mm_setr_epi32(0, 1, 2, 3)), signs_(_mm_set1_epi32(1)) {}
+
+transform2d::transform2d(const std::array<int, 2> &perm, const std::array<int, 2> &signs)
+    : perm_(_mm_setr_epi32(perm[0], perm[1], 2 + perm[0], 2 + perm[1])),
+      signs_(_mm_setr_epi32(signs[0], signs[1], signs[0], signs[1])) {}
+
+transform2d::transform2d(const point2d &p, const point2d &q) {
+  point2d diff = q - p;
+  int idx = -1;
+  for (int i = 0; i < 2; ++i) {
+    if (std::abs(diff[i]) == 1) {
+      if (idx == -1) {
+        idx = i;
+      } else {
+        throw std::invalid_argument("Points are not adjacent");
+      }
+    }
+  }
+  if (idx == -1) {
+    throw std::invalid_argument("Points are not adjacent");
+  }
+
+  insert_epi32(perm_, idx, 0);
+  insert_epi32(perm_, 0, idx);
+  insert_epi32(signs_, -diff[idx], 0);
+  insert_epi32(signs_, diff[idx], idx);
+}
+
+transform2d transform2d::rand() {
+  static std::random_device rd;
+  static std::mt19937 gen(rd());
+  return rand(gen);
+}
+
+bool transform2d::operator==(const transform2d &t) const {
+  return _mm_movemask_epi8(_mm_cmpeq_epi32(signs_, t.signs_)) == 0xFFFF &&
+         _mm_movemask_epi8(_mm_cmpeq_epi32(perm_, t.perm_)) == 0xFFFF;
+}
+
+point2d transform2d::operator*(const point2d &p) const {
+  return _mm_sign_epi32(permutevar_epi32(p.data(), perm_), signs_);
+}
+
+transform2d transform2d::operator*(const transform2d &t) const {
+  __m128i perm = permutevar_epi32(perm_, t.perm_);
+  __m128i signs = _mm_sign_epi32(permutevar_epi32(t.signs_, perm_), signs_);
+  return {perm, signs};
+}
+
+box2d transform2d::operator*(const box2d &b) const {
+  __m128i pairs = _mm_sign_epi32(permutevar_epi32(b.data(), perm_), signs_);
+  return sort_bounds(pairs);
+}
+
+bool transform2d::is_identity() const {
+  return _mm_movemask_epi8(_mm_cmpeq_epi32(signs_, _mm_set1_epi32(1))) == 0xFFFF &&
+         _mm_movemask_epi8(_mm_cmpeq_epi32(perm_, _mm_setr_epi32(0, 1, 2, 3))) == 0xFFFF;
+}
+
+transform2d transform2d::inverse() const {
+  // In general, the inverse is given by signs S' and permutations P' such
+  // that P' = P^-1 and S' = S P. The latter's components can be obtained by
+  // viewing S as a vector and applying P to it (i.e. permuting it). Moreover,
+  // in 2D, P^-1 is the same as P.
+  return transform2d(perm_, permutevar_epi32(signs_, perm_));
+}
+
+std::array<std::array<int, 2>, 2> transform2d::to_matrix() const {
+  std::array<std::array<int, 2>, 2> mat;
+  mat[perm_[0]][0] = extract_epi32(signs_, extract_epi32(perm_, 0));
+  mat[perm_[1]][1] = extract_epi32(signs_, extract_epi32(perm_, 1));
+  return mat;
+}
+
+std::string transform2d::to_string() const {
+  auto matrix = to_matrix();
+  std::string s = "[";
+  for (int i = 0; i < 2; ++i) {
+    s += "[";
+    s += std::to_string(matrix[i][0]) + ", ";
+    s += std::to_string(matrix[i][1]) + "]";
+    if (i < 1) {
+      s += ", ";
+    }
+  }
   return s;
 }
 
