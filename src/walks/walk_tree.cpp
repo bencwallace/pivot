@@ -5,6 +5,7 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 #include "defines.h"
+#include "lattice2d.h"
 #include "utils.h"
 #include "walk_node.h"
 #include "walk_tree.h"
@@ -155,7 +156,9 @@ template <class P, class B, class T, int Dim> void walk_tree<P, B, T, Dim>::todo
 
 #define WALK_TREE_INST(z, n, data) template class walk_tree<point<n>, box<n>, transform<n>, n>;
 
+template class walk_tree<point<1>, box<1>, transform<1>, 1>;
+template class walk_tree<point2d, box2d, transform2d, 2>;
 // cppcheck-suppress syntaxError
-BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_TREE_INST, ~)
+BOOST_PP_REPEAT_FROM_TO(3, DIMS_UB, WALK_TREE_INST, ~)
 
 } // namespace pivot
