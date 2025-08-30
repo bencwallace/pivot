@@ -4,7 +4,7 @@
 
 namespace pivot {
 
-template <int Dim> class walk_base {
+template <class P> class walk_base {
 
 public:
   virtual ~walk_base() = default;
@@ -15,7 +15,7 @@ public:
 
   virtual void export_csv(const std::string &path) const = 0;
 
-  virtual point<Dim> endpoint() const = 0;
+  virtual P endpoint() const = 0;
 };
 
 } // namespace pivot

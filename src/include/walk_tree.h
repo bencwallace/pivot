@@ -13,7 +13,7 @@ namespace pivot {
 template <class P, class B, class T, int Dim> class walk_node;
 
 /** @brief Represents an entire saw-tree (as per Clisby's 2010 paper). */
-template <class P, class B, class T, int Dim> class walk_tree : public walk_base<Dim> {
+template <class P, class B, class T, int Dim> class walk_tree : public walk_base<P> {
 
 public:
   /* CONSTRUCTORS, DESTRUCTOR */
