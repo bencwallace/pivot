@@ -10,7 +10,7 @@
 
 namespace pivot {
 
-template <int Dim> bool walk_node<Dim>::operator==(const walk_node &other) const {
+template <int Dim, bool Simd> bool walk_node<Dim, Simd>::operator==(const walk_node &other) const {
   if (is_leaf() && other.is_leaf()) {
     return true;
   }
@@ -18,10 +18,12 @@ template <int Dim> bool walk_node<Dim>::operator==(const walk_node &other) const
          end_ == other.end_ && *left_ == *other.left_ && *right_ == *other.right_;
 }
 
-template <int Dim> bool walk_node<Dim>::is_leaf() const { return left_ == nullptr && right_ == nullptr; }
+template <int Dim, bool Simd> bool walk_node<Dim, Simd>::is_leaf() const {
+  return left_ == nullptr && right_ == nullptr;
+}
 
-template <int Dim> std::vector<point<Dim>> walk_node<Dim>::steps() const {
-  std::vector<point<Dim>> result;
+template <int Dim, bool Simd> std::vector<point<Dim, Simd>> walk_node<Dim, Simd>::steps() const {
+  std::vector<point<Dim, Simd>> result;
   if (is_leaf()) {
     result.push_back(end_);
     return result;
