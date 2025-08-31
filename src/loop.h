@@ -6,15 +6,15 @@
 #include "walk.h"
 #include "walk_tree.h"
 
-template <int Dim>
+template <int Dim, bool Simd = false>
 int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool require_success, bool verify,
               const std::string &in_path, const std::string &out_dir) {
   std::unique_ptr<pivot::walk_base<Dim>> w;
   if (naive) {
     if (in_path.empty()) {
-      w = std::make_unique<pivot::walk<Dim>>(num_steps, seed);
+      w = std::make_unique<pivot::walk<Dim, Simd>>(num_steps, seed);
     } else {
-      w = std::make_unique<pivot::walk<Dim>>(in_path, seed);
+      w = std::make_unique<pivot::walk<Dim, Simd>>(in_path, seed);
     }
   } else {
     if (in_path.empty()) {

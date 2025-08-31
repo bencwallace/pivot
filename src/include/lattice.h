@@ -138,7 +138,7 @@ struct point_hash {
 
   // This hashing method, which exploits the known range of values that can be taken by the
   // sequence of points in a walk, ppears to result in better performance than other methods tested.
-  template <int Dim> std::size_t operator()(const point<Dim> &p) const;
+  template <int Dim, bool Simd = false> std::size_t operator()(const point<Dim, Simd> &p) const;
 };
 
 /**

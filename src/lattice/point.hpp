@@ -74,7 +74,7 @@ template <int Dim, bool Simd> std::string point<Dim, Simd>::to_string() const {
 
 point_hash::point_hash(int num_steps) : num_steps_(num_steps) {}
 
-template <int Dim> std::size_t point_hash::operator()(const point<Dim> &p) const {
+template <int Dim, bool Simd> std::size_t point_hash::operator()(const point<Dim, Simd> &p) const {
   std::size_t hash = 0;
   for (int i = 0; i < Dim; ++i) {
     hash = num_steps_ + p[i] + 2 * num_steps_ * hash;
