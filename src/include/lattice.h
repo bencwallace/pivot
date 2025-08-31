@@ -156,7 +156,7 @@ struct point_hash {
  * entries of S by S(i). Note that P e(i) = e(P(i)) and S e(i) = S(i) e(i), where e(i)
  * is the i-th standard unit vector.
  */
-template <int Dim> class transform {
+template <int Dim, bool Simd = false> class transform {
 
 public:
   /** @brief Constructs the identity transformation. */
@@ -174,7 +174,7 @@ public:
    *
    * Note that the resulting pivot transformation is not uniquely defined by the inputs.
    */
-  transform(const point<Dim> &p, const point<Dim> &q);
+  transform(const point<Dim, Simd> &p, const point<Dim, Simd> &q);
 
   /** @brief Produce a uniformly random transfom.*/
   template <typename Gen> static transform rand(Gen &gen) {
@@ -203,7 +203,7 @@ public:
    *
    * which means the P(i)-th component of the result is S(P(i)) p[i].
    */
-  point<Dim> operator*(const point<Dim> &p) const;
+  point<Dim, Simd> operator*(const point<Dim, Simd> &p) const;
 
   /**
    * @brief Composes two transforms.
@@ -238,7 +238,7 @@ public:
    * which means the P(i)-th interval from which SP(B) is constructed has bounds S(P(i)) a[i] and
    * S(P(i)) b[i].
    */
-  box<Dim> operator*(const box<Dim> &b) const;
+  box<Dim, Simd> operator*(const box<Dim, Simd> &b) const;
 
   /** @brief Returns true if the transform is the identity. */
   bool is_identity() const;
