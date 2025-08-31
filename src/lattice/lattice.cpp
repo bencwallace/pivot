@@ -6,6 +6,7 @@
 #include "point.hpp"
 #include "point_simd.hpp"
 #include "transform.hpp"
+#include "transform_simd.hpp"
 
 namespace pivot {
 
