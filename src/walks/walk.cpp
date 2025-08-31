@@ -18,10 +18,10 @@ walk<Dim>::walk(const std::vector<point<Dim>> &steps, std::optional<unsigned int
 }
 
 template <int Dim>
-walk<Dim>::walk(int num_steps, std::optional<unsigned int> seed) : walk(line<Dim>(num_steps), seed) {}
+walk<Dim>::walk(int num_steps, std::optional<unsigned int> seed) : walk(line<Dim, false>(num_steps), seed) {}
 
 template <int Dim>
-walk<Dim>::walk(const std::string &path, std::optional<unsigned int> seed) : walk(from_csv<Dim>(path), seed) {}
+walk<Dim>::walk(const std::string &path, std::optional<unsigned int> seed) : walk(from_csv<Dim, false>(path), seed) {}
 
 template <int Dim>
 std::optional<std::vector<point<Dim>>> walk<Dim>::try_pivot(int step, const transform<Dim> &trans) const {

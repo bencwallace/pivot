@@ -8,9 +8,9 @@
 
 namespace pivot {
 
-template <int Dim> std::vector<point<Dim>> from_csv(const std::string &path) {
+template <int Dim, bool Simd = false> std::vector<point<Dim, Simd>> from_csv(const std::string &path) {
   std::ifstream file(path);
-  std::vector<point<Dim>> points;
+  std::vector<point<Dim, Simd>> points;
   std::string line;
   while (std::getline(file, line)) {
     std::array<int, Dim> coords;
@@ -23,12 +23,13 @@ template <int Dim> std::vector<point<Dim>> from_csv(const std::string &path) {
       coords[i] = std::stoi(line.substr(start, end - start));
       start = end + 1;
     }
-    points.push_back(point<Dim>(coords));
+    points.push_back(point<Dim, Simd>(coords));
   }
   return points;
 }
 
-template <int Dim> void to_csv(const std::string &path, const std::vector<point<Dim>> &points) {
+template <int Dim, bool Simd = false>
+void to_csv(const std::string &path, const std::vector<point<Dim, Simd>> &points) {
   // TODO: check path exists
   std::ofstream file(path);
   for (const auto &p : points) {
@@ -39,17 +40,18 @@ template <int Dim> void to_csv(const std::string &path, const std::vector<point<
   }
 }
 
-template <int Dim> std::vector<point<Dim>> line(int num_steps) {
-  std::vector<point<Dim>> steps(num_steps);
+template <int Dim, bool Simd = false> std::vector<point<Dim, Simd>> line(int num_steps) {
+  std::vector<point<Dim, Simd>> steps(num_steps);
   for (int i = 0; i < num_steps; ++i) {
-    steps[i] = (i + 1) * point<Dim>::unit(0);
+    steps[i] = (i + 1) * point<Dim, Simd>::unit(0);
   }
   return steps;
 }
 
-#define FROM_CSV_INST(z, n, data) template std::vector<point<n>> from_csv<n>(const std::string &path);
-#define TO_CSV_INST(z, n, data) template void to_csv<n>(const std::string &path, const std::vector<point<n>> &points);
-#define LINE_INST(z, n, data) template std::vector<point<n>> line(int num_steps);
+#define FROM_CSV_INST(z, n, data) template std::vector<point<n>> from_csv<n, false>(const std::string &path);
+#define TO_CSV_INST(z, n, data)                                                                                        \
+  template void to_csv<n, false>(const std::string &path, const std::vector<point<n>> &points);
+#define LINE_INST(z, n, data) template std::vector<point<n>> line<n, false>(int num_steps);
 
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TO_CSV_INST, ~)
