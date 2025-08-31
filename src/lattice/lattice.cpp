@@ -1,6 +1,7 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 #include "box.hpp"
+#include "box_simd.hpp"
 #include "lattice.h"
 #include "point.hpp"
 #include "point_simd.hpp"
