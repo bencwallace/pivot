@@ -21,4 +21,6 @@ BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_HASH_CALL_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TRANSFORM_INST, ~)
 
+template std::size_t point_hash::operator()<2>(const point<2, true> &p) const;
+
 } // namespace pivot
