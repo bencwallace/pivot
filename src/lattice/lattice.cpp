@@ -3,6 +3,7 @@
 #include "box.hpp"
 #include "lattice.h"
 #include "point.hpp"
+#include "point_simd.hpp"
 #include "transform.hpp"
 
 namespace pivot {
