@@ -6,6 +6,7 @@
 
 #include "ctors.hpp"
 #include "graphviz.hpp"
+#include "lattice_simd.h"
 #include "pivot.hpp"
 
 namespace pivot {
@@ -48,5 +49,10 @@ template <int Dim, bool Simd> std::vector<point<Dim, Simd>> walk_node<Dim, Simd>
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, INTERSECT_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_NODE_INST, ~)
+
+template bool intersect<2, true>(const walk_node<2, true> *l_walk, const walk_node<2, true> *r_walk,
+                                 const point<2, true> &l_anchor, const point<2, true> &r_anchor,
+                                 const transform<2, true> &l_symm, const transform<2, true> &r_symm);
+template class walk_node<2, true>;
 
 } // namespace pivot

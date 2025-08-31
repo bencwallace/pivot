@@ -4,6 +4,7 @@
 
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
+#include "lattice_simd.h"
 #include "utils.h"
 
 namespace pivot {
@@ -57,5 +58,9 @@ template <int Dim, bool Simd = false> std::vector<point<Dim, Simd>> line(int num
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TO_CSV_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, FROM_CSV_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, LINE_INST, ~)
+
+template std::vector<point<2, true>> from_csv<2, true>(const std::string &path);
+template void to_csv<2, true>(const std::string &path, const std::vector<point<2, true>> &points);
+template std::vector<point<2, true>> line<2, true>(int num_steps);
 
 } // namespace pivot
