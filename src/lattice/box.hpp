@@ -24,7 +24,7 @@ std::string interval::to_string() const {
   return result;
 }
 
-template <int Dim> box<Dim> &box<Dim>::operator+=(const point<Dim> &p) {
+template <int Dim, bool Simd> box<Dim, Simd> &box<Dim, Simd>::operator+=(const point<Dim, Simd> &p) {
   for (int i = 0; i < Dim; ++i) {
     intervals_[i].left_ += p[i];
     intervals_[i].right_ += p[i];
@@ -32,7 +32,7 @@ template <int Dim> box<Dim> &box<Dim>::operator+=(const point<Dim> &p) {
   return *this;
 }
 
-template <int Dim> box<Dim> &box<Dim>::operator-=(const point<Dim> &b) {
+template <int Dim, bool Simd> box<Dim, Simd> &box<Dim, Simd>::operator-=(const point<Dim, Simd> &b) {
   for (int i = 0; i < Dim; ++i) {
     intervals_[i].left_ -= b[i];
     intervals_[i].right_ -= b[i];
@@ -40,9 +40,9 @@ template <int Dim> box<Dim> &box<Dim>::operator-=(const point<Dim> &b) {
   return *this;
 }
 
-template <int Dim> box<Dim>::box(const std::array<interval, Dim> &intervals) : intervals_(intervals) {}
+template <int Dim, bool Simd> box<Dim, Simd>::box(const std::array<interval, Dim> &intervals) : intervals_(intervals) {}
 
-template <int Dim> box<Dim>::box(std::span<const point<Dim>> points) {
+template <int Dim, bool Simd> box<Dim, Simd>::box(std::span<const point<Dim, Simd>> points) {
   std::array<int, Dim> min;
   std::array<int, Dim> max;
   min.fill(std::numeric_limits<int>::max());
@@ -60,17 +60,17 @@ template <int Dim> box<Dim>::box(std::span<const point<Dim>> points) {
   }
 }
 
-template <int Dim> bool box<Dim>::operator==(const box &b) const { return intervals_ == b.intervals_; }
+template <int Dim, bool Simd> bool box<Dim, Simd>::operator==(const box &b) const { return intervals_ == b.intervals_; }
 
-template <int Dim> bool box<Dim>::operator!=(const box &b) const { return intervals_ != b.intervals_; }
+template <int Dim, bool Simd> bool box<Dim, Simd>::operator!=(const box &b) const { return intervals_ != b.intervals_; }
 
-template <int Dim> interval box<Dim>::operator[](int i) const { return intervals_[i]; }
+template <int Dim, bool Simd> interval box<Dim, Simd>::operator[](int i) const { return intervals_[i]; }
 
-template <int Dim> bool box<Dim>::empty() const {
+template <int Dim, bool Simd> bool box<Dim, Simd>::empty() const {
   return std::any_of(intervals_.begin(), intervals_.end(), [](const interval &i) { return i.empty(); });
 }
 
-template <int Dim> box<Dim> box<Dim>::operator|(const box<Dim> &b) const {
+template <int Dim, bool Simd> box<Dim, Simd> box<Dim, Simd>::operator|(const box<Dim, Simd> &b) const {
   std::array<interval, Dim> intervals;
   for (int i = 0; i < Dim; ++i) {
     intervals[i] = interval(std::min(intervals_[i].left_, b.intervals_[i].left_),
@@ -79,7 +79,7 @@ template <int Dim> box<Dim> box<Dim>::operator|(const box<Dim> &b) const {
   return box(intervals);
 }
 
-template <int Dim> box<Dim> box<Dim>::operator&(const box<Dim> &b) const {
+template <int Dim, bool Simd> box<Dim, Simd> box<Dim, Simd>::operator&(const box<Dim, Simd> &b) const {
   std::array<interval, Dim> intervals;
   for (int i = 0; i < Dim; ++i) {
     intervals[i] = interval(std::max(intervals_[i].left_, b.intervals_[i].left_),
@@ -88,7 +88,7 @@ template <int Dim> box<Dim> box<Dim>::operator&(const box<Dim> &b) const {
   return box(intervals);
 }
 
-template <int Dim> std::string box<Dim>::to_string() const {
+template <int Dim, bool Simd> std::string box<Dim, Simd>::to_string() const {
   std::string s = "";
   for (int i = 0; i < Dim - 1; ++i) {
     s += intervals_[i].to_string() + " x ";
