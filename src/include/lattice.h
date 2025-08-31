@@ -39,7 +39,7 @@ struct interval {
 /**
  * @brief Represents a Dim-dimensional point.
  */
-template <int Dim> class point : boost::multipliable<point<Dim>, int> {
+template <int Dim, bool Simd = false> class point : boost::multipliable<point<Dim, Simd>, int> {
 
 public:
   point() = default;
@@ -77,7 +77,7 @@ private:
   std::array<int, Dim> coords_{};
 };
 
-template <typename S, typename T, T Dim> point(std::array<S, Dim>) -> point<Dim>;
+template <typename S, typename T, T Dim> point(std::array<S, Dim>) -> point<Dim, false>;
 
 /** @brief Represents a Dim-dimensional box. */
 template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
