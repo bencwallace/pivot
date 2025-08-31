@@ -13,7 +13,7 @@
 
 namespace pivot {
 
-template <int Dim> struct box;
+template <int Dim, bool Simd> struct box;
 
 /**
  * @brief Represents a closed interval [left_, right_].
@@ -80,7 +80,7 @@ private:
 template <typename S, typename T, T Dim> point(std::array<S, Dim>) -> point<Dim, false>;
 
 /** @brief Represents a Dim-dimensional box. */
-template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
+template <int Dim, bool Simd = false> struct box : boost::additive<box<Dim, Simd>, point<Dim, Simd>> {
   std::array<interval, Dim> intervals_;
 
   box() = delete;
@@ -94,7 +94,7 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
    * in the sense that the input sequences of points (p0, ...) is effectively translated by e0 - p0
    * prior to the box's construction. In other words, the box will always have a vertex at e0.
    */
-  box(std::span<const point<Dim>> points);
+  box(std::span<const point<Dim, Simd>> points);
 
   bool operator==(const box &b) const;
 
@@ -105,9 +105,9 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
   bool empty() const;
 
   /** @brief Action of a point (understood as a vector) on a box */
-  box<Dim> &operator+=(const point<Dim> &b);
+  box<Dim, Simd> &operator+=(const point<Dim, Simd> &b);
 
-  box<Dim> &operator-=(const point<Dim> &b);
+  box<Dim, Simd> &operator-=(const point<Dim, Simd> &b);
 
   /**
    * @brief Returns the "union" of two boxes.
@@ -129,7 +129,7 @@ template <int Dim> struct box : boost::additive<box<Dim>, point<Dim>> {
   std::string to_string() const;
 };
 
-template <typename S, typename T, S Dim, T N> box(std::array<point<Dim>, N>) -> box<Dim>;
+template <typename S, typename T, S Dim, T N> box(std::array<point<Dim>, N>) -> box<Dim, false>;
 
 struct point_hash {
   int num_steps_;
