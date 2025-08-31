@@ -18,11 +18,11 @@ walk<Dim, Simd>::walk(const std::vector<point<Dim, Simd>> &steps, std::optional<
 }
 
 template <int Dim, bool Simd>
-walk<Dim, Simd>::walk(int num_steps, std::optional<unsigned int> seed) : walk(line<Dim, false>(num_steps), seed) {}
+walk<Dim, Simd>::walk(int num_steps, std::optional<unsigned int> seed) : walk(line<Dim, Simd>(num_steps), seed) {}
 
 template <int Dim, bool Simd>
 walk<Dim, Simd>::walk(const std::string &path, std::optional<unsigned int> seed)
-    : walk(from_csv<Dim, false>(path), seed) {}
+    : walk(from_csv<Dim, Simd>(path), seed) {}
 
 template <int Dim, bool Simd>
 std::optional<std::vector<point<Dim, Simd>>> walk<Dim, Simd>::try_pivot(int step,
@@ -127,5 +127,7 @@ point<Dim, Simd> walk<Dim, Simd>::pivot_point(int step, int i, const transform<D
 
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_INST, ~)
+
+template class walk<2, true>;
 
 } // namespace pivot
