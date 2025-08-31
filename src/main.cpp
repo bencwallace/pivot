@@ -21,6 +21,7 @@ int main(int argc, char **argv) {
   std::string in_path{""};
   std::string out_dir{""};
   unsigned int seed;
+  bool simd;
 
   CLI::App app{"Implementation of the pivot algorithm"};
   argv = app.ensure_utf8(argv);
@@ -36,6 +37,7 @@ int main(int argc, char **argv) {
   app.add_option("--in", in_path, "input path");
   app.add_option("--out", out_dir, "output directory");
   app.add_option("--seed", seed, "seed")->default_val(std::random_device()());
+  app.add_flag("--simd", simd, "use SIMD (if supported)");
 
   CLI11_PARSE(app, argc, argv);
   bool fast;
@@ -45,11 +47,19 @@ int main(int argc, char **argv) {
     fast = !naive;
   }
 
-  switch (dim) {
-    // cppcheck-suppress syntaxError
-    BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, CASE_MACRO, ~)
-  default:
-    std::cerr << "Invalid dimension: " << dim << '\n';
-    return 1;
+  if (!simd) {
+    switch (dim) {
+      // cppcheck-suppress syntaxError
+      BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, CASE_MACRO, ~)
+    default:
+      std::cerr << "Invalid dimension: " << dim << '\n';
+      return 1;
+    }
+  } else {
+    if (dim != 2) {
+      std::cerr << "SIMD only supported for 2D\n";
+      return 1;
+    }
+    return main_loop<2, true>(num_steps, iters, naive, fast, seed, require_success, verify, in_path, out_dir);
   }
 }

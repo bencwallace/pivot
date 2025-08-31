@@ -9,7 +9,7 @@
 template <int Dim, bool Simd = false>
 int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool require_success, bool verify,
               const std::string &in_path, const std::string &out_dir) {
-  std::unique_ptr<pivot::walk_base<Dim>> w;
+  std::unique_ptr<pivot::walk_base<Dim, Simd>> w;
   if (naive) {
     if (in_path.empty()) {
       w = std::make_unique<pivot::walk<Dim, Simd>>(num_steps, seed);
@@ -18,14 +18,14 @@ int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool re
     }
   } else {
     if (in_path.empty()) {
-      w = std::make_unique<pivot::walk_tree<Dim>>(num_steps, seed);
+      w = std::make_unique<pivot::walk_tree<Dim, Simd>>(num_steps, seed);
     } else {
-      w = std::make_unique<pivot::walk_tree<Dim>>(in_path, seed);
+      w = std::make_unique<pivot::walk_tree<Dim, Simd>>(in_path, seed);
     }
   }
   std::cerr << "Initialized walk with " << num_steps << " steps\n";
 
-  std::vector<pivot::point<Dim>> endpoints;
+  std::vector<pivot::point<Dim, Simd>> endpoints;
   if (require_success) {
     endpoints.reserve(iters);
   }
