@@ -28,6 +28,12 @@ transform<2, true>::transform(const point<2, true> &p, const point<2, true> &q) 
   perm_ = insert_epi32(perm_, 0, idx);
   signs_ = insert_epi32(signs_, -diff[idx], 0);
   signs_ = insert_epi32(signs_, diff[idx], idx);
+
+  // TODO: clean this up
+  perm_ = insert_epi32(perm_, idx + 2, 2);
+  perm_ = insert_epi32(perm_, 2, idx + 2);
+  signs_ = insert_epi32(signs_, -diff[idx], 2);
+  signs_ = insert_epi32(signs_, diff[idx], idx + 2);
 }
 
 transform<2, true> transform<2, true>::rand() {
