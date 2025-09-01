@@ -7,16 +7,16 @@
 
 using namespace pivot;
 
-template <int Dim>
-std::vector<pivot::point<Dim>> random_walk(int num_sites) {
+template <int Dim, bool Simd = false>
+std::vector<pivot::point<Dim, Simd>> random_walk(int num_sites) {
     static std::random_device rd;
     static std::mt19937 gen(rd());
     static std::uniform_int_distribution<> dist(0, Dim - 1);
 
-    std::vector<pivot::point<Dim>> steps;
-    steps.push_back(pivot::point<Dim>::unit(0));
+    std::vector<pivot::point<Dim, Simd>> steps;
+    steps.push_back(pivot::point<Dim, Simd>::unit(0));
     for (int i = 1; i < num_sites; ++i) {
-        steps.push_back(steps.back() + pivot::point<Dim>::unit(dist(gen)));
+        steps.push_back(steps.back() + pivot::point<Dim, Simd>::unit(dist(gen)));
     }
     return steps;
 }
