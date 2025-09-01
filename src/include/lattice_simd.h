@@ -134,6 +134,7 @@ public:
       signs[i] = 2 * flip_(gen) - 1;
     }
     std::shuffle(perm.begin(), perm.end(), gen);
+
     return transform(perm, signs);
   }
 
