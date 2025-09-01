@@ -5,6 +5,7 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 #include "defines.h"
+#include "lattice_simd.h"
 #include "utils.h"
 #include "walk_node.h"
 #include "walk_tree.h"

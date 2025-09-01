@@ -96,6 +96,11 @@ template <> struct box<2, true> : boost::additive<box<2, true>, point<2, true>> 
 
   __m128i data() const { return data_; }
 
+  std::array<interval, 2> intervals() const {
+    return {interval{static_cast<int>(extract_epi32(data_, 0)), static_cast<int>(extract_epi32(data_, 2))},
+            interval{static_cast<int>(extract_epi32(data_, 1)), static_cast<int>(extract_epi32(data_, 3))}};
+  }
+
   bool operator==(const box &b) const;
 
   bool operator!=(const box &b) const;

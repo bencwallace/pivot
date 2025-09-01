@@ -2,6 +2,7 @@
 
 #include <boost/preprocessor/repeat_from_to.hpp>
 
+#include "lattice_simd.h"
 #include "loop.h"
 
 #define CASE_MACRO(z, n, data)                                                                                         \
