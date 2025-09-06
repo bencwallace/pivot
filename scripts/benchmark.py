@@ -54,7 +54,7 @@ def analyze(dim):
     plt.title(f"Dimension {dim}")
     plt.xlabel("Number of steps")
     plt.ylabel("Microseconds per pivot attempt")
-    plt.xscale("log")
+    plt.xscale("log", base=2)
     plt.savefig(Path(__file__).parent / "benchmark" / f"dim_{dim}" / "times.png")
     plt.show()
 
