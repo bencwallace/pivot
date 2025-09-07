@@ -14,7 +14,7 @@ DEFAULT_PIVOT_PATH = Path(__file__).parent.parent / "build" / "pivot"
 pivot_path = os.getenv("PIVOT_PATH", DEFAULT_PIVOT_PATH)
 
 
-def warmup(dim: int):
+def warmup(dim: int, seed: int | None = None):
     print(f"Running warmup for dimension {dim}")
     for steps in STEPS:
         warm_up_iters = WARM_UP_FACTOR * steps
@@ -23,18 +23,23 @@ def warmup(dim: int):
         out_dir = Path(__file__).parent / "benchmark" / f"dim_{dim}" / f"warmup_{steps}"
         out_dir.mkdir(parents=True, exist_ok=True)
 
-        os.system(f"{pivot_path} -d {dim} -s {steps} -i {warm_up_iters} --out {out_dir}")
+        cmd = f"{pivot_path} -d {dim} -s {steps} -i {warm_up_iters} --out {out_dir} "
+        if seed is not None:
+            cmd += f"--seed {seed}"
+        os.system(cmd)
         print(f"Checkpoint saved to {out_dir}/walk.csv")
 
 
-def benchmark(dim: int, slow: bool):
+def benchmark(dim: int, slow: bool, seed: int | None = None):
     print(f"Running benchmark for dimension {dim}")
     times = {}
     for steps in STEPS:
         print(f"Running benchmark with {steps} steps for {BENCH_ITERS} iterations")
 
         in_dir = Path(__file__).parent / "benchmark" / f"dim_{dim}" / f"warmup_{steps}/walk.csv"
-        cmd = f"{pivot_path} -d {dim} -s {steps} -i {BENCH_ITERS} --in {in_dir} --{'slow' if slow else 'fast'}"
+        cmd = f"{pivot_path} -d {dim} -s {steps} -i {BENCH_ITERS} --in {in_dir} --{'slow' if slow else 'fast'} "
+        if seed is not None:
+            cmd += f"--seed {seed}"
         proc = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
         proc.stderr.readline()
         start = time.time()
@@ -68,16 +73,18 @@ if __name__ == "__main__":
     subparsers = parser.add_subparsers(dest="command")
 
     warmup_parser = subparsers.add_parser("warmup")
+    warmup_parser.add_argument("--seed", default=None)
 
     benchmark_parser = subparsers.add_parser("benchmark")
     benchmark_parser.add_argument("--slow", default=False, action="store_true")
+    benchmark_parser.add_argument("--seed", default=None)
 
     analyze_parser = subparsers.add_parser("analyze")
 
     args = parser.parse_args()
     if args.command == "warmup":
-        warmup(args.dim)
+        warmup(args.dim, args.seed)
     elif args.command == "benchmark":
-        benchmark(args.dim, args.slow)
+        benchmark(args.dim, args.slow, args.seed)
     elif args.command == "analyze":
         analyze(args.dim)
