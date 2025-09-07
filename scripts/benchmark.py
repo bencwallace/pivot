@@ -2,6 +2,7 @@ import argparse
 import json
 import matplotlib.pyplot as plt
 import os
+import subprocess
 import time
 from pathlib import Path
 
@@ -33,9 +34,11 @@ def benchmark(dim: int, slow: bool):
         print(f"Running benchmark with {steps} steps for {BENCH_ITERS} iterations")
 
         in_dir = Path(__file__).parent / "benchmark" / f"dim_{dim}" / f"warmup_{steps}/walk.csv"
-        start = time.time()
         cmd = f"{pivot_path} -d {dim} -s {steps} -i {BENCH_ITERS} --in {in_dir} --{'slow' if slow else 'fast'}"
-        os.system(cmd)
+        proc = subprocess.Popen(cmd, shell=True, stderr=subprocess.PIPE)
+        proc.stderr.readline()
+        start = time.time()
+        proc.wait()
         stop = time.time()
         times[steps] = 1_000_000 * (stop - start) / BENCH_ITERS
         print(f"Time per pivot attempt: {times[steps]:.2f} µs")

@@ -23,6 +23,7 @@ int main_loop(int num_steps, int iters, bool naive, bool fast, int seed, bool re
       w = std::make_unique<pivot::walk_tree<Dim>>(in_path, seed);
     }
   }
+  std::cerr << "Initialized walk with " << num_steps << " steps\n";
 
   std::vector<pivot::point<Dim>> endpoints;
   if (require_success) {
