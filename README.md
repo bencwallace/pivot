@@ -1,3 +1,6 @@
+> [!NOTE]
+> For an even more optimized implementation of the pivot algorithm in 2D, see [pivot-simd](https://github.com/bencwallace/pivot-simd).
+
 # pivot
 
 A fast implementation of the pivot algorithm for sampling the
