@@ -8,7 +8,7 @@ from pathlib import Path
 
 WARM_UP_FACTOR = 20
 BENCH_ITERS = 1_000_000
-STEPS = [2 ** i - 1 for i in range(2, 20)]
+STEPS = [2 ** i - 1 for i in range(2, 23)]
 
 DEFAULT_PIVOT_PATH = Path(__file__).parent.parent / "build" / "pivot"
 pivot_path = os.getenv("PIVOT_PATH", DEFAULT_PIVOT_PATH)
