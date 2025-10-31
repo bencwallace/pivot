@@ -96,14 +96,15 @@ For usage instructions, run the following command (assuming the `pivot` executab
 ## Benchmarks
 
 A simple [benchmark script](./scripts/benchmark.py) in Python (requires matplotlib) is included.
-Semi-log plots of running times per pivot attempt (after a warm up period) in dimensions 2 and 3 are provided below.
+Semi-log plots of running times per pivot attempt (after a warm up period) in dimensions 2 and 3 are provided below
+for both fast and slow versions of the (tree-based) algorithm.
 Both plots reflect the results of benchmarking on an Apple Silicon M1 Pro CPU. Random seed 42 was used.
 
 | | |
 |-|-|
 |![](assets/bench_d2.png)|![](assets/bench_d3.png)|
 
-The raw data for these plots can be found in [times2.json](bench/times2.json) and [times3.json](bench/times3.json).
+The raw data for these plots can be found in the `bench/` directory (file names `times_{2,3}_{fast,slow}.json`).
 
 ## Examples
 
