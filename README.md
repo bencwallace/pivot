@@ -1,9 +1,6 @@
-> [!NOTE]
-> For an even more optimized implementation of the pivot algorithm in 2D, see [pivot-simd](https://github.com/bencwallace/pivot-simd).
-
 # pivot
 
-A fast implementation of the pivot algorithm for sampling the
+A fast, SIMD-accelerated implementation of the pivot algorithm for sampling the
 [self-avoiding walk](https://en.wikipedia.org/wiki/Self-avoiding_walk).
 
 1. [Description](#description)
@@ -30,7 +27,8 @@ rigid transformations applied at random points of a walk, thereby pivoting one e
 In a [2010 paper](#1), [Nathan Clisby](https://clisby.net) introduced the
 *saw-tree* data structure, enabling a massive performance improvement to this algorithm.
 
-This repository provides an implementation of the saw-tree pivot algorithm.
+This repository provides an implementation of the saw-tree pivot algorithm,
+as well as a SIMD-optimized variant of the algorithm in 2 dimensions.
 
 ## Download
 
@@ -60,6 +58,17 @@ Some recommended [CMake presets](CMakePresets.json) are included. For instance, 
 
 ```
 cmake --preset release
+cmake --build --preset release -j
+```
+
+**SIMD optimizations**
+
+By default, the SIMD-optimized variant of the algorithm is enabled in the build (though it can be deselected at runtime).
+The build will fail if your compiler does not support the required instruction set (AVX2).
+To disable the SIMD build, add the `-DENABLE_AVX2=OFF` option to the CMake configuration step as follows:
+
+```
+cmake --preset release -DENABLE_AVX2=OFF
 cmake --build --preset release -j
 ```
 
@@ -96,15 +105,29 @@ For usage instructions, run the following command (assuming the `pivot` executab
 ## Benchmarks
 
 A simple [benchmark script](./scripts/benchmark.py) in Python (requires matplotlib) is included.
-Semi-log plots of running times per pivot attempt (after a warm up period) in dimensions 2 and 3 are provided below
-for both fast and slow versions of the (tree-based) algorithm.
-Both plots reflect the results of benchmarking on an Apple Silicon M1 Pro CPU. Random seed 42 was used.
+Semi-log plots of running times per pivot attempt (after a warm up period) have been included below.
+Random seed 42 was used in all cases.
+The raw data for these plots can be found in the `bench/` directory.
+
+**Fast and slow variants**
+
+The plots below compare fast and slow versions of the (tree-based) algorithm running on an Apple Silicon M1 Pro CPU.
 
 | | |
 |-|-|
 |![](assets/bench_d2.png)|![](assets/bench_d3.png)|
 
-The raw data for these plots can be found in the `bench/` directory (file names `times_{2,3}_{fast,slow}.json`).
+**SIMD-optimized fast variant**
+
+The plot below compares the fast variant of the algorithm with and without SIMD optimizations in dimension 2
+(the only dimension for which these optimizations have been implemented).
+For these benchmarks a PC was used with specifications available in [bench/specs_pc.txt](bench/specs_pc.txt).
+
+![](assets/bench_simd.png)
+
+<!-- | | |
+|-|-|
+|![](assets/bench_d2_pc.png)|![](assets/bench_simd.png)| -->
 
 ## Examples
 
