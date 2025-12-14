@@ -3,12 +3,18 @@
 #include <gtest/gtest.h>
 
 #include "lattice.h"
+
+#ifdef ENABLE_AVX2
 #include "lattice_simd.h"
+constexpr bool simd_enabled = true;
+#else
+constexpr bool simd_enabled = false;
+#endif
 
 using namespace pivot;
 
 TEST(PointTest, ToString) {
-    auto p = point<2, true>({1, 2});
+    auto p = point<2, simd_enabled>({1, 2});
     EXPECT_EQ(p.to_string(), "(1, 2)");
     auto q = point<1>({3});
     EXPECT_EQ(q.to_string(), "(3,)");
@@ -45,28 +51,28 @@ TEST(BoxTest, FromSpan1D) {
 }
 
 TEST(BoxTest, FromSpan2D) {
-    auto p1 = point<2, true>({1, 2});
-    auto b1 = box<2, true>(std::array{p1});
+    auto p1 = point<2, simd_enabled>({1, 2});
+    auto b1 = box<2, simd_enabled>(std::array{p1});
     EXPECT_EQ(b1.intervals()[0].left_, 1);
     EXPECT_EQ(b1.intervals()[0].right_, 1);
     EXPECT_EQ(b1.intervals()[1].left_, 0);
     EXPECT_EQ(b1.intervals()[1].right_, 0);
 
-    auto p2 = point<2, true>({5, 5});
-    auto b2 = box<2, true>(std::array{p1, p2});
+    auto p2 = point<2, simd_enabled>({5, 5});
+    auto b2 = box<2, simd_enabled>(std::array{p1, p2});
     EXPECT_EQ(b2.intervals()[0].left_, 1);
     EXPECT_EQ(b2.intervals()[0].right_, 5);
     EXPECT_EQ(b2.intervals()[1].left_, 0);
     EXPECT_EQ(b2.intervals()[1].right_, 3);
 
-    auto b3 = box<2, true>(std::array{p2, p1});
+    auto b3 = box<2, simd_enabled>(std::array{p2, p1});
     EXPECT_EQ(b3.intervals()[0].left_, -3);
     EXPECT_EQ(b3.intervals()[0].right_, 1);
     EXPECT_EQ(b3.intervals()[1].left_, -3);
     EXPECT_EQ(b3.intervals()[1].right_, 0);
 
-    auto p3 = point<2, true>({3, 4});
-    auto b4 = box<2, true>(std::array{p1, p2, p3});
+    auto p3 = point<2, simd_enabled>({3, 4});
+    auto b4 = box<2, simd_enabled>(std::array{p1, p2, p3});
     EXPECT_EQ(b4.intervals()[0].left_, 1);
     EXPECT_EQ(b4.intervals()[0].right_, 5);
     EXPECT_EQ(b4.intervals()[1].left_, 0);
@@ -92,15 +98,15 @@ TEST(BoxTest, Union1D) {
 }
 
 TEST(BoxTest, Union2D) {
-    box<2, true> b1({interval{-1, 1}, interval{0, 1}});
-    box<2, true> b2({interval{0, 2}, interval{0, 2}});
+    box<2, simd_enabled> b1({interval{-1, 1}, interval{0, 1}});
+    box<2, simd_enabled> b2({interval{0, 2}, interval{0, 2}});
     auto b3 = b1 | b2;
     EXPECT_EQ(b3.intervals()[0].left_, -1);
     EXPECT_EQ(b3.intervals()[0].right_, 2);
     EXPECT_EQ(b3.intervals()[1].left_, 0);
     EXPECT_EQ(b3.intervals()[1].right_, 2);
 
-    box<2, true> b4({interval{2, 3}, interval{1, 2}});
+    box<2, simd_enabled> b4({interval{2, 3}, interval{1, 2}});
     auto b5 = b1 | b4;
     EXPECT_EQ(b5.intervals()[0].left_, -1);
     EXPECT_EQ(b5.intervals()[0].right_, 3);
@@ -126,15 +132,15 @@ TEST(BoxTest, Intersection1D) {
 }
 
 TEST(BoxTest, Intersection2D) {
-    box<2, true> b1({interval{-1, 1}, interval{0, 1}});
-    box<2, true> b2({interval{0, 2}, interval{0, 2}});
+    box<2, simd_enabled> b1({interval{-1, 1}, interval{0, 1}});
+    box<2, simd_enabled> b2({interval{0, 2}, interval{0, 2}});
     auto b3 = b1 & b2;
     EXPECT_EQ(b3.intervals()[0].left_, 0);
     EXPECT_EQ(b3.intervals()[0].right_, 1);
     EXPECT_EQ(b3.intervals()[1].left_, 0);
     EXPECT_EQ(b3.intervals()[1].right_, 1);
 
-    box<2, true> b4({interval{2, 3}, interval{1, 2}});
+    box<2, simd_enabled> b4({interval{2, 3}, interval{1, 2}});
     auto b5 = b1 & b4;
     EXPECT_TRUE(b5.empty());
 }
@@ -143,19 +149,19 @@ TEST(BoxTest, ToString) {
     box<1> b1({interval{-1, 1}});
     EXPECT_EQ(b1.to_string(), "[-1, 1]");
 
-    box<2, true> b2({interval{-1, 1}, interval{0, 1}});
+    box<2, simd_enabled> b2({interval{-1, 1}, interval{0, 1}});
     EXPECT_EQ(b2.to_string(), "[-1, 1] x [0, 1]");
 }
 
 TEST(TransformTest, Pivot2D) {
-    auto e0 = point<2, true>::unit(0);
+    auto e0 = point<2, simd_enabled>::unit(0);
 
-    point<2, true> p1({3, 4});
-    point<2, true> p2({4, 4});
+    point<2, simd_enabled> p1({3, 4});
+    point<2, simd_enabled> p2({4, 4});
     transform t1(p1, p2);
     EXPECT_EQ(p1 + t1 * e0, p2);
 
-    point<2, true> p3({3, 5});
+    point<2, simd_enabled> p3({3, 5});
     transform t2(p1, p3);
     EXPECT_EQ(p1 + t2 * e0, p3);
 }
@@ -174,10 +180,10 @@ TEST(TransformTest, Pivot3D) {
 }
 
 TEST(TransformTest, Compose2D) {
-    auto t1 = transform<2, true>::rand();
-    auto t2 = transform<2, true>::rand();
+    auto t1 = transform<2, simd_enabled>::rand();
+    auto t2 = transform<2, simd_enabled>::rand();
     auto t3 = t1 * t2;
-    auto p = point<2, true>({1, 2});
+    auto p = point<2, simd_enabled>({1, 2});
     EXPECT_EQ(t3 * p, t1 * (t2 * p)) << "t1: " << t1.to_string() << ", t2: " << t2.to_string();
 }
 
@@ -190,16 +196,16 @@ TEST(TransformTest, Compose3D) {
 }
 
 TEST(TransformTest, Box2D) {
-    box<2, true> b({interval{1, 5}, interval{2, 4}});
+    box<2, simd_enabled> b({interval{1, 5}, interval{2, 4}});
 
-    point<2, true> p1({0, 0});
-    point<2, true> p2({0, 1});
-    transform<2, true> t1(p1, p2);
-    auto result1 = box<2, true>({interval{-4, -2}, interval{1, 5}});
+    point<2, simd_enabled> p1({0, 0});
+    point<2, simd_enabled> p2({0, 1});
+    transform<2, simd_enabled> t1(p1, p2);
+    auto result1 = box<2, simd_enabled>({interval{-4, -2}, interval{1, 5}});
     EXPECT_EQ(t1 * b, result1);
 
-    transform<2, true> t2({0, 1}, {-1, 1});
-    auto result2 = box<2, true>({interval{-5, -1}, interval{2, 4}});
+    transform<2, simd_enabled> t2({0, 1}, {-1, 1});
+    auto result2 = box<2, simd_enabled>({interval{-5, -1}, interval{2, 4}});
     EXPECT_EQ(t2 * b, result2);
 }
 
@@ -219,15 +225,15 @@ TEST(TransformTest, Box3D) {
 }
 
 TEST(TransformTest, Inverse2D) {
-    transform<2, true> id({0, 1}, {1, 1});
-    auto o = point<2, true>({0, 0});
-    auto e1 = point<2, true>({1, 0});
-    auto e2 = point<2, true>({0, 1});
+    transform<2, simd_enabled> id({0, 1}, {1, 1});
+    auto o = point<2, simd_enabled>({0, 0});
+    auto e1 = point<2, simd_enabled>({1, 0});
+    auto e2 = point<2, simd_enabled>({0, 1});
     ASSERT_EQ(e1, id * e1);
     ASSERT_EQ(e2, id * e2);
 
-    transform<2, true> t({1, 0}, {-1, 1});
-    transform<2, true> t_inv = t.inverse();
+    transform<2, simd_enabled> t({1, 0}, {-1, 1});
+    transform<2, simd_enabled> t_inv = t.inverse();
     auto f1 = t * e1;
     auto f2 = t * e2;
     ASSERT_EQ(f1, e2);

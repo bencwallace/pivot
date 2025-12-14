@@ -128,6 +128,8 @@ point<Dim, Simd> walk<Dim, Simd>::pivot_point(int step, int i, const transform<D
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_INST, ~)
 
+#ifdef ENABLE_AVX2
 template class walk<2, true>;
+#endif
 
 } // namespace pivot
