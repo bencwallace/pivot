@@ -36,7 +36,15 @@ def warmup(dim: int, max_power: int, seed: int | None = None):
         print(f"Checkpoint saved to {out_dir}/walk.csv")
 
 
-def benchmark(dim: int, slow: bool, max_power: int, naive: bool = False, simd: bool = False, seed: int | None = None):
+def benchmark(
+        dim: int,
+        out: str,
+        slow: bool,
+        max_power: int,
+        naive: bool = False,
+        simd: bool = False,
+        seed: int | None = None,
+    ):
     if naive:
         slow = True
     print(f"Running benchmark for dimension {dim}")
@@ -70,23 +78,27 @@ def benchmark(dim: int, slow: bool, max_power: int, naive: bool = False, simd: b
         times[steps] = 1_000_000 * (stop - start) / BENCH_ITERS
         print(f"Time per pivot attempt: {times[steps]:.2f} µs")
 
-    out_path = Path(__file__).parent / "benchmark" / f"dim_{dim}" / "times.json"
-    with open(out_path, "w") as f:
+    Path(out).parent.mkdir(parents=True, exist_ok=True)
+    with open(out, "w") as f:
         json.dump(times, f)
-    print(f"Times saved to {out_path}")
+    print(f"Times saved to {out}")
 
-def analyze(dim):
-    with open(Path(__file__).parent / "benchmark" / f"dim_{dim}" / "times.json", "r") as f:
-        times = json.load(f)
-    times = {int(k): v for k, v in times.items()}
+def analyze(dim, out, **kwargs):
+    times = {}
+    for name, path in kwargs.items():
+        with open(path) as f:
+            data = json.load(f)
+        times[name] = {int(k): v for k, v in data.items()}
 
-    steps_list = sorted(times.keys())
-    plt.plot(steps_list, [times[steps] for steps in steps_list], marker="o")
+    for name, data in times.items():
+        steps_list = sorted(data.keys())
+        plt.plot(steps_list, [data[steps] for steps in steps_list], marker="o", label=name)
     plt.title(f"Dimension {dim}")
     plt.xlabel("Number of steps")
     plt.ylabel("Microseconds per pivot attempt")
     plt.xscale("log", base=2)
-    plt.savefig(Path(__file__).parent / "benchmark" / f"dim_{dim}" / "times.png")
+    plt.legend()
+    plt.savefig(out)
     plt.show()
 
 
@@ -100,17 +112,32 @@ if __name__ == "__main__":
     warmup_parser.add_argument("--seed", default=None)
 
     benchmark_parser = subparsers.add_parser("benchmark")
+    benchmark_parser.add_argument("--out", default="times.json")
     benchmark_parser.add_argument("--simd", default=False, action="store_true")
     benchmark_parser.add_argument("--slow", default=False, action="store_true")
     benchmark_parser.add_argument("--seed", default=None)
     benchmark_parser.add_argument("--naive", default=False, action="store_true")
 
     analyze_parser = subparsers.add_parser("analyze")
+    analyze_parser.add_argument("--out", default="benchmark.png")
 
-    args = parser.parse_args()
+    args, extra = parser.parse_known_args()
     if args.command == "warmup":
+        if extra:
+            raise ValueError(f"Unrecognized arguments for warmup: {extra}")
         warmup(args.dim, args.max_power, args.seed)
     elif args.command == "benchmark":
-        benchmark(args.dim, args.slow, args.max_power, naive=args.naive, simd=args.simd, seed=args.seed)
+        if extra:
+            raise ValueError(f"Unrecognized arguments for benchmark: {extra}")
+        benchmark(args.dim, args.out, args.slow, args.max_power, naive=args.naive, simd=args.simd, seed=args.seed)
     elif args.command == "analyze":
-        analyze(args.dim)
+        extra_dict = {}
+        for i in range(0, len(extra), 2):
+            key = extra[i]
+            if i % 2 == 0:
+                if not key.startswith("--"):
+                    raise ValueError(f"Expected argument name starting with '--', got '{key}'")
+                key = key.lstrip("--")
+                value = extra[i + 1]
+                extra_dict[key] = value
+        analyze(args.dim, args.out, **extra_dict)
