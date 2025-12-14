@@ -1,12 +1,15 @@
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
 #include "box.hpp"
-#include "box_simd.hpp"
 #include "lattice.h"
 #include "point.hpp"
-#include "point_simd.hpp"
 #include "transform.hpp"
+
+#ifdef ENABLE_AVX2
+#include "box_simd.hpp"
+#include "point_simd.hpp"
 #include "transform_simd.hpp"
+#endif
 
 namespace pivot {
 
@@ -21,6 +24,8 @@ BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, POINT_HASH_CALL_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TRANSFORM_INST, ~)
 
+#ifdef ENABLE_AVX2
 template std::size_t point_hash::operator()<2>(const point<2, true> &p) const;
+#endif
 
 } // namespace pivot

@@ -24,6 +24,8 @@ std::string interval::to_string() const {
   return result;
 }
 
+template <int Dim, bool Simd> std::array<interval, Dim> box<Dim, Simd>::intervals() const { return intervals_; }
+
 template <int Dim, bool Simd> box<Dim, Simd> &box<Dim, Simd>::operator+=(const point<Dim, Simd> &p) {
   for (int i = 0; i < Dim; ++i) {
     intervals_[i].left_ += p[i];

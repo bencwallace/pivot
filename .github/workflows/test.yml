@@ -97,7 +97,7 @@ jobs:
             cmake --build ${{github.workspace}}/graphviz/build --target install -j
 
       - name: Configure CMake
-        run: cmake --preset release -DGRAPHVIZ_INCLUDE_PATH=~/.local/include/graphviz
+        run: cmake --preset release -DGRAPHVIZ_INCLUDE_PATH=~/.local/include/graphviz -DENABLE_AVX2=OFF
 
       - name: Build
         run: cmake --build --preset release --target test_pivot -j

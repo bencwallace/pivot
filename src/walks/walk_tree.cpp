@@ -4,11 +4,13 @@
 
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
-#include "defines.h"
-#include "lattice_simd.h"
 #include "utils.h"
 #include "walk_node.h"
 #include "walk_tree.h"
+
+#ifdef ENABLE_AVX2
+#include "lattice_simd.h"
+#endif
 
 namespace pivot {
 
@@ -154,6 +156,8 @@ template <int Dim, bool Simd> void walk_tree<Dim, Simd>::todot(const std::string
 // cppcheck-suppress syntaxError
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, WALK_TREE_INST, ~)
 
+#ifdef ENABLE_AVX2
 template class walk_tree<2, true>;
+#endif
 
 } // namespace pivot

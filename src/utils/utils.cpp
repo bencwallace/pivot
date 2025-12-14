@@ -4,8 +4,11 @@
 
 #include <boost/preprocessor/repetition/repeat_from_to.hpp>
 
-#include "lattice_simd.h"
 #include "utils.h"
+
+#ifdef ENABLE_AVX2
+#include "lattice_simd.h"
+#endif
 
 namespace pivot {
 
@@ -59,8 +62,10 @@ BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, TO_CSV_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, FROM_CSV_INST, ~)
 BOOST_PP_REPEAT_FROM_TO(1, DIMS_UB, LINE_INST, ~)
 
+#ifdef ENABLE_AVX2
 template std::vector<point<2, true>> from_csv<2, true>(const std::string &path);
 template void to_csv<2, true>(const std::string &path, const std::vector<point<2, true>> &points);
 template std::vector<point<2, true>> line<2, true>(int num_steps);
+#endif
 
 } // namespace pivot

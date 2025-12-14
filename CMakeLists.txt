@@ -49,9 +49,19 @@ endif()
 target_compile_options(pivot
   PUBLIC
     -Wall -Wextra -Werror -Wpedantic
-    -mavx2
     $<$<CONFIG:Debug>:-O0 -g>
 )
+option(ENABLE_AVX2 "Enable AVX2" ON)
+if (ENABLE_AVX2)
+  target_compile_options(pivot
+    PUBLIC
+      -mavx2
+  )
+  target_compile_definitions(pivot
+    PUBLIC
+      ENABLE_AVX2
+  )
+endif()
 target_compile_definitions(pivot
   PUBLIC
     $<$<CONFIG:Debug>:_GLIBCXX_DEBUG>

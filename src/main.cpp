@@ -2,8 +2,11 @@
 
 #include <boost/preprocessor/repeat_from_to.hpp>
 
-#include "lattice_simd.h"
 #include "loop.h"
+
+#ifdef ENABLE_AVX2
+#include "lattice_simd.h"
+#endif
 
 #define CASE_MACRO(z, n, data)                                                                                         \
   case n:                                                                                                              \
@@ -57,10 +60,15 @@ int main(int argc, char **argv) {
       return 1;
     }
   } else {
+#ifdef ENABLE_AVX2
     if (dim != 2) {
       std::cerr << "SIMD only supported for 2D\n";
       return 1;
     }
     return main_loop<2, true>(num_steps, iters, naive, fast, seed, require_success, verify, in_path, out_dir);
+#else
+    std::cerr << "SIMD not enabled in this build\n";
+    return 1;
+#endif
   }
 }

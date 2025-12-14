@@ -96,6 +96,8 @@ template <int Dim, bool Simd = false> struct box : boost::additive<box<Dim, Simd
    */
   box(std::span<const point<Dim, Simd>> points);
 
+  std::array<interval, Dim> intervals() const;
+
   bool operator==(const box &b) const;
 
   bool operator!=(const box &b) const;
