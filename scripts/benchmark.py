@@ -28,13 +28,15 @@ def warmup(dim: int, max_power: int, seed: int | None = None):
         out_dir.mkdir(parents=True, exist_ok=True)
 
         cmd = f"{pivot_path} -d {dim} -s {steps} -i {warm_up_iters} --out {out_dir} "
+        if dim == 2:
+            cmd += "--simd "
         if seed is not None:
             cmd += f"--seed {seed}"
         os.system(cmd)
         print(f"Checkpoint saved to {out_dir}/walk.csv")
 
 
-def benchmark(dim: int, slow: bool, max_power: int, naive: bool = False, seed: int | None = None):
+def benchmark(dim: int, slow: bool, max_power: int, naive: bool = False, simd: bool = False, seed: int | None = None):
     if naive:
         slow = True
     print(f"Running benchmark for dimension {dim}")
@@ -52,6 +54,7 @@ def benchmark(dim: int, slow: bool, max_power: int, naive: bool = False, seed: i
             f"--in {in_dir} "
             f"--{'slow' if slow else 'fast'} "
             f"{'--naive' if naive else ''} "
+            f"{'--simd' if simd else ''} "
         )
         if seed is not None:
             cmd += f"--seed {seed}"
@@ -97,6 +100,7 @@ if __name__ == "__main__":
     warmup_parser.add_argument("--seed", default=None)
 
     benchmark_parser = subparsers.add_parser("benchmark")
+    benchmark_parser.add_argument("--simd", default=False, action="store_true")
     benchmark_parser.add_argument("--slow", default=False, action="store_true")
     benchmark_parser.add_argument("--seed", default=None)
     benchmark_parser.add_argument("--naive", default=False, action="store_true")
@@ -107,6 +111,6 @@ if __name__ == "__main__":
     if args.command == "warmup":
         warmup(args.dim, args.max_power, args.seed)
     elif args.command == "benchmark":
-        benchmark(args.dim, args.slow, args.max_power, naive=args.naive, seed=args.seed)
+        benchmark(args.dim, args.slow, args.max_power, naive=args.naive, simd=args.simd, seed=args.seed)
     elif args.command == "analyze":
         analyze(args.dim)
