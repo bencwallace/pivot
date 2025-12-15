@@ -129,7 +129,7 @@ template <int Dim, bool Simd = false> struct box : boost::additive<box<Dim, Simd
   std::string to_string() const;
 };
 
-template <typename S, typename T, S Dim, T N> box(std::array<point<Dim>, N>) -> box<Dim, false>;
+template <typename S, typename T, S Dim, T N, bool Simd> box(std::array<point<Dim, Simd>, N>) -> box<Dim, Simd>;
 
 struct point_hash {
   int num_steps_;
