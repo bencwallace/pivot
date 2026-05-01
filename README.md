@@ -63,9 +63,7 @@ cmake --build --preset release -j
 
 **SIMD optimizations**
 
-By default, the SIMD-optimized variant of the algorithm is enabled in the build (though it can be deselected at runtime).
-The build will fail if your compiler does not support the required instruction set (AVX2).
-To disable the SIMD build, add the `-DENABLE_AVX2=OFF` option to the CMake configuration step as follows:
+By default, the build uses AVX2 and will fail if your compiler is targeting a non-x86 ISA. To disable the SIMD build, add the `-DENABLE_AVX2=OFF` option to the CMake configuration step as follows:
 
 ```
 cmake --preset release -DENABLE_AVX2=OFF
